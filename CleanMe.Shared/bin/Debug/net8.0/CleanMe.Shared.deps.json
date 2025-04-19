@@ -1,0 +1,39 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v8.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v8.0": {
+      "CleanMe.Shared/1.0.0": {
+        "dependencies": {
+          "CleanMe.Domain": "1.0.0"
+        },
+        "runtime": {
+          "CleanMe.Shared.dll": {}
+        }
+      },
+      "CleanMe.Domain/1.0.0": {
+        "runtime": {
+          "CleanMe.Domain.dll": {
+            "assemblyVersion": "1.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "CleanMe.Shared/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "CleanMe.Domain/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
