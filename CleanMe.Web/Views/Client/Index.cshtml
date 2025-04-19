@@ -1,0 +1,107 @@
+﻿@using CleanMe.Web.Helpers
+@model IEnumerable<CleanMe.Application.ViewModels.ClientIndexViewModel>
+
+@{
+    ViewData["Title"] = "Client List";
+    string sortOrder = ViewBag.SortOrder as string ?? "ASC";
+    string sortColumn = ViewBag.SortColumn as string ?? "Name";
+}
+
+<h2>Client List</h2>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<!-- Add Button (Top-Right) -->
+<div class="text-end mb-3">
+    <a asp-action="AddEdit" class="btn btn-primary">Add Client</a>
+</div>
+
+<!-- Filtering Form -->
+<form method="get" id="filterForm">
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <!-- Column Headers with Sorting -->
+                <tr>
+                    <th>
+                        <a href="#" onclick="sortTable('Name')">
+                            Name @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "Name"))
+                        </a>
+                    </th>
+                    <th>
+                        <a href="#" onclick="sortTable('Brand')">
+                            Brand @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "Brand"))
+                        </a>
+                    </th>
+                    <th>
+                        <a href="#" onclick="sortTable('AccNo')">
+                            Acc No @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "AccNo"))
+                        </a>
+                    </th>
+                    <th>
+                        <a href="#" onclick="sortTable('IsActive')">
+                            Active @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "IsActive"))
+                        </a>
+                    </th>
+                    <th>Actions</th>
+                </tr>
+
+                <!-- Filter Row -->
+                <tr>
+                    <td><input type="text" name="name" class="form-control" value="@ViewBag.Name" placeholder="Search Client Name"></td>
+                    <td><input type="text" name="brand" class="form-control" value="@ViewBag.Brand" placeholder="Search Brand"></td>
+                    <td><input type="text" name="accNo" class="form-control" value="@ViewBag.AccNo" placeholder="Search Acc No"></td>
+                    <td>
+                        <select name="isActive" class="form-control">
+                            <option value="">All</option>
+                            <option value="1" selected="@(ViewBag.IsActive == "1" ? "selected" : null)">Active</option>
+                            <option value="0" selected="@(ViewBag.IsActive == "0" ? "selected" : null)">Inactive</option>
+                        </select>
+                    </td>
+                    <td>
+                        <button type="submit" class="btn btn-success">Filter</button>
+                        <a href="@Url.Action("Index", "Client")" class="btn btn-secondary">Clear</a>
+                    </td>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var Client in Model)
+                {
+                    <tr>
+                        <td>@Client.Name</td>
+                        <td>@Client.Brand</td>
+                        <td>@Client.AccNo</td>
+                        <td>@(Client.IsActive ? "Yes" : "No")</td>
+                        <td>
+                            <a asp-action="AddEdit" asp-route-clientId="@Client.clientId" class="btn btn-warning btn-sm">Edit</a>
+                            <a asp-action="Delete" asp-route-clientId="@Client.clientId" class="btn btn-danger btn-sm">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</form>
+
+<!-- JavaScript for Sorting -->
+<script>
+    function sortTable(column) {
+        let sortColumn = new URLSearchParams(window.location.search).get("sortColumn");
+        let sortOrder = new URLSearchParams(window.location.search).get("sortOrder") === "ASC" ? "DESC" : "ASC";
+        let params = new URLSearchParams(window.location.search);
+        params.set("sortColumn", column);
+        params.set("sortOrder", sortOrder);
+        window.location.search = params.toString();
+    }
+</script>

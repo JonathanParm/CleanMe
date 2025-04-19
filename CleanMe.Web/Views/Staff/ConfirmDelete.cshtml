@@ -1,0 +1,40 @@
+﻿@model CleanMe.Application.ViewModels.StaffViewModel
+
+@{
+    ViewData["Title"] = "Confirm Delete";
+}
+
+<h2>Delete Staff Member</h2>
+
+<div class="alert alert-warning">
+    Are you sure you want to delete this staff member?
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Staff No:</label>
+    <p class="form-control-plaintext">@Model.StaffNo</p>
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Full Name:</label>
+    <p class="form-control-plaintext">@Model.Fullname</p>
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Work Role:</label>
+    <p class="form-control-plaintext">@Model.WorkRole</p>
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Contact Detail:</label>
+    <p class="form-control-plaintext">@Model.ContactDetail</p>
+</div>
+
+<!-- Add additional read-only fields if needed -->
+
+<form asp-action="ConfirmDelete" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="StaffId" />
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>

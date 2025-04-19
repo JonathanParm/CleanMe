@@ -1,0 +1,114 @@
+﻿@using CleanMe.Web.Helpers
+@model IEnumerable<CleanMe.Application.ViewModels.AssetLocationIndexViewModel>
+
+@{
+    ViewData["Title"] = "Asset Location List";
+    string sortOrder = ViewBag.SortOrder as string ?? "ASC";
+    string sortColumn = ViewBag.SortColumn as string ?? "SequenceOrder";
+}
+
+<h2>AssetLocation List</h2>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<!-- Add Button (Top-Right) -->
+<!-- <div class="text-end mb-3">
+    <a asp-action="AddEdit" class="btn btn-primary">Add AssetLocation</a>
+</div> -->
+
+<!-- Filtering Form -->
+<form method="get" id="filterForm">
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <!-- Column Headers with Sorting -->
+                <tr>
+                    <th>
+                        <a href="#" onclick="sortTable('AreaName')">
+                            AssetLocation @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "AreaName"))
+                        </a>
+                    </th>
+                    <th>
+                        <a href="#" onclick="sortTable('Name')">
+                            Description @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "Description"))
+                        </a>
+                    </th>
+                    <th>
+                        <a href="#" onclick="sortTable('ReportCode')">
+                            Report Code @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "ReportCode"))
+                        </a>
+                    </th>
+                    <th>
+                        <a href="#" onclick="sortTable('TownSuburb')">
+                            Suburb Town @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "TownSuburb"))
+                        </a>
+                    </th>
+                    <th>
+                        <a href="#" onclick="sortTable('IsActive')">
+                            Active @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "IsActive"))
+                        </a>
+                    </th>
+                    <th>Actions</th>
+                </tr>
+
+                <!-- Filter Row -->
+                <tr>
+                    <td><input type="text" name="areaName" class="form-control" value="@ViewBag.AreaName" placeholder="Search Area Name"></td>
+                    <td><input type="text" name="description" class="form-control" value="@ViewBag.Description" placeholder="Search Asset Location"></td>
+                    <td><input type="text" name="reportCode" class="form-control" value="@ViewBag.ReportCode" placeholder="Search Report Code"></td>
+                    <td><input type="text" name="townSuburb" class="form-control" value="@ViewBag.TownSuburb" placeholder="Search Town, Suburb"></td>
+                    <td>
+                        <select name="isActive" class="form-control">
+                            <option value="">All</option>
+                            <option value="1" selected="@(ViewBag.IsActive == "1" ? "selected" : null)">Active</option>
+                            <option value="0" selected="@(ViewBag.IsActive == "0" ? "selected" : null)">Inactive</option>
+                        </select>
+                    </td>
+                    <td>
+                        <button type="submit" class="btn btn-success">Filter</button>
+                        <a href="@Url.Action("Index", "AssetLocation")" class="btn btn-secondary">Clear</a>
+                    </td>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var AssetLocation in Model)
+                {
+                    <tr>
+                        <td>@AssetLocation.AreaName</td>
+                        <td>@AssetLocation.Description</td>
+                        <td>@AssetLocation.ReportCode</td>
+                        <td>@AssetLocation.TownSuburb</td>
+                        <td>@(AssetLocation.IsActive ? "Yes" : "No")</td>
+                        <td>
+                            <a asp-action="AddEdit" asp-route-assetLocationId="@AssetLocation.assetLocationId" class="btn btn-warning btn-sm">Edit</a>
+                            <a asp-action="Delete" asp-route-assetLocationId="@AssetLocation.assetLocationId" class="btn btn-danger btn-sm">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</form>
+
+<!-- JavaScript for Sorting -->
+<script>
+    function sortTable(column) {
+        let sortColumn = new URLSearchParams(window.location.search).get("sortColumn");
+        let sortOrder = new URLSearchParams(window.location.search).get("sortOrder") === "ASC" ? "DESC" : "ASC";
+        let params = new URLSearchParams(window.location.search);
+        params.set("sortColumn", column);
+        params.set("sortOrder", sortOrder);
+        window.location.search = params.toString();
+    }
+</script>

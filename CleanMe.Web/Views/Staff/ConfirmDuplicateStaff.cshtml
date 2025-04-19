@@ -1,0 +1,44 @@
+﻿@model CleanMe.Application.ViewModels.StaffViewModel
+
+@{
+    ViewData["Title"] = "Duplicate Staff Warning";
+}
+
+<h2>Warning: Duplicate Staff Found</h2>
+
+<p>A staff member with the same name or staff no already exists. What would you like to do?</p>
+
+@if (ViewBag.DuplicateStaff != null && ((IEnumerable<CleanMe.Application.ViewModels.StaffViewModel>)ViewBag.DuplicateStaff).Any())
+{
+    <h4>Matching Staff Records</h4>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Staff No</th>
+                <th>Staff Name</th>
+                <th>Contact detail</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var staff in ViewBag.DuplicateStaff as IEnumerable<CleanMe.Application.ViewModels.StaffViewModel>)
+            {
+                <tr>
+                    <td>@staff.StaffNo</td>
+                    <td>@staff.FirstName @staff.FamilyName</td>
+                    <td>@staff.ContactDetail</td>
+                    <td>
+                        <a asp-action="AddEdit" asp-route-staffId="@staff.StaffId" class="btn btn-primary">Go to Record</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<form asp-action="AddEdit" method="post">
+    <input type="hidden" name="StaffId" value="@Model.StaffId" />
+    <input type="hidden" name="StaffNo" value="@Model.StaffNo" />
+    <button type="submit" class="btn btn-primary">Proceed with New Staff</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>

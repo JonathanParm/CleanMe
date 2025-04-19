@@ -1,0 +1,179 @@
+﻿@using CleanMe.Application.ViewModels
+@using CleanMe.Domain.Enums
+@using CleanMe.Shared.Helpers
+
+@model CleanMe.Application.ViewModels.StaffViewModel
+
+@{
+    ViewData["Title"] = Model.StaffId == 0 ? "Add Staff" : "Edit Staff";
+    var workRoleList = EnumHelper.ToSelectList<WorkRole>(Model.WorkRole);
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form asp-action="AddEdit" method="post" id="staffForm" novalidate>
+    @Html.AntiForgeryToken()
+
+    @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+
+    <input asp-for="StaffId" type="hidden" />
+    <input asp-for="ApplicationUserId" type="hidden" />
+    <input type="hidden" id="ShowPasswordSection" name="ShowPasswordSection" value="@Model.ShowPasswordSection.ToString().ToLower()" />
+
+
+    <div class="form-group">
+        <label asp-for="StaffNo" class="form-label"></label>
+        <input asp-for="StaffNo" class="form-control" id="staffNo" readonly="@(Model.StaffId > 0 ? "readonly" : null)" />
+        <span asp-validation-for="StaffNo" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="FirstName" class="form-label"></label>
+        <input asp-for="FirstName" class="form-control" required />
+        <span asp-validation-for="FirstName" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="FamilyName" class="form-label"></label>
+        <input asp-for="FamilyName" class="form-control" required />
+        <span asp-validation-for="FamilyName" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="PhoneHome" class="form-label"></label>
+        <input asp-for="PhoneHome" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="PhoneMobile" class="form-label"></label>
+        <input asp-for="PhoneMobile" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Email" class="form-label"></label>
+        <input type="email" id="emailInput" name="Email" class="form-control" asp-for="Email" required />
+        <span id="emailStatus" class="text-danger"></span>
+    </div>
+
+    <!-- Address Partial View -->
+    <h3>Address</h3>
+    @Html.EditorFor(model => model.Address, "_AddressPartialView")
+
+    <div class="form-group">
+        <label asp-for="IrdNumber" class="form-label"></label>
+        <input asp-for="IrdNumber" class="form-control" required />
+        <span asp-validation-for="IrdNumber" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="BankAccount" class="form-label"></label>
+        <input asp-for="BankAccount" class="form-control" required />
+        <span asp-validation-for="BankAccount" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="PayrollId" class="form-label"></label>
+        <input asp-for="PayrollId" class="form-control" required />
+        <span asp-validation-for="PayrollId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="JobTitle" class="form-label"></label>
+        <input asp-for="JobTitle" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="WorkRole" class="form-label"></label>
+        @Html.DropDownListFor(m => m.WorkRole, workRoleList, "-- Select Work Role --", new { @class = "form-control" })
+        <span asp-validation-for="WorkRole" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Is Active</label>
+        <select asp-for="IsActive" class="form-control">
+            <option value="true">Active</option>
+            <option value="false">Inactive</option>
+        </select>
+    </div>
+
+    <!-- User Login Section -->
+    <div class="mb-3">
+        <button type="button" id="toggleUserLogin" class="btn btn-info">
+            @(string.IsNullOrWhiteSpace(Model.ApplicationUserId) ? "Create User Login" : "Change Password")
+        </button>
+    </div>
+
+    <div id="passwordSection" style="display:@(Model.ShowPasswordSection ? "block" : "none")">
+        @Html.EditorFor(model => model.ChangePassword, "_ChangePasswordPartialView")
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const toggleButton = document.getElementById("toggleUserLogin");
+            const passwordSection = document.getElementById("passwordSection");
+            const hiddenField = document.getElementById("ShowPasswordSection");
+            const emailInput = document.getElementById("emailInput");
+            const emailStatus = document.getElementById("emailStatus");
+            const form = document.getElementById("staffForm");
+
+            if (toggleButton) {
+                toggleButton.addEventListener("click", function () {
+                const visible = passwordSection.style.display === "block";
+                const nowVisible = !visible;
+
+                passwordSection.style.display = nowVisible ? "block" : "none";
+                hiddenField.value = nowVisible.toString().toLowerCase(); // sync to "true"/"false"
+                console.log("Toggle clicked. Now visible:", nowVisible);
+            });
+            }
+
+
+            if (emailInput) {
+                emailInput.addEventListener("blur", function () {
+                    debugger;
+
+                    let email = emailInput.value.trim();
+                    let staffId = "@Model.StaffId";
+
+                    if (email === "") {
+                        emailStatus.textContent = "";
+                        return;
+                    }
+
+                    fetch(`/Staff/IsEmailAvailable?email=${encodeURIComponent(email)}&staffId=${staffId}`)
+                        .then(response => response.json())
+                        .then(isAvailable => {
+                            if (!isAvailable) {
+                                emailStatus.textContent = "This email is already in use.";
+                                emailStatus.style.color = "red";
+                            } else {
+                                emailStatus.textContent = "";
+                            }
+                        })
+                        .catch(error => {
+                            emailStatus.textContent = "Error checking email.";
+                            emailStatus.style.color = "red";
+                        });
+                });
+            }
+
+            form.addEventListener("submit", function (event) {
+                debugger;
+
+                const homePhone = document.querySelector("[name='PhoneHome']").value.trim();
+                const mobilePhone = document.querySelector("[name='PhoneMobile']").value.trim();
+                const email = document.querySelector("[name='Email']").value.trim();
+
+                if (!homePhone && !mobilePhone && !email) {
+                    event.preventDefault();
+                    alert("At least one contact detail (Home Phone, Mobile Phone, or Email) is required.");
+                }
+            });
+        });
+    </script>
+}

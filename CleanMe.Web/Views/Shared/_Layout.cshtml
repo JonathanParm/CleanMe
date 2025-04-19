@@ -1,0 +1,135 @@
+﻿@using CleanMe.Shared.Models
+@using Microsoft.AspNetCore.Identity
+@using CleanMe.Domain.Entities
+@inject UserManager<ApplicationUser> UserManager
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@ViewData["Title"] - CleanMe</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+    <style>
+        /* Make the navbar fixed at the top */
+        .navbar {
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        body {
+            padding-top: 70px; /* Prevent content from being hidden behind the fixed navbar */
+        }
+    </style>
+</head>
+<body>
+
+    @{
+        var user = await UserManager.GetUserAsync(User);
+        var roles = user != null ? await UserManager.GetRolesAsync(user) : new List<string>();
+        bool isAdmin = roles.Contains("Admin");
+        bool isStaff = roles.Contains("Staff");
+        bool isClient = roles.Contains("Client");
+    }
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">CleanMe</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <!-- Home Page -->
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Home" asp-action="Index">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Home" asp-action="Contact">Contact Us</a>
+                    </li>
+
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <!-- Admin & Other Users -->
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Reports" asp-action="Index">Reports</a>
+                        </li>
+
+                        @if (isAdmin)
+                        {
+                            <!-- Schedule -->
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Schedule" asp-action="Index">Schedule</a>
+                            </li>
+
+                            <!-- Setup Dropdown -->
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="setupDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Setup
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="setupDropdown">
+                                    <li><a class="dropdown-item" asp-controller="Region" asp-action="Index">Region</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Area" asp-action="Index">Area</a></li>
+                                    <li><a class="dropdown-item" asp-controller="AssetLocation" asp-action="Index">Asset location</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Asset" asp-action="Index">Asset</a></li>
+                                    <li><a class="dropdown-item" asp-controller="AssetType" asp-action="Index">Asset type</a></li>
+                                    <li><a class="dropdown-item" asp-controller="CleanFrequency" asp-action="Index">Cleaning frequency</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Staff" asp-action="Index">Staff</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Client" asp-action="Index">Client</a></li>
+                                    <li><a class="dropdown-item" asp-controller="ClientContact" asp-action="Index">Client Contact</a></li>
+                                </ul>
+                            </li>
+                        }
+
+                        <!-- My Account Dropdown -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="myAccountDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                My Account
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="myAccountDropdown">
+                                <li><a class="dropdown-item" asp-controller="Profile" asp-action="Index">My Profile</a></li>
+                                @if (isAdmin)
+                                {
+                                    <li><a class="dropdown-item" asp-controller="Organisation" asp-action="Details">Organisation Details</a></li>
+                                }
+                            </ul>
+                        </li>
+                    }
+                </ul>
+
+                <ul class="navbar-nav">
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <li class="nav-item">
+                            <form asp-controller="Account" asp-action="Logout" method="post">
+                                <button type="submit" class="btn btn-link nav-link">Logout</button>
+                            </form>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Account" asp-action="Login">Login</a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        @RenderBody()
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    @RenderSection("Scripts", required: false)
+
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+    }
+
+</body>
+</html>
