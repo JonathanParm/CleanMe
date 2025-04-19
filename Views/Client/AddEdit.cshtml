@@ -1,0 +1,130 @@
+﻿@using CleanMe.Application.ViewModels
+@using CleanMe.Domain.Enums
+@using CleanMe.Shared.Helpers
+
+@model CleanMe.Application.ViewModels.ClientViewModel
+
+@{
+    ViewData["Title"] = Model.clientId == 0 ? "Add Client" : "Edit Client";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form asp-action="AddEdit" asp-controller="Client" method="post" id="ClientForm" novalidate>
+    @Html.AntiForgeryToken()
+
+    @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+
+    @Html.HiddenFor(m => m.clientId)
+    @* <input asp-for="clientId" type="hidden" /> *@
+
+    <div class="form-group">
+        <label asp-for="Name" class="form-label"></label>
+        <input asp-for="Name" class="form-control" required />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Brand" class="form-label"></label>
+        <input asp-for="Brand" class="form-control" required />
+        <span asp-validation-for="Brand" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="AccNo" class="form-label"></label>
+        <input asp-for="AccNo" class="form-control" required />
+        <span asp-validation-for="AccNo" class="text-danger"></span>
+    </div>
+
+    <!-- Address Partial View -->
+    <h3>Address</h3>
+    @Html.EditorFor(model => model.Address, "_AddressPartialView")
+
+    <div class="mb-3">
+        <label class="form-label">Is Active</label>
+        <select asp-for="IsActive" class="form-control">
+            <option value="true">Active</option>
+            <option value="false">Inactive</option>
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+
+</form>
+
+<h3 class="mt-4">Client Contacts</h3>
+
+<!-- Add Contact Button -->
+<div class="text-start mb-3">
+    <button type="button"
+            class="btn btn-sm btn-primary"
+            data-redirect="@Url.Action("AddEdit", "ClientContact", new
+            {
+                clientId = Model.clientId,
+                returnUrl = Url.Action("AddEdit", "Client", new { clientId = Model.clientId })
+            })"
+            data-form="ClientForm">
+            ➕ Add Client Contact
+    </button>
+</div>
+
+<!-- Contacts Table -->
+<div class="table-responsive">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Full Name</th>
+                <th>Job Title</th>
+                <th>Mobile</th>
+                <th>Email</th>
+                <th>Active</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var contact in Model.ContactsList)
+            {
+                <tr>
+                    <td>@contact.FullName</td>
+                    <td>@contact.JobTitle</td>
+                    <td>@contact.PhoneMobile</td>
+                    <td>@contact.Email</td>
+                    <td>@(contact.IsActive ? "Yes" : "No")</td>
+                    <td>
+                        <button type="button"
+                                class="btn btn-sm btn-warning redirect-after-save"
+                                data-redirect="@Url.Action("AddEdit", "ClientContact", new
+                                {
+                                    clientContactId = contact.clientContactId,
+                                    clientId = Model.clientId,
+                                    returnUrl = Url.Action("AddEdit", "Client", new { clientId = Model.clientId })
+                                })"
+                                data-form="ClientForm">
+                                ✏️ Edit
+                        </button>
+
+                        <button type="button"
+                                class="btn btn-sm btn-danger redirect-after-save"
+                                data-redirect="@Url.Action("Delete", "ClientContact", new
+                                {
+                                    clientContactId = contact.clientContactId,
+                                    clientId = Model.clientId,
+                                    returnUrl = Url.Action("AddEdit", "Client", new { clientId = Model.clientId })
+                                })"
+                                data-form="ClientForm">
+                                🗑 Delete
+                        </button>
+
+                        @* <a asp-controller="ClientContact" asp-action="AddEdit" asp-route-clientContactId="@contact.clientContactId" class="btn btn-sm btn-warning">Edit</a>
+                        <a asp-controller="ClientContact" asp-action="Delete" asp-route-clientContactId="@contact.clientContactId" class="btn btn-sm btn-danger">Delete</a> *@
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script src="~/js/shared/redirect-on-submit.js"></script>
+}

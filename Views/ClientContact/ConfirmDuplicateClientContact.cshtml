@@ -1,0 +1,47 @@
+﻿@model CleanMe.Application.ViewModels.ClientContactViewModel
+
+@{
+    ViewData["Title"] = "Duplicate Client Contact Warning";
+}
+
+<h2>Warning: Duplicate Client Contact Found</h2>
+
+<p>A Client Contact with the same name already exists. What would you like to do?</p>
+
+@if (ViewBag.DuplicateClientContact != null && ((IEnumerable<CleanMe.Application.ViewModels.ClientContactViewModel>)ViewBag.DuplicateClientContact).Any())
+{
+    <h4>Matching Client Contact Records</h4>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Client Name</th>
+                <th>Client Contact Name</th>
+                <th>Job Title</th>
+                <th>Mobile Phone</th>
+                <th>Email</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var ClientContact in ViewBag.DuplicateClientContact as IEnumerable<CleanMe.Application.ViewModels.ClientContactViewModel>)
+            {
+                <tr>
+                    <td>@ClientContact.ClientName</td>
+                    <td>@ClientContact.FirstName @ClientContact.FamilyName</td>
+                    <td>@ClientContact.JobTitle</td>
+                    <td>@ClientContact.PhoneMobile</td>
+                    <td>@ClientContact.Email</td>
+                    <td>
+                        <a asp-action="AddEdit" asp-route-clientContactId="@ClientContact.clientContactId" class="btn btn-primary">Go to Record</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<form asp-action="AddEdit" method="post">
+    <input type="hidden" name="clientContactId" value="@Model.clientContactId" />
+    <button type="submit" class="btn btn-primary">Proceed with New Client Contact</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>

@@ -1,0 +1,118 @@
+﻿@using CleanMe.Application.ViewModels
+@using CleanMe.Domain.Enums
+@using CleanMe.Shared.Helpers
+
+@model CleanMe.Application.ViewModels.RegionViewModel
+
+@{
+    ViewData["Title"] = Model.regionId == 0 ? "Add Region" : "Edit Region";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form asp-action="AddEdit" method="post" id="RegionForm" novalidate>
+    @Html.AntiForgeryToken()
+
+    @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+
+    @Html.HiddenFor(m => m.regionId)
+    @* <input asp-for="regionId" type="hidden" /> *@
+
+    <div class="form-group">
+        <label asp-for="Name" class="form-label"></label>
+        <input asp-for="Name" class="form-control" required />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="ReportCode" class="form-label"></label>
+        <input asp-for="ReportCode" class="form-control" required />
+        <span asp-validation-for="ReportCode" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="SequenceOrder" class="form-label"></label>
+        <input asp-for="SequenceOrder" class="form-control" required />
+        <span asp-validation-for="SequenceOrder" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Is Active</label>
+        <select asp-for="IsActive" class="form-control">
+            <option value="true">Active</option>
+            <option value="false">Inactive</option>
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>
+
+<h3 class="mt-4">Areas</h3>
+
+<!-- Add Area Button -->
+<div class="text-start mb-3">
+    <button type="button"
+            class="btn btn-sm btn-primary"
+            data-redirect="@Url.Action("AddEdit", "Area", new
+            {
+                regionId = Model.regionId,
+                returnUrl = Url.Action("AddEdit", "Region", new { regionId = Model.regionId })
+            })"
+            data-form="RegionForm">
+            ➕ Add Area
+    </button>
+</div>
+
+<!-- Areas Table -->
+<div class="table-responsive">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Area</th>
+                <th>Report Code</th>
+                <th>Active</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var area in Model.AreasList)
+            {
+                <tr>
+                    <td>@area.Name</td>
+                    <td>@area.ReportCode</td>
+                    <td>@(area.IsActive ? "Yes" : "No")</td>
+                    <td>
+                        <button type="button"
+                                class="btn btn-sm btn-warning redirect-after-save"
+                                data-redirect="@Url.Action("AddEdit", "Area", new
+                                {
+                                    areaId = area.areaId,
+                                    regionId = Model.regionId,
+                                    returnUrl = Url.Action("AddEdit", "Region", new { regionId = Model.regionId })
+                                })"
+                                data-form="RegionForm">
+                                ✏️ Edit
+                        </button>
+
+                        <button type="button"
+                                class="btn btn-sm btn-danger redirect-after-save"
+                                data-redirect="@Url.Action("Delete", "Area", new
+                                {
+                                    areaId = area.areaId,
+                                    regionId = Model.regionId,
+                                    returnUrl = Url.Action("AddEdit", "Region", new { regionId = Model.regionId })
+                                })"
+                                data-form="RegionForm">
+                                🗑 Delete
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script src="~/js/shared/redirect-on-submit.js"></script>
+}

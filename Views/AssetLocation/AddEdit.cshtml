@@ -1,0 +1,80 @@
+﻿@using CleanMe.Application.ViewModels
+@using CleanMe.Domain.Enums
+@using CleanMe.Shared.Helpers
+
+@model CleanMe.Application.ViewModels.AssetLocationViewModel
+
+@{
+    ViewData["Title"] = Model.assetLocationId == 0 ? "Add AssetLocation" : "Edit AssetLocation";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<div class="form-group">
+    <label class="form-label">Area</label>
+    <div class="form-control-plaintext">@Model.AreaName</div>
+</div>
+
+<form asp-action="AddEdit" method="post" id="AssetLocationForm" novalidate>
+    @Html.AntiForgeryToken()
+
+    @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+
+    <input asp-for="assetLocationId" type="hidden" />
+    <input asp-for="areaId" type="hidden" />
+    <input type="hidden" name="ReturnUrl" value="@ViewBag.ReturnUrl" />
+
+    <div class="form-group">
+        <label asp-for="Description" class="form-label"></label>
+        <input asp-for="Description" class="form-control" required />
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
+    <!-- Address Partial View -->
+    <h3>Address</h3>
+    @Html.EditorFor(model => model.Address, "_AddressPartialView")
+
+    <div class="form-group">
+        <label asp-for="SequenceOrder" class="form-label"></label>
+        <input asp-for="SequenceOrder" class="form-control" required />
+        <span asp-validation-for="SequenceOrder" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="SeqNo" class="form-label"></label>
+        <input asp-for="SeqNo" class="form-control" required />
+        <span asp-validation-for="SeqNo" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="ReportCode" class="form-label"></label>
+        <input asp-for="ReportCode" class="form-control" required />
+        <span asp-validation-for="ReportCode" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="AccNo" class="form-label"></label>
+        <input asp-for="AccNo" class="form-control" required />
+        <span asp-validation-for="AccNo" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Is Active</label>
+        <select asp-for="IsActive" class="form-control">
+            <option value="true">Active</option>
+            <option value="false">Inactive</option>
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a href="@ViewBag.ReturnUrl" class="btn btn-secondary">Cancel</a>
+    @* <a asp-action="Index" class="btn btn-secondary">Cancel</a> *@
+</form>
+
+@section Scripts {
+    <script>
+        window.onerror = function (msg, url, line, col, error) {
+            alert("JS Error: " + msg);
+        };
+    </script>
+}

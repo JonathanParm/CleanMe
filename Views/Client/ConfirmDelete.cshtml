@@ -1,0 +1,39 @@
+﻿@model CleanMe.Application.ViewModels.AssetLocationViewModel
+
+@{
+    ViewData["Title"] = "Confirm Delete";
+}
+
+<h2>Delete Asset Location</h2>
+
+<div class="alert alert-warning">
+    Are you sure you want to delete this Asset Location?
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Description</label>
+    <p class="form-control-plaintext">@Model.Description</p>
+</div>
+
+<div class="mb-3">
+    <label class="form-label">ReportCode</label>
+    <p class="form-control-plaintext">@Model.ReportCode</p>
+</div>
+
+<!-- Address Partial View -->
+<h3>Address</h3>
+@Html.EditorFor(model => model.Address, "_AddressPartialReadOnlyView")
+
+<div class="mb-3">
+    <label class="form-label">Acc No</label>
+    <p class="form-control-plaintext">@Model.AccNo</p>
+</div>
+
+<!-- Add additional read-only fields if needed -->
+
+<form asp-action="ConfirmDelete" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="assetLocationId" />
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>

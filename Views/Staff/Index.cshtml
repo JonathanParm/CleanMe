@@ -1,0 +1,114 @@
+﻿@using CleanMe.Web.Helpers
+@model IEnumerable<CleanMe.Application.ViewModels.StaffIndexViewModel>
+
+@{
+    ViewData["Title"] = "Staff List";
+    string sortOrder = ViewBag.SortOrder as string ?? "ASC";
+    string sortColumn = ViewBag.SortColumn as string ?? "StaffNo";
+}
+
+<h2>Staff List</h2>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<!-- Add Button (Top-Right) -->
+<div class="text-end mb-3">
+    <a asp-action="AddEdit" class="btn btn-primary">Add Staff</a>
+</div>
+
+<!-- Filtering Form -->
+<form method="get" id="filterForm">
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <!-- Column Headers with Sorting -->
+                <tr>
+                    <th>
+                        <a href="#" onclick="sortTable('StaffNo')">
+                            Staff No @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "StaffNo"))
+                        </a>
+                    </th>
+                    <th>
+                        <a href="#" onclick="sortTable('FullName')">
+                            Full Name @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "FullName"))
+                        </a>
+                    </th>
+                    <th>
+                        <a href="#" onclick="sortTable('WorkRole')">
+                            Work Role @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "WorkRole"))
+                        </a>
+                    </th>
+                    <th>
+                        <a href="#" onclick="sortTable('ContactDetail')">
+                            Contact Detail @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "ContactDetail"))
+                        </a>
+                    </th>
+                    <th>
+                        <a href="#" onclick="sortTable('IsActive')">
+                            Active @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "IsActive"))
+                        </a>
+                    </th>
+                    <th>Actions</th>
+                </tr>
+
+                <!-- Filter Row -->
+                <tr>
+                    <td><input type="text" name="staffNo" class="form-control" value="@ViewBag.StaffNo" placeholder="Search Staff No"></td>
+                    <td><input type="text" name="fullName" class="form-control" value="@ViewBag.FullName" placeholder="Search Full Name"></td>
+                    <td><input type="text" name="workRole" class="form-control" value="@ViewBag.WorkRole" placeholder="Search Work Role"></td>
+                    <td><input type="text" name="contactDetail" class="form-control" value="@ViewBag.ContactDetail" placeholder="Search Contact"></td>
+                    <td>
+                        <select name="isActive" class="form-control">
+                            <option value="">All</option>
+                            <option value="1" selected="@(ViewBag.IsActive == "1" ? "selected" : null)">Active</option>
+                            <option value="0" selected="@(ViewBag.IsActive == "0" ? "selected" : null)">Inactive</option>
+                        </select>
+                    </td>
+                    <td>
+                        <button type="submit" class="btn btn-success">Filter</button>
+                        <a href="@Url.Action("Index", "Staff")" class="btn btn-secondary">Clear</a>
+                    </td>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var staff in Model)
+                {
+                    <tr>
+                        <td>@staff.StaffNo</td>
+                        <td>@staff.FullName</td>
+                        <td>@staff.WorkRole</td>
+                        <td>@staff.ContactDetail</td>
+                        <td>@(staff.IsActive ? "Yes" : "No")</td>
+                        <td>
+                            <a asp-action="AddEdit" asp-route-staffId="@staff.staffId" class="btn btn-warning btn-sm">Edit</a>
+                            <a asp-action="Delete" asp-route-staffId="@staff.staffId" class="btn btn-danger btn-sm">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</form>
+
+<!-- JavaScript for Sorting -->
+<script>
+    function sortTable(column) {
+        let sortColumn = new URLSearchParams(window.location.search).get("sortColumn");
+        let sortOrder = new URLSearchParams(window.location.search).get("sortOrder") === "ASC" ? "DESC" : "ASC";
+        let params = new URLSearchParams(window.location.search);
+        params.set("sortColumn", column);
+        params.set("sortOrder", sortOrder);
+        window.location.search = params.toString();
+    }
+</script>
