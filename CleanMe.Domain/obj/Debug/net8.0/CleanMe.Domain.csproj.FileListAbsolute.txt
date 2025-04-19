@@ -1,0 +1,11 @@
+C:\Users\Jonat\source\repos\CleanMe\CleanMe.Domain\bin\Debug\net8.0\CleanMe.Domain.deps.json
+C:\Users\Jonat\source\repos\CleanMe\CleanMe.Domain\bin\Debug\net8.0\CleanMe.Domain.dll
+C:\Users\Jonat\source\repos\CleanMe\CleanMe.Domain\bin\Debug\net8.0\CleanMe.Domain.pdb
+C:\Users\Jonat\source\repos\CleanMe\CleanMe.Domain\obj\Debug\net8.0\CleanMe.Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Jonat\source\repos\CleanMe\CleanMe.Domain\obj\Debug\net8.0\CleanMe.Domain.AssemblyInfoInputs.cache
+C:\Users\Jonat\source\repos\CleanMe\CleanMe.Domain\obj\Debug\net8.0\CleanMe.Domain.AssemblyInfo.cs
+C:\Users\Jonat\source\repos\CleanMe\CleanMe.Domain\obj\Debug\net8.0\CleanMe.Domain.csproj.CoreCompileInputs.cache
+C:\Users\Jonat\source\repos\CleanMe\CleanMe.Domain\obj\Debug\net8.0\CleanMe.Domain.dll
+C:\Users\Jonat\source\repos\CleanMe\CleanMe.Domain\obj\Debug\net8.0\refint\CleanMe.Domain.dll
+C:\Users\Jonat\source\repos\CleanMe\CleanMe.Domain\obj\Debug\net8.0\CleanMe.Domain.pdb
+C:\Users\Jonat\source\repos\CleanMe\CleanMe.Domain\obj\Debug\net8.0\ref\CleanMe.Domain.dll
