@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\CleanMe.Web.props" />
+</Project>

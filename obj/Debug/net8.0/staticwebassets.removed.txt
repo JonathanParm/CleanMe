@@ -1,0 +1,2 @@
+C:\Users\Jonat\source\repos\CleanMe\CleanMe.Web\wwwroot\js\area\area-addedit.js
+C:\Users\Jonat\source\repos\CleanMe\CleanMe.Web\wwwroot\js\clientcontact\clientcontact-addedit.js
