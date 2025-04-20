@@ -1,42 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using CleanMe.Application.Interfaces;
+﻿using CleanMe.Application.Interfaces;
 using CleanMe.Application.ViewModels;
-using CleanMe.Domain.Interfaces;
 using CleanMe.Domain.Entities;
-using CleanMe.Domain.Enums;
+using CleanMe.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
-using System.Reflection;
-using Microsoft.AspNetCore.Http.HttpResults;
-using CleanMe.Domain.Common;
-using CleanMe.Application.DTOs;
 
 namespace CleanMe.Application.Services
 {
     public class RegionService : IRegionService
     {
-        private readonly IRepository<Region> _efCoreRepository; // For EF Core CRUD
-        private readonly IRegionRepository _regionRepository; // For Dapper queries
-        private readonly IDapperRepository _dapperRepository;
-        private readonly IUserService _userService;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IUserService _userService;
         private readonly ILogger<StaffService> _logger;
 
         public RegionService(
-            IRepository<Region> efCoreRepository,
-            IRegionRepository regionRepository,
-            IDapperRepository dapperRepository,
-            IUserService userService,
             IUnitOfWork unitOfWork,
+            IUserService userService,
             ILogger<StaffService> logger)
         {
-            _efCoreRepository = efCoreRepository;
-            _regionRepository = regionRepository;
-            _dapperRepository = dapperRepository;
-            _userService = userService;
             _unitOfWork = unitOfWork;
+            _userService = userService;
             _logger = logger;
         }
 
@@ -46,9 +28,27 @@ namespace CleanMe.Application.Services
             string sortColumn, string sortOrder, int pageNumber, int pageSize)
         {
             _logger.LogInformation("Fetching regions list using Dapper.");
-            return await _regionRepository.GetRegionIndexAsync(
-                name, code, isActive,
-                sortColumn, sortOrder, pageNumber, pageSize);
+            try
+            {
+                var query = "EXEC dbo.RegionGetIndexView @Name, @Code, @IsActive, @SortColumn, @SortOrder, @PageNumber, @PageSize";
+                var parameters = new
+                {
+                    Name = name,
+                    Code = code,
+                    IsActive = isActive,
+                    SortColumn = sortColumn,
+                    SortOrder = sortOrder,
+                    PageNumber = pageNumber,
+                    PageSize = pageSize
+                };
+
+                return await _unitOfWork.DapperRepository.QueryAsync<RegionIndexViewModel>(query, parameters);
+            }
+            catch (Exception ex)
+            {
+                // Log error (you can inject a logger if needed)
+                throw new ApplicationException("Error fetching regions from stored procedure", ex);
+            }
         }
 
         public async Task<IEnumerable<RegionViewModel>> FindDuplicateRegionAsync(string name, string reportCode, int? regionId = null)
@@ -63,12 +63,12 @@ namespace CleanMe.Application.Services
 
             var parameters = new { Name = name, ReportCode = reportCode, regionId = regionId };
 
-            return await _dapperRepository.QueryAsync<RegionViewModel>(query, parameters);
+            return await _unitOfWork.DapperRepository.QueryAsync<RegionViewModel>(query, parameters);
         }
 
-        public async Task<RegionViewModel?> GetRegionByIdAsync(int regionId)
+        public async Task<RegionViewModel?> GetRegionViewModelByIdAsync(int regionId)
         {
-            var region = await _regionRepository.GetRegionByIdAsync(regionId);
+            var region = await _unitOfWork.RegionRepository.GetRegionByIdAsync(regionId);
 
             if (region == null)
             {
@@ -85,9 +85,9 @@ namespace CleanMe.Application.Services
             };
         }
 
-        public async Task<RegionViewModel?> GetRegionWithAreasByIdAsync(int regionId)
+        public async Task<RegionViewModel?> GetRegionViewModelWithAreasByIdAsync(int regionId)
         {
-            var region = await _regionRepository.GetRegionWithAreasByIdAsync(regionId);
+            var region = await _unitOfWork.RegionRepository.GetRegionWithAreasByIdAsync(regionId);
 
             if (region == null)
             {
@@ -132,8 +132,7 @@ namespace CleanMe.Application.Services
                 UpdatedById = addedById
             };
 
-            await _efCoreRepository.AddAsync(region);
-            await _unitOfWork.CommitAsync();
+            await _unitOfWork.RegionRepository.AddRegionAsync(region);
 
             return region.regionId;
         }
@@ -141,7 +140,7 @@ namespace CleanMe.Application.Services
         // Updates an existing region (EF Core)
         public async Task UpdateRegionAsync(RegionViewModel model, string updatedById)
         {
-            var region = await _efCoreRepository.GetByIdAsync(model.regionId);
+            var region = await _unitOfWork.RegionRepository.GetRegionByIdAsync(model.regionId);
             if (region == null)
             {
                 _logger.LogWarning($"Region with ID {model.regionId} not found.");
@@ -154,13 +153,12 @@ namespace CleanMe.Application.Services
             region.UpdatedAt = DateTime.UtcNow;
             region.UpdatedById = updatedById;
 
-            _efCoreRepository.Update(region);
-            await _unitOfWork.CommitAsync();
+            await _unitOfWork.RegionRepository.UpdateRegionAsync(region);
         }
 
         public async Task<bool> SoftDeleteRegionAsync(int regionId, string updatedById)
         {
-            var region = await _efCoreRepository.GetByIdAsync(regionId);
+            var region = await _unitOfWork.RegionRepository.GetRegionByIdAsync(regionId);
 
             if (region == null)
             {
@@ -173,16 +171,9 @@ namespace CleanMe.Application.Services
             region.UpdatedAt = DateTime.UtcNow;
             region.UpdatedById = updatedById;
 
-            _efCoreRepository.Update(region);
-            await _unitOfWork.CommitAsync();
+            await _unitOfWork.RegionRepository.UpdateRegionAsync(region);
 
-            _efCoreRepository.Update(region);
-            int rowsAffected = await _unitOfWork.CommitAsync(); // Returns the number of affected rows
-
-            if (rowsAffected > 0)
-                return true;
-            else
-                return false;
+            return true;
         }
     }
 }

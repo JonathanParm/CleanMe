@@ -105,6 +105,8 @@ namespace CleanMe.Domain.Entities
         public int clientId { get; set; }
 
         // Navigation property
-        public Client Client { get; set; } = null!;
+        [DisplayName("Client")]
+        [ForeignKey(nameof(clientId))]
+        public virtual Client? Client { get; set; }
     }
 }

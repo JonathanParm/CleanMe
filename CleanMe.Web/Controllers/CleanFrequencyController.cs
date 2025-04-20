@@ -59,15 +59,15 @@ namespace CleanMe.Web.Controllers
             }
         }
         // AddEdit Action (Handles Both Add & Edit)
-        public async Task<IActionResult> AddEdit(int? CleanFrequencyId)
+        public async Task<IActionResult> AddEdit(int? cleanFrequencyId)
         {
             try
             {
                 CleanFrequencyViewModel model;
 
-                if (CleanFrequencyId.HasValue) // Edit Mode
+                if (cleanFrequencyId.HasValue) // Edit Mode
                 {
-                    model = await _cleanFrequencyService.GetCleanFrequencyByIdAsync(CleanFrequencyId.Value);
+                    model = await _cleanFrequencyService.GetCleanFrequencyViewModelByIdAsync(cleanFrequencyId.Value);
                     if (model == null)
                     {
                         return NotFound();
@@ -108,7 +108,7 @@ namespace CleanMe.Web.Controllers
                 if (duplicateCleanFrequency.Any())
                 {
                     //TempData["WarningMessage"] = "A CleanFrequency with the same name or code already exists.";
-                    //TempData["MatchingStaffIds"] = duplicateCleanFrequency.Select(s => s.CleanFrequencyId).ToArray();
+                    //TempData["MatchingStaffIds"] = duplicateCleanFrequency.Select(s => s.cleanFrequencyId).ToArray();
                     ModelState.AddModelError("Name", "A Clean Frequency with the same name or code already exists.");
                     return View(model);
                 }
@@ -116,11 +116,11 @@ namespace CleanMe.Web.Controllers
                 // Add new CleanFrequency
                 if (model.cleanFrequencyId == 0)
                 {
-                    int newCleanFrequencyId = await _cleanFrequencyService.AddCleanFrequencyAsync(model, GetCurrentUserId());
+                    int newcleanFrequencyId = await _cleanFrequencyService.AddCleanFrequencyAsync(model, GetCurrentUserId());
                 }
                 else // Update Existing CleanFrequency
                 {
-                    var existingCleanFrequency = await _cleanFrequencyService.GetCleanFrequencyByIdAsync(model.cleanFrequencyId);
+                    var existingCleanFrequency = await _cleanFrequencyService.GetCleanFrequencyViewModelByIdAsync(model.cleanFrequencyId);
                     if (existingCleanFrequency == null)
                     {
                         TempData["ErrorMessage"] = "Clean Frequency record not found.";
@@ -144,10 +144,10 @@ namespace CleanMe.Web.Controllers
             }
         }
 
-        // GET: /CleanFrequency/Delete?CleanFrequencyId=123
+        // GET: /CleanFrequency/Delete?cleanFrequencyId=123
         public async Task<IActionResult> Delete(int cleanFrequencyId)
         {
-            var CleanFrequency = await _cleanFrequencyService.GetCleanFrequencyByIdAsync(cleanFrequencyId);
+            var CleanFrequency = await _cleanFrequencyService.GetCleanFrequencyViewModelByIdAsync(cleanFrequencyId);
             if (CleanFrequency == null)
             {
                 TempData["ErrorMessage"] = "Clean Frequency not found.";
@@ -164,7 +164,7 @@ namespace CleanMe.Web.Controllers
             try
             {
                 var userId = GetCurrentUserId();
-                var CleanFrequency = await _cleanFrequencyService.GetCleanFrequencyByIdAsync(cleanFrequencyId);
+                var CleanFrequency = await _cleanFrequencyService.GetCleanFrequencyViewModelByIdAsync(cleanFrequencyId);
                 if (CleanFrequency == null)
                 {
                     TempData["ErrorMessage"] = "Clean Frequency not found.";

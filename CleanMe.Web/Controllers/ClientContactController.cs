@@ -122,7 +122,7 @@ namespace CleanMe.Web.Controllers
         {
             try
             {
-                var clientContact = await _clientContactService.GetClientContactByIdAsync(clientContactId);
+                var clientContact = await _clientContactService.GetClientContactViewModelByIdAsync(clientContactId);
                 if (clientContact == null)
                 {
                     TempData["ErrorMessage"] = "Client contact not found.";
@@ -151,7 +151,7 @@ namespace CleanMe.Web.Controllers
                 var result = await _clientContactService.SoftDeleteClientContactAsync(clientContactId, GetCurrentUserId());
                 if (result)
                 {
-                    var clientContact = await _clientContactService.GetClientContactByIdAsync(clientContactId);
+                    var clientContact = await _clientContactService.GetClientContactViewModelByIdAsync(clientContactId);
                     if (!string.IsNullOrWhiteSpace(clientContact?.ApplicationUserId))
                         await _userService.DisableUserLoginAsync(clientContact.ApplicationUserId);
                 }

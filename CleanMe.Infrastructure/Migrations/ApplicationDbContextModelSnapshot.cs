@@ -35,7 +35,8 @@ namespace CleanMe.Infrastructure.Migrations
 
                     b.Property<string>("AddedById")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(450)
+                        .HasColumnType("NVARCHAR");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -62,7 +63,8 @@ namespace CleanMe.Infrastructure.Migrations
 
                     b.Property<string>("UpdatedById")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(450)
+                        .HasColumnType("NVARCHAR");
 
                     b.Property<int>("regionId")
                         .HasColumnType("int");
@@ -72,6 +74,78 @@ namespace CleanMe.Infrastructure.Migrations
                     b.HasIndex("regionId");
 
                     b.ToTable("Areas");
+                });
+
+            modelBuilder.Entity("CleanMe.Domain.Entities.Asset", b =>
+                {
+                    b.Property<int>("assetId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("assetId"));
+
+                    b.Property<string>("Access")
+                        .HasMaxLength(200)
+                        .HasColumnType("VARCHAR");
+
+                    b.Property<DateTime>("AddedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("AddedById")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("NVARCHAR");
+
+                    b.Property<string>("ClientReference")
+                        .HasMaxLength(50)
+                        .HasColumnType("VARCHAR");
+
+                    b.Property<bool>("Inaccessable")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("MdReference")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("VARCHAR");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("VARCHAR");
+
+                    b.Property<string>("Position")
+                        .HasMaxLength(50)
+                        .HasColumnType("VARCHAR");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedById")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("NVARCHAR");
+
+                    b.Property<int>("assetLocationId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("assetTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("clientId")
+                        .HasColumnType("int");
+
+                    b.HasKey("assetId");
+
+                    b.HasIndex("assetLocationId");
+
+                    b.HasIndex("assetTypeId");
+
+                    b.HasIndex("clientId");
+
+                    b.ToTable("Assets");
                 });
 
             modelBuilder.Entity("CleanMe.Domain.Entities.AssetLocation", b =>
@@ -105,6 +179,7 @@ namespace CleanMe.Infrastructure.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("ReportCode")
+                        .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("VARCHAR");
 
@@ -723,6 +798,33 @@ namespace CleanMe.Infrastructure.Migrations
                     b.Navigation("Region");
                 });
 
+            modelBuilder.Entity("CleanMe.Domain.Entities.Asset", b =>
+                {
+                    b.HasOne("CleanMe.Domain.Entities.AssetLocation", "AssetLocation")
+                        .WithMany("Assets")
+                        .HasForeignKey("assetLocationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("CleanMe.Domain.Entities.AssetType", "AssetType")
+                        .WithMany("Assets")
+                        .HasForeignKey("assetTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("CleanMe.Domain.Entities.Client", "Client")
+                        .WithMany("Assets")
+                        .HasForeignKey("clientId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("AssetLocation");
+
+                    b.Navigation("AssetType");
+
+                    b.Navigation("Client");
+                });
+
             modelBuilder.Entity("CleanMe.Domain.Entities.AssetLocation", b =>
                 {
                     b.HasOne("CleanMe.Domain.Entities.Area", "Area")
@@ -943,8 +1045,20 @@ namespace CleanMe.Infrastructure.Migrations
                     b.Navigation("AssetLocations");
                 });
 
+            modelBuilder.Entity("CleanMe.Domain.Entities.AssetLocation", b =>
+                {
+                    b.Navigation("Assets");
+                });
+
+            modelBuilder.Entity("CleanMe.Domain.Entities.AssetType", b =>
+                {
+                    b.Navigation("Assets");
+                });
+
             modelBuilder.Entity("CleanMe.Domain.Entities.Client", b =>
                 {
+                    b.Navigation("Assets");
+
                     b.Navigation("ClientContacts");
                 });
 

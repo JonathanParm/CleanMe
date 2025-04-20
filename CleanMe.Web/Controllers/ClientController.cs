@@ -69,7 +69,7 @@ namespace CleanMe.Web.Controllers
 
                 if (clientId.HasValue) // Edit Mode
                 {
-                    model = await _clientService.GetClientWithContactsByIdAsync(clientId.Value);
+                    model = await _clientService.GetClientViewModelWithContactsByIdAsync(clientId.Value);
                     if (model == null)
                     {
                         return NotFound();
@@ -126,7 +126,7 @@ namespace CleanMe.Web.Controllers
                 }
                 else // Update Existing Client
                 {
-                    var existingClient = await _clientService.GetClientByIdAsync(model.clientId);
+                    var existingClient = await _clientService.GetClientViewModelByIdAsync(model.clientId);
                     if (existingClient == null)
                     {
                         TempData["ErrorMessage"] = "Client record not found.";
@@ -157,7 +157,7 @@ namespace CleanMe.Web.Controllers
         // GET: /Client/Delete?ClientId=123
         public async Task<IActionResult> Delete(int clientId)
         {
-            var Client = await _clientService.GetClientByIdAsync(clientId);
+            var Client = await _clientService.GetClientViewModelByIdAsync(clientId);
             if (Client == null)
             {
                 TempData["ErrorMessage"] = "Client not found.";
@@ -174,7 +174,7 @@ namespace CleanMe.Web.Controllers
             try
             {
                 var userId = GetCurrentUserId();
-                var Client = await _clientService.GetClientByIdAsync(clientId);
+                var Client = await _clientService.GetClientViewModelByIdAsync(clientId);
                 if (Client == null)
                 {
                     TempData["ErrorMessage"] = "Client not found.";

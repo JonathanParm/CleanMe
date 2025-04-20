@@ -1,6 +1,6 @@
 ﻿using System.Data;
 
-namespace CleanMe.Application.Interfaces
+namespace CleanMe.Domain.Interfaces
 {
     public interface IDapperRepository
     {

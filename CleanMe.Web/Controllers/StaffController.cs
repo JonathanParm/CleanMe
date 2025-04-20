@@ -58,7 +58,7 @@ namespace CleanMe.Web.Controllers
             try
             {
                 var model = staffId.HasValue
-                    ? await _staffService.GetStaffByIdAsync(staffId.Value)
+                    ? await _staffService.GetStaffViewModelByIdAsync(staffId.Value)
                     : new StaffViewModel();
                 return View(model);
             }
@@ -107,7 +107,7 @@ namespace CleanMe.Web.Controllers
         {
             try
             {
-                var staff = await _staffService.GetStaffByIdAsync(staffId);
+                var staff = await _staffService.GetStaffViewModelByIdAsync(staffId);
                 if (staff == null) return RedirectToAction("Index");
                 return View("ConfirmDelete", staff);
             }
@@ -127,7 +127,7 @@ namespace CleanMe.Web.Controllers
                 var result = await _staffService.SoftDeleteStaffAsync(staffId, GetCurrentUserId());
                 if (result)
                 {
-                    var staff = await _staffService.GetStaffByIdAsync(staffId);
+                    var staff = await _staffService.GetStaffViewModelByIdAsync(staffId);
                     if (!string.IsNullOrWhiteSpace(staff?.ApplicationUserId))
                         await _userService.DisableUserLoginAsync(staff.ApplicationUserId);
                 }

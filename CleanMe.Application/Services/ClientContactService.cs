@@ -1,42 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using CleanMe.Application.Interfaces;
+﻿using CleanMe.Application.Interfaces;
 using CleanMe.Application.ViewModels;
-using CleanMe.Domain.Interfaces;
 using CleanMe.Domain.Entities;
-using CleanMe.Domain.Enums;
+using CleanMe.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
-using System.Reflection;
-using Microsoft.AspNetCore.Http.HttpResults;
-using CleanMe.Domain.Common;
-using CleanMe.Application.DTOs;
 
 namespace CleanMe.Application.Services
 {
     public class ClientContactService : IClientContactService
     {
-        private readonly IRepository<ClientContact> _efCoreRepository; // For EF Core CRUD
-        private readonly IClientContactRepository _clientContactRepository; // For Dapper queries
-        private readonly IDapperRepository _dapperRepository;
-        private readonly IUserService _userService;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IUserService _userService;
         private readonly ILogger<StaffService> _logger;
 
         public ClientContactService(
-            IRepository<ClientContact> efCoreRepository,
-            IClientContactRepository clientContactRepository,
-            IDapperRepository dapperRepository,
-            IUserService userService,
             IUnitOfWork unitOfWork,
+            IUserService userService,
             ILogger<StaffService> logger)
         {
-            _efCoreRepository = efCoreRepository;
-            _clientContactRepository = clientContactRepository;
-            _dapperRepository = dapperRepository;
-            _userService = userService;
             _unitOfWork = unitOfWork;
+            _userService = userService;
             _logger = logger;
         }
 
@@ -46,9 +28,22 @@ namespace CleanMe.Application.Services
             string sortColumn, string sortOrder, int pageNumber, int pageSize)
         {
             _logger.LogInformation("Fetching Client Contacts list using Dapper.");
-            return await _clientContactRepository.GetClientContactIndexAsync(
-                clientName, fullName, jobTitle, phoneMobile, email, isActive,
-                sortColumn, sortOrder, pageNumber, pageSize);
+            var query = "EXEC dbo.ClientContactGetIndexView @ClientName, @FullName, @JobTitle, @phoneMobile, @email, @IsActive, @SortColumn, @SortOrder, @PageNumber, @PageSize";
+            var parameters = new
+            {
+                ClientName = clientName,
+                FullName = fullName,
+                JobTitle = jobTitle,
+                PhoneMobile = phoneMobile,
+                Email = email,
+                IsActive = isActive,
+                SortColumn = sortColumn,
+                SortOrder = sortOrder,
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            };
+
+            return await _unitOfWork.DapperRepository.QueryAsync<ClientContactIndexViewModel>(query, parameters);
         }
 
         public async Task<IEnumerable<ClientContactViewModel>> FindDuplicateClientContactAsync(string firstName, string familyName, int? clientContactId = null)
@@ -82,27 +77,47 @@ namespace CleanMe.Application.Services
 
             var parameters = new { FirstName = firstName, FamilyName = familyName, clientContactId = clientContactId };
 
-            return await _dapperRepository.QueryAsync<ClientContactViewModel>(query, parameters);
-        }
-
-        public async Task<bool> IsEmailAvailableAsync(string email, int clientContactId = 0)
-        {
-            return await _clientContactRepository.IsEmailAvailableAsync(email, clientContactId);
-        }
-
-        public async Task<ClientContact?> GetClientContactByIdAsync(int clientContactId)
-        {
-            return await _clientContactRepository.GetClientContactByIdAsync(clientContactId);
+            return await _unitOfWork.DapperRepository.QueryAsync<ClientContactViewModel>(query, parameters);
         }
 
         public async Task<ClientContactViewModel?> GetClientContactViewModelByIdAsync(int clientContactId)
         {
-            return await _clientContactRepository.GetClientContactViewModelByIdAsync(clientContactId);
+            var clientContact = await _unitOfWork.ClientContactRepository.GetClientContactByIdAsync(clientContactId);
+            if (clientContact == null)
+            {
+                _logger.LogWarning($"Client Contact with ID {clientContactId} not found.");
+                return null;
+            }
+
+            return new ClientContactViewModel
+            {
+                clientContactId = clientContact.clientContactId,
+                clientId = clientContact.clientId,
+                FirstName = clientContact.FirstName,
+                FamilyName = clientContact.FamilyName,
+                Email = clientContact.Email,
+                PhoneMobile = clientContact.PhoneMobile,
+                JobTitle = clientContact.JobTitle,
+                IsActive = clientContact.IsActive,
+                ApplicationUserId = clientContact.ApplicationUserId,
+                ClientName = clientContact.Client.Name
+            };
         }
 
         public async Task<ClientContactViewModel> PrepareNewClientContactViewModelAsync(int clientId)
         {
-            return await _clientContactRepository.PrepareNewClientContactViewModelAsync(clientId);
+            var client =  await _unitOfWork.ClientRepository.GetClientByIdAsync(clientId);
+
+            //if (client == null)
+            //    throw new NotFoundException("Client not found.");
+
+            return new ClientContactViewModel
+            {
+                clientId = client.clientId,
+                ClientName = client.Name,
+                IsActive = true
+            };
+
         }
 
         // Creates a new ClientContact (EF Core)
@@ -110,7 +125,7 @@ namespace CleanMe.Application.Services
         {
             _logger.LogInformation($"Adding new regon: {model.Fullname}");
 
-            var ClientContact = new ClientContact
+            var clientContact = new ClientContact
             {
                 clientId = model.clientId,
                 FirstName = model.FirstName,
@@ -126,39 +141,37 @@ namespace CleanMe.Application.Services
                 UpdatedById = addedById
             };
 
-            await _efCoreRepository.AddAsync(ClientContact);
-            await _unitOfWork.CommitAsync();
+            await _unitOfWork.ClientContactRepository.AddClientContactAsync(clientContact);
 
-            return ClientContact.clientContactId;
+            return clientContact.clientContactId;
         }
 
         // Updates an existing ClientContact (EF Core)
         public async Task UpdateClientContactAsync(ClientContactViewModel model, string updatedById)
         {
-            var ClientContact = await _efCoreRepository.GetByIdAsync(model.clientContactId);
-            if (ClientContact == null)
+            var clientContact = await _unitOfWork.ClientContactRepository.GetClientContactByIdAsync(model.clientContactId);
+            if (clientContact == null)
             {
                 _logger.LogWarning($"Client Contact with ID {model.clientContactId} not found.");
                 throw new Exception("Client Contact not found.");
             }
 
-            ClientContact.FirstName = model.FirstName;
-            ClientContact.FamilyName = model.FamilyName;
-            ClientContact.PhoneMobile = model.PhoneMobile;
-            ClientContact.Email = model.Email;
-            ClientContact.JobTitle = model.JobTitle;
-            ClientContact.IsActive = model.IsActive;
-            ClientContact.ApplicationUserId = model.ApplicationUserId;
-            ClientContact.UpdatedAt = DateTime.UtcNow;
-            ClientContact.UpdatedById = updatedById;
+            clientContact.FirstName = model.FirstName;
+            clientContact.FamilyName = model.FamilyName;
+            clientContact.PhoneMobile = model.PhoneMobile;
+            clientContact.Email = model.Email;
+            clientContact.JobTitle = model.JobTitle;
+            clientContact.IsActive = model.IsActive;
+            clientContact.ApplicationUserId = model.ApplicationUserId;
+            clientContact.UpdatedAt = DateTime.UtcNow;
+            clientContact.UpdatedById = updatedById;
 
-            _efCoreRepository.Update(ClientContact);
-            await _unitOfWork.CommitAsync();
+            await _unitOfWork.ClientContactRepository.UpdateClientContactAsync(clientContact);
         }
 
         public async Task<bool> SoftDeleteClientContactAsync(int clientContactId, string updatedById)
         {
-            var clientContact = await _efCoreRepository.GetByIdAsync(clientContactId);
+            var clientContact = await _unitOfWork.ClientContactRepository.GetClientContactByIdAsync(clientContactId);
 
             if (clientContact == null)
             {
@@ -171,21 +184,19 @@ namespace CleanMe.Application.Services
             clientContact.UpdatedAt = DateTime.UtcNow;
             clientContact.UpdatedById = updatedById;
 
-            _efCoreRepository.Update(clientContact);
-            await _unitOfWork.CommitAsync();
+            await _unitOfWork.ClientContactRepository.UpdateClientContactAsync(clientContact);
 
-            _efCoreRepository.Update(clientContact);
-            int rowsAffected = await _unitOfWork.CommitAsync(); // Returns the number of affected rows
+            return true;
+        }
 
-            if (rowsAffected > 0)
-                return true;
-            else
-                return false;
+        public async Task<bool> IsEmailAvailableAsync(string email, int clientContactId = 0)
+        {
+            return await _unitOfWork.ClientContactRepository.IsEmailAvailableAsync(email, clientContactId);
         }
 
         public async Task UpdateClientContactApplicationUserId(int clientContactId, string applicationUserId)
         {
-            var clientContact = await _efCoreRepository.GetByIdAsync(clientContactId);
+            var clientContact = await _unitOfWork.ClientContactRepository.GetClientContactByIdAsync(clientContactId);
 
             if (clientContact == null)
             {
@@ -194,8 +205,7 @@ namespace CleanMe.Application.Services
 
             clientContact.ApplicationUserId = applicationUserId;
 
-            _efCoreRepository.Update(clientContact);
-            await _unitOfWork.CommitAsync();
+            await _unitOfWork.ClientContactRepository.UpdateClientContactAsync(clientContact);
         }
     }
 }

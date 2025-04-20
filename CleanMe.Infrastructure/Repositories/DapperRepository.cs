@@ -1,6 +1,6 @@
-﻿using Dapper;
+﻿using CleanMe.Domain.Interfaces;
+using Dapper;
 using System.Data;
-using CleanMe.Application.Interfaces;
 
 namespace CleanMe.Infrastructure.Repositories
 {

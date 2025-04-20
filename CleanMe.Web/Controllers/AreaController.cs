@@ -115,7 +115,7 @@ namespace CleanMe.Web.Controllers
                 }
                 else // Update Existing Area
                 {
-                    var existingArea = await _areaService.GetAreaByIdAsync(model.areaId);
+                    var existingArea = await _areaService.GetAreaViewModelByIdAsync(model.areaId);
                     if (existingArea == null)
                     {
                         TempData["ErrorMessage"] = "Area record not found.";
@@ -147,7 +147,7 @@ namespace CleanMe.Web.Controllers
         // GET: /Area/Delete?areaId=123
         public async Task<IActionResult> Delete(int areaId, string? returnUrl = null)
         {
-            var area = await _areaService.GetAreaByIdAsync(areaId);
+            var area = await _areaService.GetAreaViewModelByIdAsync(areaId);
             if (area == null)
             {
                 TempData["ErrorMessage"] = "Area not found.";

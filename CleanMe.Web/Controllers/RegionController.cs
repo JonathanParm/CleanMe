@@ -67,7 +67,7 @@ namespace CleanMe.Web.Controllers
 
                 if (regionId.HasValue) // Edit Mode
                 {
-                    model = await _regionService.GetRegionWithAreasByIdAsync(regionId.Value);
+                    model = await _regionService.GetRegionViewModelWithAreasByIdAsync(regionId.Value);
                     if (model == null)
                     {
                         return NotFound();
@@ -122,7 +122,7 @@ namespace CleanMe.Web.Controllers
                 }
                 else // Update Existing Region
                 {
-                    var existingRegion = await _regionService.GetRegionByIdAsync(model.regionId);
+                    var existingRegion = await _regionService.GetRegionViewModelByIdAsync(model.regionId);
                     if (existingRegion == null)
                     {
                         TempData["ErrorMessage"] = "Region record not found.";
@@ -152,7 +152,7 @@ namespace CleanMe.Web.Controllers
         // GET: /Region/Delete?regionId=123
         public async Task<IActionResult> Delete(int regionId)
         {
-            var region = await _regionService.GetRegionByIdAsync(regionId);
+            var region = await _regionService.GetRegionViewModelByIdAsync(regionId);
             if (region == null)
             {
                 TempData["ErrorMessage"] = "Region not found.";
@@ -169,7 +169,7 @@ namespace CleanMe.Web.Controllers
             try
             {
                 var userId = GetCurrentUserId();
-                var region = await _regionService.GetRegionByIdAsync(regionId);
+                var region = await _regionService.GetRegionViewModelByIdAsync(regionId);
                 if (region == null)
                 {
                     TempData["ErrorMessage"] = "Region not found.";

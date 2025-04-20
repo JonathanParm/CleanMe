@@ -69,5 +69,8 @@ namespace CleanMe.Domain.Entities
 
         // Navigation property
         public ICollection<ClientContact> ClientContacts { get; set; } = new List<ClientContact>();
+
+        // Navigation property
+        public ICollection<Asset> Assets { get; set; } = new List<Asset>();
     }
 }

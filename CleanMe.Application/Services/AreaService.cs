@@ -1,42 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using CleanMe.Application.Interfaces;
+﻿using CleanMe.Application.Interfaces;
 using CleanMe.Application.ViewModels;
-using CleanMe.Domain.Interfaces;
 using CleanMe.Domain.Entities;
-using CleanMe.Domain.Enums;
+using CleanMe.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
-using System.Reflection;
-using Microsoft.AspNetCore.Http.HttpResults;
-using CleanMe.Domain.Common;
-using CleanMe.Application.DTOs;
 
 namespace CleanMe.Application.Services
 {
     public class AreaService : IAreaService
     {
-        private readonly IRepository<Area> _efCoreRepository; // For EF Core CRUD
-        private readonly IAreaRepository _areaRepository; // For Dapper queries
-        private readonly IDapperRepository _dapperRepository;
-        private readonly IUserService _userService;
         private readonly IUnitOfWork _unitOfWork;
+
+        private readonly IUserService _userService;
         private readonly ILogger<StaffService> _logger;
 
         public AreaService(
-            IRepository<Area> efCoreRepository,
-            IAreaRepository areaRepository,
-            IDapperRepository dapperRepository,
-            IUserService userService,
             IUnitOfWork unitOfWork,
+            IUserService userService,
             ILogger<StaffService> logger)
         {
-            _efCoreRepository = efCoreRepository;
-            _areaRepository = areaRepository;
-            _dapperRepository = dapperRepository;
-            _userService = userService;
             _unitOfWork = unitOfWork;
+
+            _userService = userService;
             _logger = logger;
         }
 
@@ -46,9 +30,28 @@ namespace CleanMe.Application.Services
                 string sortColumn, string sortOrder, int pageNumber, int pageSize)
         {
             _logger.LogInformation("Fetching Areas list using Dapper.");
-            return await _areaRepository.GetAreaIndexAsync(
-                regionName, name, reportCode, isActive,
-                sortColumn, sortOrder, pageNumber, pageSize);
+            try
+            {
+                var query = "EXEC dbo.AreaGetIndexView @RegionName, @Name, @ReportCode, @IsActive, @SortColumn, @SortOrder, @PageNumber, @PageSize";
+                var parameters = new
+                {
+                    RegionName = regionName,
+                    Name = name,
+                    ReportCode = reportCode,
+                    IsActive = isActive,
+                    SortColumn = sortColumn,
+                    SortOrder = sortOrder,
+                    PageNumber = pageNumber,
+                    PageSize = pageSize
+                };
+
+                return await _unitOfWork.DapperRepository.QueryAsync<AreaIndexViewModel>(query, parameters);
+            }
+            catch (Exception ex)
+            {
+                // Log error (you can inject a logger if needed)
+                throw new ApplicationException("Error fetching Areas from stored procedure", ex);
+            }
         }
 
         public async Task<IEnumerable<AreaViewModel>> FindDuplicateAreaAsync(string name, int reportCode, int? areaId = null)
@@ -63,22 +66,35 @@ namespace CleanMe.Application.Services
 
             var parameters = new { Name = name, ReportCode = reportCode, areaId = areaId };
 
-            return await _dapperRepository.QueryAsync<AreaViewModel>(query, parameters);
-        }
-
-        public async Task<AreaViewModel?> GetAreaByIdAsync(int areaId)
-        {
-            return await _areaRepository.GetAreaByIdAsync(areaId);
+            return await _unitOfWork.DapperRepository.QueryAsync<AreaViewModel>(query, parameters);
         }
 
         public async Task<AreaViewModel?> GetAreaViewModelByIdAsync(int areaId)
         {
-            return await _areaRepository.GetAreaViewModelByIdAsync(areaId);
+            var area = await _unitOfWork.AreaRepository.GetAreaByIdAsync(areaId);
+
+            if (area == null)
+            {
+                return null; // No match found
+            }
+
+            // Convert `Area` entity to `AreaViewModel`
+            return new AreaViewModel
+            {
+                areaId = area.areaId,
+                Name = area.Name,
+                regionId = area.regionId,
+                RegionName = area.Region?.Name,
+                SequenceOrder = area.SequenceOrder,
+                SeqNo = area.SeqNo,
+                ReportCode = area.ReportCode,
+                IsActive = area.IsActive
+            };
         }
 
         public async Task<AreaViewModel?> GetAreaViewModelWithAssetLocationsByIdAsync(int areaId)
         {
-            var area = await _areaRepository.GetAreaViewModelWithAssetLocationsByIdAsync(areaId);
+            var area = await _unitOfWork.AreaRepository.GetAreaWithAssetLocationsByIdAsync(areaId);
 
             if (area == null)
             {
@@ -113,7 +129,18 @@ namespace CleanMe.Application.Services
 
         public async Task<AreaViewModel> PrepareNewAreaViewModelAsync(int regionId)
         {
-            return await _areaRepository.PrepareNewAreaViewModelAsync(regionId);
+            var region = await _unitOfWork.RegionRepository.GetRegionByIdAsync(regionId);
+
+            if (region == null)
+                throw new Exception("Region not found.");
+
+            return new AreaViewModel
+            {
+                regionId = region.regionId,
+                RegionName = region.Name,
+                AssetLocationsList = new List<AssetLocationIndexViewModel>(),
+                IsActive = true
+            };
         }
 
         // Creates a new Area (EF Core)
@@ -135,8 +162,7 @@ namespace CleanMe.Application.Services
                 UpdatedById = addedById
             };
 
-            await _efCoreRepository.AddAsync(Area);
-            await _unitOfWork.CommitAsync();
+            await _unitOfWork.AreaRepository.AddAreaAsync(Area);
 
             return Area.areaId;
         }
@@ -144,10 +170,10 @@ namespace CleanMe.Application.Services
         // Updates an existing Area (EF Core)
         public async Task UpdateAreaAsync(AreaViewModel model, string updatedById)
         {
-            var Area = await _efCoreRepository.GetByIdAsync(model.areaId);
+            var Area = await _unitOfWork.AreaRepository.GetAreaByIdAsync(model.areaId);
             if (Area == null)
             {
-                _logger.LogWarning($"Area with ID {model.areaId} not found.");
+                _logger.LogWarning($"Update Area with ID {model.areaId} not found.");
                 throw new Exception("Area not found.");
             }
 
@@ -160,35 +186,28 @@ namespace CleanMe.Application.Services
             Area.UpdatedAt = DateTime.UtcNow;
             Area.UpdatedById = updatedById;
 
-            _efCoreRepository.Update(Area);
-            await _unitOfWork.CommitAsync();
+            _unitOfWork.AreaRepository.UpdateAreaAsync(Area);
         }
 
         public async Task<bool> SoftDeleteAreaAsync(int areaId, string updatedById)
         {
-            var Area = await _efCoreRepository.GetByIdAsync(areaId);
+            var area = await _unitOfWork.AreaRepository.GetAreaByIdAsync(areaId);
 
-            if (Area == null)
+            if (area == null)
             {
-                throw new KeyNotFoundException("Area not found.");
+                _logger.LogWarning($"Soft Delete Area with ID {areaId} not found.");
+                throw new Exception("Area not found.");
             }
 
             // Soft delete staff
-            Area.IsDeleted = true;
-            Area.IsActive = false;
-            Area.UpdatedAt = DateTime.UtcNow;
-            Area.UpdatedById = updatedById;
+            area.IsDeleted = true;
+            area.IsActive = false;
+            area.UpdatedAt = DateTime.UtcNow;
+            area.UpdatedById = updatedById;
 
-            _efCoreRepository.Update(Area);
-            await _unitOfWork.CommitAsync();
+            _unitOfWork.AreaRepository.UpdateAreaAsync(area);
 
-            _efCoreRepository.Update(Area);
-            int rowsAffected = await _unitOfWork.CommitAsync(); // Returns the number of affected rows
-
-            if (rowsAffected > 0)
-                return true;
-            else
-                return false;
+            return true;
         }
     }
 }

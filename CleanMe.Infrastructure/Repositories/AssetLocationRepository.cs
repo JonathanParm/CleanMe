@@ -21,102 +21,26 @@ namespace CleanMe.Infrastructure.Repositories
 {
     public class AssetLocationRepository : IAssetLocationRepository
     {
-        private readonly string _connectionString;
         private readonly ApplicationDbContext _context;
-        private readonly IDapperRepository _dapperRepository;
 
-        public AssetLocationRepository(IConfiguration configuration, ApplicationDbContext context, IDapperRepository dapperRepository)
+        public AssetLocationRepository(ApplicationDbContext context)
         {
-            _connectionString = configuration.GetConnectionString("DefaultConnection");
             _context = context;
-            _dapperRepository = dapperRepository;
         }
 
-        public async Task<IEnumerable<AssetLocationIndexViewModel>> GetAssetLocationIndexAsync(
-                string? areaName, string? description, string? townSuburb, string? reportCode, string? isActive,
-                string sortColumn, string sortOrder, int pageNumber, int pageSize)
+        public async Task<IEnumerable<AssetLocation>> GetAllAssetLocationsAsync()
         {
-            try
-            {
-                var sql = "EXEC dbo.AssetLocationGetIndexView @AreaName, @Description, @TownSuburb, @ReportCode, @IsActive, @SortColumn, @SortOrder, @PageNumber, @PageSize";
-                var parameters = new
-                {
-                    AreaName = areaName,
-                    Description = description,
-                    TownSuburb = townSuburb,
-                    ReportCode = reportCode,
-                    IsActive = isActive,
-                    SortColumn = sortColumn,
-                    SortOrder = sortOrder,
-                    PageNumber = pageNumber,
-                    PageSize = pageSize
-                };
-
-                using var connection = new SqlConnection(_connectionString);
-                return await connection.QueryAsync<AssetLocationIndexViewModel>(sql, parameters);
-            }
-            catch (Exception ex)
-            {
-                // Log error (you can inject a logger if needed)
-                throw new ApplicationException("Error fetching AssetLocations from stored procedure", ex);
-            }
+            return await _context.AssetLocations
+                .Where(c => !c.IsDeleted)
+                .OrderBy(c => c.Description)
+                .ToListAsync();
         }
 
-        public async Task<AssetLocationViewModel?> GetAssetLocationViewModelByIdAsync(int assetLocationId)
+        public async Task<AssetLocation?> GetAssetLocationByIdAsync(int assetLocationId)
         {
-            var sql = "dbo.AssetLocationGetById";
-            var parameters = new { assetLocationId = assetLocationId };
-
-            var results = await _dapperRepository.QueryAsync<AssetLocationWithAddressDto>(sql, parameters, CommandType.StoredProcedure);
-            var row = results.FirstOrDefault();
-            if (row == null) return null;
-
-            // Convert `AssetLocation` entity to `AssetLocationViewModel`
-            return new AssetLocationViewModel
-            {
-                assetLocationId = row.assetLocationId,
-                Description = row.Description,
-                areaId = row.areaId,
-                Address = new AddressViewModel
-                {
-                    Line1 = row.AddressLine1,
-                    Line2 = row.AddressLine2,
-                    Suburb = row.AddressSuburb,
-                    TownOrCity = row.AddressTownOrCity,
-                    Postcode = row.AddressPostcode
-                },
-                SequenceOrder = row.SequenceOrder,
-                SeqNo = row.SeqNo,
-                ReportCode = row.ReportCode,
-                AccNo = row.AccNo,
-                IsActive = row.IsActive
-            };
+            return await _context.AssetLocations
+                .FirstOrDefaultAsync(al => al.assetLocationId == assetLocationId);
         }
-
-        //public async Task<AssetLocationViewModel?> GetAssetLocationViewModelByIdAsync(int assetLocationId)
-        //{
-        //    var assetLocation = await _context.AssetLocations
-        //        .Include(al => al.Area)
-        //        .FirstOrDefaultAsync(al => al.assetLocationId == assetLocationId);
-
-        //    if (assetLocation == null)
-        //    {
-        //        return null; // No match found
-        //    }
-
-        //    // Convert `AssetLocation` entity to `AssetLocationViewModel`
-        //    return new AssetLocationViewModel
-        //    {
-        //        assetLocationId = assetLocation.assetLocationId,
-        //        Description = assetLocation.Description,
-        //        areaId = assetLocation.areaId,
-        //        AreaName = assetLocation.Area?.Name,
-        //        SequenceOrder = assetLocation.SequenceOrder,
-        //        SeqNo = assetLocation.SeqNo,
-        //        //ReportCode = assetLocation.ReportCode,
-        //        IsActive = assetLocation.IsActive
-        //    };
-        //}
 
         public async Task<AssetLocationViewModel> PrepareNewAssetLocationViewModelAsync(int areaId)
         {
@@ -136,26 +60,16 @@ namespace CleanMe.Infrastructure.Repositories
             };
         }
 
-        public async Task AddAssetLocationAsync(AssetLocation assetLocation, string createdById)
+        public async Task AddAssetLocationAsync(AssetLocation assetLocation)
         {
             await _context.AssetLocations.AddAsync(assetLocation);
             await _context.SaveChangesAsync();
         }
 
-        public async Task UpdateAssetLocationAsync(AssetLocation assetLocation, string updatedById)
+        public async Task UpdateAssetLocationAsync(AssetLocation assetLocation)
         {
             _context.AssetLocations.Update(assetLocation);
             await _context.SaveChangesAsync();
-        }
-
-        public async Task SoftDeleteAssetLocationAsync(int id, string deletedById)
-        {
-            var assetLocation = await _context.AssetLocations.FindAsync(id);
-            if (assetLocation != null)
-            {
-                _context.AssetLocations.Remove(assetLocation);
-                await _context.SaveChangesAsync();
-            }
         }
     }
 }

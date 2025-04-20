@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace CleanMe.Application.ViewModels
 {
@@ -39,6 +40,8 @@ namespace CleanMe.Application.ViewModels
         public bool IsActive { get; set; } = true;
 
         public string? RegionName { get; set; }
+
+        public IEnumerable<SelectListItem> Regions { get; set; } = new List<SelectListItem>();
 
         public List<AssetLocationIndexViewModel> AssetLocationsList { get; set; } = new();
 

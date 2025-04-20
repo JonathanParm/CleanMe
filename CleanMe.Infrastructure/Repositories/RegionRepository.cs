@@ -1,60 +1,26 @@
-﻿using CleanMe.Application.Interfaces;
-using CleanMe.Application.ViewModels;
-using CleanMe.Domain.Entities;
-using CleanMe.Domain.Enums;
+﻿using CleanMe.Domain.Entities;
 using CleanMe.Domain.Interfaces;
 using CleanMe.Infrastructure.Data;
-using Dapper;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CleanMe.Infrastructure.Repositories
 {
     public class RegionRepository : IRegionRepository
     {
-        private readonly string _connectionString;
         private readonly ApplicationDbContext _context;
-        private readonly IDapperRepository _dapperRepository;
 
-        public RegionRepository(IConfiguration configuration, ApplicationDbContext context, IDapperRepository dapperRepository)
+        public RegionRepository(ApplicationDbContext context)
         {
-            _connectionString = configuration.GetConnectionString("DefaultConnection");
             _context = context;
-            _dapperRepository = dapperRepository;
         }
 
-        public async Task<IEnumerable<RegionIndexViewModel>> GetRegionIndexAsync(
-                string? name, string? code, string? isActive,
-                string sortColumn, string sortOrder, int pageNumber, int pageSize)
+        public async Task<IEnumerable<Region>> GetAllRegionsAsync()
         {
-            try
-            {
-                var sql = "EXEC dbo.RegionGetIndexView @Name, @Code, @IsActive, @SortColumn, @SortOrder, @PageNumber, @PageSize";
-                var parameters = new
-                {
-                    Name = name,
-                    Code = code,
-                    IsActive = isActive,
-                    SortColumn = sortColumn,
-                    SortOrder = sortOrder,
-                    PageNumber = pageNumber,
-                    PageSize = pageSize
-                };
-
-                using var connection = new SqlConnection(_connectionString);
-                return await connection.QueryAsync<RegionIndexViewModel>(sql, parameters);
-            }
-            catch (Exception ex)
-            {
-                // Log error (you can inject a logger if needed)
-                throw new ApplicationException("Error fetching regions from stored procedure", ex);
-            }
+            return await _context.Regions
+                .Where(c => !c.IsDeleted)
+                .OrderBy(c => c.Name)
+                .ToListAsync();
         }
 
         public async Task<Region?> GetRegionByIdAsync(int regionId)
@@ -69,26 +35,16 @@ namespace CleanMe.Infrastructure.Repositories
                 .FirstOrDefaultAsync(r => r.regionId == regionId);
         }
 
-        public async Task AddRegionAsync(Region region, string createdById)
+        public async Task AddRegionAsync(Region region)
         {
             await _context.Regions.AddAsync(region);
             await _context.SaveChangesAsync();
         }
 
-        public async Task UpdateRegionAsync(Region region, string updatedById)
+        public async Task UpdateRegionAsync(Region region)
         {
             _context.Regions.Update(region);
             await _context.SaveChangesAsync();
-        }
-
-        public async Task SoftDeleteRegionAsync(int id, string deletedById)
-        {
-            var region = await _context.Regions.FindAsync(id);
-            if (region != null)
-            {
-                _context.Regions.Remove(region);
-                await _context.SaveChangesAsync();
-            }
         }
     }
 }

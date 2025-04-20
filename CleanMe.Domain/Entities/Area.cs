@@ -45,7 +45,7 @@ namespace CleanMe.Domain.Entities
         public int SeqNo { get; set; }
 
         [Required]
-        [Display(Name = "Active")]
+        [DisplayName("Active")]
         public bool IsActive { get; set; } = true;
 
         [Required]
@@ -57,7 +57,9 @@ namespace CleanMe.Domain.Entities
         public DateTime AddedAt { get; set; }
 
         [Required]
-        [DisplayName("Added by")]
+        [DisplayName("Created by")]
+        [Column(TypeName = "NVARCHAR")]
+        [StringLength(450)]
         public string AddedById { get; set; }
 
         [Required]
@@ -66,6 +68,8 @@ namespace CleanMe.Domain.Entities
 
         [Required]
         [DisplayName("Updated by")]
+        [Column(TypeName = "NVARCHAR")]
+        [StringLength(450)]
         public string UpdatedById { get; set; }
 
         // Navigation property

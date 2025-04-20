@@ -1,0 +1,82 @@
+﻿@using CleanMe.Application.ViewModels
+@using CleanMe.Domain.Enums
+@using CleanMe.Shared.Helpers
+
+@model CleanMe.Application.ViewModels.AssetViewModel
+
+@{
+    ViewData["Title"] = Model.assetId == 0 ? "Add Asset" : "Edit Asset";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form asp-action="AddEdit" method="post" id="AssetForm" novalidate>
+    @Html.AntiForgeryToken()
+
+    @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+
+    <input asp-for="assetId" type="hidden" />
+
+    <div class="form-group">
+        <label asp-for="MdReference" class="form-label"></label>
+        <input asp-for="MdReference" class="form-control" required />
+        <span asp-validation-for="MdReference" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Name" class="form-label"></label>
+        <input asp-for="Name" class="form-control" required />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="ClientReference" class="form-label"></label>
+        <input asp-for="ClientReference" class="form-control" required />
+        <span asp-validation-for="ClientReference" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="clientId" class="form-label"></label>
+        <select asp-for="clientId" class="form-control" asp-items="Model.Clients"></select>
+        <span asp-validation-for="clientId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="assetLocationId" class="form-label"></label>
+        <select asp-for="assetLocationId" class="form-control" asp-items="Model.AssetLocations"></select>
+        <span asp-validation-for="assetLocationId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="assetTypeId" class="form-label"></label>
+        <select asp-for="assetTypeId" class="form-control" asp-items="Model.AssetTypes"></select>
+        <span asp-validation-for="assetTypeId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Position" class="form-label"></label>
+        <input asp-for="Position" class="form-control" required />
+        <span asp-validation-for="Position" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Access" class="form-label"></label>
+        <input asp-for="Access" class="form-control" required />
+        <span asp-validation-for="Access" class="text-danger"></span>
+    </div>
+
+    <div class="form-check">
+        <input asp-for="Inaccessable" class="form-check-input" type="checkbox" />
+        <label asp-for="Inaccessable" class="form-check-label ms-2"></label>
+    </div>
+    <span asp-validation-for="Inaccessable" class="text-danger"></span>
+
+
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>
+
+@section Scripts {
+    <script>
+    </script>
+}

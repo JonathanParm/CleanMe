@@ -1,0 +1,124 @@
+﻿@using CleanMe.Web.Helpers
+@model IEnumerable<CleanMe.Application.ViewModels.AssetIndexViewModel>
+
+@{
+    ViewData["Title"] = "Asset List";
+    string sortOrder = ViewBag.SortOrder as string ?? "ASC";
+    string sortColumn = ViewBag.SortColumn as string ?? "AssetName";
+}
+
+<h2>Asset List</h2>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<!-- Add Button (Top-Right) -->
+<div class="text-end mb-3">
+    <a asp-action="AddEdit" class="btn btn-primary">Add Asset</a>
+</div>
+
+<!-- Filtering Form -->
+<form method="get" id="filterForm">
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <!-- Column Headers with Sorting -->
+                <tr>
+                    <th>
+                        <a href="#" onclick="sortTable('AssetName')">
+                            Asset @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "AssetName"))
+                        </a>
+                    </th>
+                    <th>
+                        <a href="#" onclick="sortTable('RegionName')">
+                            Region @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "RegionName"))
+                        </a>
+                    </th>
+                    <th>
+                        <a href="#" onclick="sortTable('MdReference')">
+                            MD Reference @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "MdReference"))
+                        </a>
+                    </th>
+                    <th>
+                        <a href="#" onclick="sortTable('ClientName')">
+                            Client @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "ClientName"))
+                        </a>
+                    </th>
+                    <th>
+                        <a href="#" onclick="sortTable('ClientReference')">
+                            Client Reference @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "ClientReference"))
+                        </a>
+                    </th>
+                    <th>
+                        <a href="#" onclick="sortTable('AssetLocation')">
+                            Location @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "AssetLocation"))
+                        </a>
+                    </th>
+                    <th>
+                        <a href="#" onclick="sortTable('AssetType')">
+                            Type @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "AssetType"))
+                        </a>
+                    </th>
+                    <th>Actions</th>
+                </tr>
+
+                <!-- Filter Row -->
+                <tr>
+                    <td><input type="text" name="assetName" class="form-control" value="@ViewBag.AssetName" placeholder="Search Asset"></td>
+                    <td><input type="text" name="regionName" class="form-control" value="@ViewBag.RegionName" placeholder="Search Region"></td>
+                    <td><input type="text" name="mdReference" class="form-control" value="@ViewBag.MdReference" placeholder="Search MD Ref."></td>
+                    <td><input type="text" name="clientName" class="form-control" value="@ViewBag.ClientName" placeholder="Search Client"></td>
+                    <td><input type="text" name="clientReference" class="form-control" value="@ViewBag.ClientReference" placeholder="Search Client Ref."></td>
+                    <td><input type="text" name="assetLocation" class="form-control" value="@ViewBag.AssetLocation" placeholder="Search Location"></td>
+                    <td><input type="text" name="assetType" class="form-control" value="@ViewBag.AssetType" placeholder="Search Type"></td>
+                    <td>
+                        <button type="submit" class="btn btn-success">Filter</button>
+                        <a href="@Url.Action("Index", "Asset")" class="btn btn-secondary">Clear</a>
+                    </td>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var Asset in Model)
+                {
+                    <tr>
+                        <td>@Asset.AssetName</td>
+                        <td>@Asset.RegionName</td>
+                        <td>@Asset.MdReference</td>
+                        <td>@Asset.ClientName</td>
+                        <td>@Asset.ClientReference</td>
+                        <td>@Asset.AssetLocation</td>
+                        <td>@Asset.AssetType</td>
+                        <td>
+                            <a asp-action="AddEdit" asp-route-assetId="@Asset.assetId" class="btn btn-warning btn-sm">Edit</a>
+                            <a asp-action="Delete" asp-route-assetId="@Asset.assetId" class="btn btn-danger btn-sm">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</form>
+
+<!-- JavaScript for Sorting -->
+<script>
+    function sortTable(column) {
+        let sortColumn = new URLSearchParams(window.location.search).get("sortColumn");
+        let sortOrder = new URLSearchParams(window.location.search).get("sortOrder") === "ASC" ? "DESC" : "ASC";
+        let params = new URLSearchParams(window.location.search);
+        params.set("sortColumn", column);
+        params.set("sortOrder", sortOrder);
+        window.location.search = params.toString();
+    }
+</script>
+
+

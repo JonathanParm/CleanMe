@@ -70,28 +70,33 @@ builder.Services.AddScoped<IDbConnection>(sp =>
 
 // Add services
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<UserManager<ApplicationUser>>();
-builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddScoped<IStaffService, StaffService>();
-builder.Services.AddScoped<IStaffRepository, StaffRepository>();
-builder.Services.AddScoped<IClientService, ClientService>();
-builder.Services.AddScoped<IClientRepository, ClientRepository>();
-builder.Services.AddScoped<IClientContactService, ClientContactService>();
-builder.Services.AddScoped<IClientContactRepository, ClientContactRepository>();
-builder.Services.AddScoped<IRegionService, RegionService>();
-builder.Services.AddScoped<IRegionRepository, RegionRepository>();
-builder.Services.AddScoped<IAreaService, AreaService>();
-builder.Services.AddScoped<IAreaRepository, AreaRepository>();
-builder.Services.AddScoped<ICleanFrequencyService, CleanFrequencyService>();
-builder.Services.AddScoped<ICleanFrequencyRepository, CleanFrequencyRepository>();
-builder.Services.AddScoped<IAssetLocationService, AssetLocationService>();
-builder.Services.AddScoped<IAssetLocationRepository, AssetLocationRepository>();
-builder.Services.AddScoped<IAssetTypeService, AssetTypeService>();
-builder.Services.AddScoped<IAssetTypeRepository, AssetTypeRepository>();
-
-
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IErrorLoggingService, ErrorLoggingService>();
+builder.Services.AddScoped<UserManager<ApplicationUser>>();
+builder.Services.AddScoped<IDapperRepository, DapperRepository>();
+
+builder.Services.AddScoped<IAreaService, AreaService>();
+builder.Services.AddScoped<IAreaRepository, AreaRepository>();
+builder.Services.AddScoped<IAssetLocationService, AssetLocationService>();
+builder.Services.AddScoped<IAssetLocationRepository, AssetLocationRepository>();
+builder.Services.AddScoped<IAssetService, AssetService>();
+builder.Services.AddScoped<IAssetRepository, AssetRepository>();
+builder.Services.AddScoped<IAssetTypeService, AssetTypeService>();
+builder.Services.AddScoped<IAssetTypeRepository, AssetTypeRepository>();
+builder.Services.AddScoped<ICleanFrequencyService, CleanFrequencyService>();
+builder.Services.AddScoped<ICleanFrequencyRepository, CleanFrequencyRepository>();
+builder.Services.AddScoped<IClientContactService, ClientContactService>();
+builder.Services.AddScoped<IClientContactRepository, ClientContactRepository>();
+builder.Services.AddScoped<IClientService, ClientService>();
+builder.Services.AddScoped<IClientRepository, ClientRepository>();
+builder.Services.AddScoped<IRegionService, RegionService>();
+builder.Services.AddScoped<IRegionRepository, RegionRepository>();
+builder.Services.AddScoped<IStaffService, StaffService>();
+builder.Services.AddScoped<IStaffRepository, StaffRepository>();
+
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<ILookupService, LookupService>();
+
 builder.Services.AddControllersWithViews(options =>
 {
     options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());

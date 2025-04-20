@@ -56,5 +56,8 @@ namespace CleanMe.Domain.Entities
         [Column(TypeName = "NVARCHAR")]
         [StringLength(450)]
         public string UpdatedById { get; set; }
+
+        //Navigation property
+        public ICollection<Asset> Assets { get; set; } = new List<Asset>();
     }
 }

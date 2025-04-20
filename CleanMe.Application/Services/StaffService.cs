@@ -12,30 +12,23 @@ using System.Reflection;
 using Microsoft.AspNetCore.Http.HttpResults;
 using CleanMe.Domain.Common;
 using CleanMe.Application.DTOs;
+using System.Collections;
+using System.Data;
 
 namespace CleanMe.Application.Services
 {
     public class StaffService : IStaffService
     {
-        private readonly IRepository<Staff> _efCoreRepository; // For EF Core CRUD
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IStaffRepository _staffRepository;
-        private readonly IDapperRepository _dapperRepository;
         private readonly IUserService _userService;
         private readonly ILogger<StaffService> _logger;
 
         public StaffService(
-            IRepository<Staff> efCoreRepository,
             IUnitOfWork unitOfWork,
-            IStaffRepository staffRepository,
-            IDapperRepository dapperRepository,
             IUserService userService,
             ILogger<StaffService> logger)
         {
-            _efCoreRepository = efCoreRepository;
             _unitOfWork = unitOfWork;
-            _staffRepository = staffRepository;
-            _dapperRepository = dapperRepository;
             _userService = userService;
             _logger = logger;
         }
@@ -46,9 +39,22 @@ namespace CleanMe.Application.Services
             string sortColumn, string sortOrder, int pageNumber, int pageSize)
         {
             _logger.LogInformation("Fetching staff list using Dapper.");
-            return await _staffRepository.GetStaffIndexAsync(
-                staffNo, fullName, workRole, contactDetail, isActive,
-                sortColumn, sortOrder, pageNumber, pageSize);
+            var query = "EXEC dbo.StaffGetIndexView @StaffNo, @FullName, @WorkRole, @ContactDetail, @IsActive, @SortColumn, @SortOrder, @PageNumber, @PageSize";
+
+            var parameters = new
+            {
+                StaffNo = staffNo,
+                FullName = fullName,
+                WorkRole = workRole,
+                ContactDetail = contactDetail,
+                IsActive = isActive,
+                SortColumn = sortColumn,
+                SortOrder = sortOrder,
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            };
+
+            return await _unitOfWork.DapperRepository.QueryAsync<StaffIndexViewModel>(query, parameters);
         }
 
         public async Task<IEnumerable<StaffViewModel>> FindDuplicateStaffAsync(string firstName, string familyName, int? staffNo, int? staffId = null)
@@ -63,7 +69,7 @@ namespace CleanMe.Application.Services
 
             var parameters = new { FirstName = firstName, FamilyName = familyName, StaffNo = staffNo, staffId = staffId };
 
-            var duplicateStaff = await _dapperRepository.QueryAsync<StaffWithAddressDto>(query, parameters);
+            var duplicateStaff = await _unitOfWork.DapperRepository.QueryAsync<StaffWithAddressDto>(query, parameters);
 
             // Map `Staff` entity to `StaffViewModel`
             return duplicateStaff.Select(s => new StaffViewModel
@@ -93,40 +99,40 @@ namespace CleanMe.Application.Services
             });
         }
 
-        public async Task<StaffViewModel?> GetStaffByIdAsync(int staffId)
+        public async Task<StaffViewModel?> GetStaffViewModelByIdAsync(int staffId)
         {
-            var staff = await _staffRepository.GetStaffByIdAsync(staffId); // Calls repository
+            var query = "dbo.StaffGetById";
+            var parameters = new { staffId = staffId };
 
-            if (staff == null)
-            {
-                return null; // No match found
-            }
+            var results = await _unitOfWork.DapperRepository.QueryAsync<StaffWithAddressDto>(query, parameters, CommandType.StoredProcedure);
+            var row = results.FirstOrDefault();
+            if (row == null) return null;
 
             // Convert `Staff` entity to `StaffViewModel`
             return new StaffViewModel
             {
-                StaffId = staff.staffId,
-                StaffNo = staff.StaffNo,
-                FirstName = staff.FirstName,
-                FamilyName = staff.FamilyName,
-                PhoneHome = staff.PhoneHome,
-                PhoneMobile = staff.PhoneMobile,
-                Email = staff.Email,
+                StaffId = row.staffId,
+                StaffNo = row.StaffNo,
+                FirstName = row.FirstName,
+                FamilyName = row.FamilyName,
+                PhoneHome = row.PhoneHome,
+                PhoneMobile = row.PhoneMobile,
+                Email = row.Email,
                 Address = new AddressViewModel
                 {
-                    Line1 = staff.Address.Line1,
-                    Line2 = staff.Address.Line2,
-                    Suburb = staff.Address.Suburb,
-                    TownOrCity = staff.Address.TownOrCity,
-                    Postcode = staff.Address.Postcode,
+                    Line1 = row.AddressLine1,
+                    Line2 = row.AddressLine2,
+                    Suburb = row.AddressSuburb,
+                    TownOrCity = row.AddressTownOrCity,
+                    Postcode = row.AddressPostcode
                 },
-                IrdNumber = staff.IrdNumber,
-                BankAccount = staff.BankAccount,
-                PayrollId = staff.PayrollId,
-                JobTitle = staff.JobTitle,
-                WorkRole = staff.WorkRole,
-                IsActive = staff.IsActive,
-                ApplicationUserId = staff.ApplicationUserId
+                IrdNumber = row.IrdNumber,
+                BankAccount = row.BankAccount,
+                PayrollId = row.PayrollId,
+                JobTitle = row.JobTitle,
+                WorkRole = row.WorkRole,
+                IsActive = row.IsActive,
+                ApplicationUserId = row.ApplicationUserId
             };
         }
 
@@ -141,10 +147,9 @@ namespace CleanMe.Application.Services
 
             var parameters = new { Email = email, StaffId = staffId };
 
-            int count = await _dapperRepository.ExecuteScalarAsync<int>(query, parameters); // Ensures int return type
+            int count = await _unitOfWork.DapperRepository.ExecuteScalarAsync<int>(query, parameters); // Ensures int return type
             return count == 0; // Email is available if count is 0
         }
-
 
         // Creates a new staff member (EF Core)
         public async Task<int> AddStaffAsync(StaffViewModel model, string addedById)
@@ -180,8 +185,7 @@ namespace CleanMe.Application.Services
                 UpdatedById = addedById
             };
 
-            await _efCoreRepository.AddAsync(staff);
-            await _unitOfWork.CommitAsync();
+            await _unitOfWork.StaffRepository.AddStaffAsync(staff);
 
             return staff.staffId;
         }
@@ -189,7 +193,7 @@ namespace CleanMe.Application.Services
         // Updates an existing staff member (EF Core)
         public async Task UpdateStaffAsync(StaffViewModel model, string updatedById)
         {
-            var staff = await _efCoreRepository.GetByIdAsync(model.StaffId);
+            var staff = await _unitOfWork.StaffRepository.GetStaffByIdAsync(model.StaffId);
             if (staff == null)
             {
                 _logger.LogWarning($"Staff member with ID {model.StaffId} not found.");
@@ -220,13 +224,13 @@ namespace CleanMe.Application.Services
             staff.UpdatedAt = DateTime.UtcNow;
             staff.UpdatedById = updatedById;
 
-            _efCoreRepository.Update(staff);
+            await _unitOfWork.StaffRepository.UpdateStaffAsync(staff);
             await _unitOfWork.CommitAsync();
         }
 
         public async Task<bool> SoftDeleteStaffAsync(int staffId, string updatedById)
         {
-            var staff = await _efCoreRepository.GetByIdAsync(staffId);
+            var staff = await _unitOfWork.StaffRepository.GetStaffByIdAsync(staffId);
 
             if (staff == null)
             {
@@ -239,22 +243,15 @@ namespace CleanMe.Application.Services
             staff.UpdatedAt = DateTime.UtcNow;
             staff.UpdatedById = updatedById;
 
-            _efCoreRepository.Update(staff);
-            await _unitOfWork.CommitAsync();
+            await _unitOfWork.StaffRepository.UpdateStaffAsync(staff);
 
-            _efCoreRepository.Update(staff);
-            int rowsAffected = await _unitOfWork.CommitAsync(); // Returns the number of affected rows
-
-            if (rowsAffected > 0)
-                return true;
-            else
-                return false;
+            return true;
         }
 
         // Assigns a login account to a staff member (via UserService)
         public async Task<bool> AssignApplicationUserAsync(int staffId, string email, string password)
         {
-            var staff = await _efCoreRepository.GetByIdAsync(staffId);
+            var staff = await _unitOfWork.StaffRepository.GetStaffByIdAsync(staffId);
             if (staff == null)
             {
                 _logger.LogWarning($"Staff with ID {staffId} not found for user assignment.");
@@ -275,8 +272,7 @@ namespace CleanMe.Application.Services
             }
 
             staff.ApplicationUserId = applicationUserId;
-            _efCoreRepository.Update(staff);
-            await _unitOfWork.CommitAsync();
+            await _unitOfWork.StaffRepository.UpdateStaffAsync(staff);
 
             _logger.LogInformation($"Successfully assigned ApplicationUserId {applicationUserId} to Staff ID {staffId}.");
             return true;
@@ -284,7 +280,7 @@ namespace CleanMe.Application.Services
 
         public async Task UpdateStaffApplicationUserId(int staffId, string applicationUserId)
         {
-            var staff = await _efCoreRepository.GetByIdAsync(staffId);
+            var staff = await _unitOfWork.StaffRepository.GetStaffByIdAsync(staffId);
 
             if (staff == null)
             {
@@ -292,9 +288,7 @@ namespace CleanMe.Application.Services
             }
 
             staff.ApplicationUserId = applicationUserId;
-
-            _efCoreRepository.Update(staff);
-            await _unitOfWork.CommitAsync();
+            await _unitOfWork.StaffRepository.UpdateStaffAsync(staff);
         }
 
     }

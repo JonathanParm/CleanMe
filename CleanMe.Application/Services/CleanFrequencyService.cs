@@ -12,31 +12,23 @@ using System.Reflection;
 using Microsoft.AspNetCore.Http.HttpResults;
 using CleanMe.Domain.Common;
 using CleanMe.Application.DTOs;
+using System.Collections;
 
 namespace CleanMe.Application.Services
 {
     public class CleanFrequencyService : ICleanFrequencyService
     {
-        private readonly IRepository<CleanFrequency> _efCoreRepository; // For EF Core CRUD
-        private readonly ICleanFrequencyRepository _CleanFrequencyRepository; // For Dapper queries
-        private readonly IDapperRepository _dapperRepository;
-        private readonly IUserService _userService;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IUserService _userService;
         private readonly ILogger<StaffService> _logger;
 
         public CleanFrequencyService(
-            IRepository<CleanFrequency> efCoreRepository,
-            ICleanFrequencyRepository CleanFrequencyRepository,
-            IDapperRepository dapperRepository,
-            IUserService userService,
             IUnitOfWork unitOfWork,
+            IUserService userService,
             ILogger<StaffService> logger)
         {
-            _efCoreRepository = efCoreRepository;
-            _CleanFrequencyRepository = CleanFrequencyRepository;
-            _dapperRepository = dapperRepository;
-            _userService = userService;
             _unitOfWork = unitOfWork;
+            _userService = userService;
             _logger = logger;
         }
 
@@ -46,9 +38,28 @@ namespace CleanMe.Application.Services
             string sortColumn, string sortOrder, int pageNumber, int pageSize)
         {
             _logger.LogInformation("Fetching Clean Frequencies list using Dapper.");
-            return await _CleanFrequencyRepository.GetCleanFrequencyIndexAsync(
-                name, description, code, isActive,
-                sortColumn, sortOrder, pageNumber, pageSize);
+            try
+            {
+                var query = "EXEC dbo.CleanFrequencyGetIndexView @Name, @Description, @Code, @IsActive, @SortColumn, @SortOrder, @PageNumber, @PageSize";
+                var parameters = new
+                {
+                    Name = name,
+                    Description = description,
+                    Code = code,
+                    IsActive = isActive,
+                    SortColumn = sortColumn,
+                    SortOrder = sortOrder,
+                    PageNumber = pageNumber,
+                    PageSize = pageSize
+                };
+
+                return await _unitOfWork.DapperRepository.QueryAsync<CleanFrequencyIndexViewModel>(query, parameters);
+            }
+            catch (Exception ex)
+            {
+                // Log error (you can inject a logger if needed)
+                throw new ApplicationException("Error fetching CleanFrequencys from stored procedure", ex);
+            }
         }
 
         public async Task<IEnumerable<CleanFrequencyViewModel>> FindDuplicateCleanFrequencyAsync(string name, string code, int? cleanFrequencyId = null)
@@ -63,12 +74,12 @@ namespace CleanMe.Application.Services
 
             var parameters = new { Name = name, Code = code, CleanFrequencyId = cleanFrequencyId };
 
-            return await _dapperRepository.QueryAsync<CleanFrequencyViewModel>(query, parameters);
+            return await _unitOfWork.DapperRepository.QueryAsync<CleanFrequencyViewModel>(query, parameters);
         }
 
-        public async Task<CleanFrequencyViewModel?> GetCleanFrequencyByIdAsync(int cleanFrequencyId)
+        public async Task<CleanFrequencyViewModel?> GetCleanFrequencyViewModelByIdAsync(int cleanFrequencyId)
         {
-            var CleanFrequency = await _CleanFrequencyRepository.GetCleanFrequencyByIdAsync(cleanFrequencyId);
+            var CleanFrequency = await _unitOfWork.CleanFrequencyRepository.GetCleanFrequencyByIdAsync(cleanFrequencyId);
 
             if (CleanFrequency == null)
             {
@@ -91,7 +102,7 @@ namespace CleanMe.Application.Services
         {
             _logger.LogInformation($"Adding new cleaning frequency: {model.Name}");
 
-            var CleanFrequency = new CleanFrequency
+            var cleanFrequency = new CleanFrequency
             {
                 Name = model.Name,
                 Description = model.Description,
@@ -103,58 +114,50 @@ namespace CleanMe.Application.Services
                 UpdatedById = addedById
             };
 
-            await _efCoreRepository.AddAsync(CleanFrequency);
-            await _unitOfWork.CommitAsync();
+            await _unitOfWork.CleanFrequencyRepository.AddCleanFrequencyAsync(cleanFrequency);
 
-            return CleanFrequency.cleanFrequencyId;
+            return cleanFrequency.cleanFrequencyId;
         }
 
         // Updates an existing CleanFrequency (EF Core)
         public async Task UpdateCleanFrequencyAsync(CleanFrequencyViewModel model, string updatedById)
         {
-            var CleanFrequency = await _efCoreRepository.GetByIdAsync(model.cleanFrequencyId);
-            if (CleanFrequency == null)
+            var cleanFrequency = await _unitOfWork.CleanFrequencyRepository.GetCleanFrequencyByIdAsync(model.cleanFrequencyId);
+            if (cleanFrequency == null)
             {
                 _logger.LogWarning($"Clean Frequency with ID {model.cleanFrequencyId} not found.");
                 throw new Exception("Clean Frequency not found.");
             }
 
-            CleanFrequency.Name = model.Name;
-            CleanFrequency.Description = model.Description;
-            CleanFrequency.Code = model.Code;
-            CleanFrequency.IsActive = model.IsActive;
-            CleanFrequency.UpdatedAt = DateTime.UtcNow;
-            CleanFrequency.UpdatedById = updatedById;
+            cleanFrequency.Name = model.Name;
+            cleanFrequency.Description = model.Description;
+            cleanFrequency.Code = model.Code;
+            cleanFrequency.IsActive = model.IsActive;
+            cleanFrequency.UpdatedAt = DateTime.UtcNow;
+            cleanFrequency.UpdatedById = updatedById;
 
-            _efCoreRepository.Update(CleanFrequency);
+            await _unitOfWork.CleanFrequencyRepository.UpdateCleanFrequencyAsync(cleanFrequency);
             await _unitOfWork.CommitAsync();
         }
 
         public async Task<bool> SoftDeleteCleanFrequencyAsync(int cleanFrequencyId, string updatedById)
         {
-            var CleanFrequency = await _efCoreRepository.GetByIdAsync(cleanFrequencyId);
+            var cleanFrequency = await _unitOfWork.CleanFrequencyRepository.GetCleanFrequencyByIdAsync(cleanFrequencyId);
 
-            if (CleanFrequency == null)
+            if (cleanFrequency == null)
             {
                 throw new KeyNotFoundException("Clean Frequency not found.");
             }
 
             // Soft delete staff
-            CleanFrequency.IsDeleted = true;
-            CleanFrequency.IsActive = false;
-            CleanFrequency.UpdatedAt = DateTime.UtcNow;
-            CleanFrequency.UpdatedById = updatedById;
+            cleanFrequency.IsDeleted = true;
+            cleanFrequency.IsActive = false;
+            cleanFrequency.UpdatedAt = DateTime.UtcNow;
+            cleanFrequency.UpdatedById = updatedById;
 
-            _efCoreRepository.Update(CleanFrequency);
-            await _unitOfWork.CommitAsync();
+            await _unitOfWork.CleanFrequencyRepository.UpdateCleanFrequencyAsync(cleanFrequency);
 
-            _efCoreRepository.Update(CleanFrequency);
-            int rowsAffected = await _unitOfWork.CommitAsync(); // Returns the number of affected rows
-
-            if (rowsAffected > 0)
-                return true;
-            else
-                return false;
+            return true;
         }
     }
 }

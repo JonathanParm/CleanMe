@@ -12,30 +12,26 @@ using System.Reflection;
 using Microsoft.AspNetCore.Http.HttpResults;
 using CleanMe.Domain.Common;
 using CleanMe.Application.DTOs;
+using System.Collections;
+using System.Data;
 
 namespace CleanMe.Application.Services
 {
     public class AssetLocationService : IAssetLocationService
     {
-        private readonly IRepository<AssetLocation> _efCoreRepository; // For EF Core CRUD
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IAssetLocationRepository _assetLocationRepository;
-        private readonly IDapperRepository _dapperRepository;
+
         private readonly IUserService _userService;
         private readonly ILogger<AssetLocationService> _logger;
 
         public AssetLocationService(
-            IRepository<AssetLocation> efCoreRepository,
             IUnitOfWork unitOfWork,
-            IAssetLocationRepository AssetLocationRepository,
-            IDapperRepository dapperRepository,
+
             IUserService userService,
             ILogger<AssetLocationService> logger)
         {
-            _efCoreRepository = efCoreRepository;
             _unitOfWork = unitOfWork;
-            _assetLocationRepository = AssetLocationRepository;
-            _dapperRepository = dapperRepository;
+
             _userService = userService;
             _logger = logger;
         }
@@ -46,9 +42,29 @@ namespace CleanMe.Application.Services
             string sortColumn, string sortOrder, int pageNumber, int pageSize)
         {
             _logger.LogInformation("Fetching AssetLocation list using Dapper.");
-            return await _assetLocationRepository.GetAssetLocationIndexAsync(
-                areaName, description, townSuburb, reportCode, isActive,
-                sortColumn, sortOrder, pageNumber, pageSize);
+            try
+            {
+                var query = "EXEC dbo.AssetLocationGetIndexView @AreaName, @Description, @TownSuburb, @ReportCode, @IsActive, @SortColumn, @SortOrder, @PageNumber, @PageSize";
+                var parameters = new
+                {
+                    AreaName = areaName,
+                    Description = description,
+                    TownSuburb = townSuburb,
+                    ReportCode = reportCode,
+                    IsActive = isActive,
+                    SortColumn = sortColumn,
+                    SortOrder = sortOrder,
+                    PageNumber = pageNumber,
+                    PageSize = pageSize
+                };
+
+                return await _unitOfWork.DapperRepository.QueryAsync<AssetLocationIndexViewModel>(query, parameters);
+            }
+            catch (Exception ex)
+            {
+                // Log error (you can inject a logger if needed)
+                throw new ApplicationException("Error fetching AssetLocations from stored procedure", ex);
+            }
         }
 
         public async Task<IEnumerable<AssetLocationViewModel>> FindDuplicateAssetLocationAsync(string description, string? reportCode, int? assetLocationId = null)
@@ -63,7 +79,7 @@ namespace CleanMe.Application.Services
 
             var parameters = new { Description = description, ReportCode = reportCode, assetLocationId = assetLocationId };
 
-            var duplicateAssetLocation = await _dapperRepository.QueryAsync<AssetLocationWithAddressDto>(query, parameters);
+            var duplicateAssetLocation = await _unitOfWork.DapperRepository.QueryAsync<AssetLocationWithAddressDto>(query, parameters);
 
             // Map `AssetLocation` entity to `AssetLocationViewModel`
             return duplicateAssetLocation.Select(al => new AssetLocationViewModel
@@ -89,37 +105,47 @@ namespace CleanMe.Application.Services
 
         public async Task<AssetLocationViewModel?> GetAssetLocationViewModelByIdAsync(int assetLocationId)
         {
-            var assetLocation = await _assetLocationRepository.GetAssetLocationViewModelByIdAsync(assetLocationId); // Calls repository
+            var query = "dbo.AssetLocationGetById";
+            var parameters = new { assetLocationId = assetLocationId };
 
-            if (assetLocation == null)
-            {
-                return null; // No match found
-            }
+            var results = await _unitOfWork.DapperRepository.QueryAsync<AssetLocationWithAddressDto>(query, parameters, CommandType.StoredProcedure);
+            var row = results.FirstOrDefault();
+            if (row == null) return null;
 
             // Convert `AssetLocation` entity to `AssetLocationViewModel`
             return new AssetLocationViewModel
             {
-                assetLocationId = assetLocation.assetLocationId,
-                Description = assetLocation.Description,
-                areaId = assetLocation.areaId,
+                assetLocationId = row.assetLocationId,
+                Description = row.Description,
+                areaId = row.areaId,
                 Address = new AddressViewModel
                 {
-                    Line1 = assetLocation.Address.Line1,
-                    Line2 = assetLocation.Address.Line2,
-                    Suburb = assetLocation.Address.Suburb,
-                    TownOrCity = assetLocation.Address.TownOrCity,
-                    Postcode = assetLocation.Address.Postcode,
+                    Line1 = row.AddressLine1,
+                    Line2 = row.AddressLine2,
+                    Suburb = row.AddressSuburb,
+                    TownOrCity = row.AddressTownOrCity,
+                    Postcode = row.AddressPostcode
                 },
-                SequenceOrder = assetLocation.SequenceOrder,
-                SeqNo = assetLocation.SeqNo,
-                ReportCode = assetLocation.ReportCode,
-                AccNo = assetLocation.AccNo,
-                IsActive = assetLocation.IsActive
+                SequenceOrder = row.SequenceOrder,
+                SeqNo = row.SeqNo,
+                ReportCode = row.ReportCode,
+                AccNo = row.AccNo,
+                IsActive = row.IsActive
             };
         }
         public async Task<AssetLocationViewModel> PrepareNewAssetLocationViewModelAsync(int areaId)
         {
-            return await _assetLocationRepository.PrepareNewAssetLocationViewModelAsync(areaId);
+            var area = await _unitOfWork.AreaRepository.GetAreaByIdAsync(areaId);
+
+            if (area == null)
+                throw new Exception("Area not found.");
+
+            return new AssetLocationViewModel
+            {
+                areaId = area.areaId,
+                AreaName = area.Name,
+                IsActive = true
+            };
         }
 
         // Creates a new AssetLocation member (EF Core)
@@ -150,16 +176,14 @@ namespace CleanMe.Application.Services
                 UpdatedById = addedById
             };
 
-            await _efCoreRepository.AddAsync(AssetLocation);
-            await _unitOfWork.CommitAsync();
+            await _unitOfWork.AssetLocationRepository.AddAssetLocationAsync(AssetLocation);
 
             return AssetLocation.assetLocationId;
         }
 
-        // Updates an existing AssetLocation member (EF Core)
         public async Task UpdateAssetLocationAsync(AssetLocationViewModel model, string updatedById)
         {
-            var assetLocation = await _efCoreRepository.GetByIdAsync(model.assetLocationId);
+            var assetLocation = await _unitOfWork.AssetLocationRepository.GetAssetLocationByIdAsync(model.assetLocationId);
             if (assetLocation == null)
             {
                 _logger.LogWarning($"AssetLocation member with ID {model.assetLocationId} not found.");
@@ -184,13 +208,12 @@ namespace CleanMe.Application.Services
             assetLocation.UpdatedAt = DateTime.UtcNow;
             assetLocation.UpdatedById = updatedById;
 
-            _efCoreRepository.Update(assetLocation);
-            await _unitOfWork.CommitAsync();
+            await _unitOfWork.AssetLocationRepository.UpdateAssetLocationAsync(assetLocation);
         }
 
         public async Task<bool> SoftDeleteAssetLocationAsync(int assetLocationId, string updatedById)
         {
-            var assetLocation = await _efCoreRepository.GetByIdAsync(assetLocationId);
+            var assetLocation = await _unitOfWork.AssetLocationRepository.GetAssetLocationByIdAsync(assetLocationId);
 
             if (assetLocation == null)
             {
@@ -203,44 +226,35 @@ namespace CleanMe.Application.Services
             assetLocation.UpdatedAt = DateTime.UtcNow;
             assetLocation.UpdatedById = updatedById;
 
-            _efCoreRepository.Update(assetLocation);
-            await _unitOfWork.CommitAsync();
+            await _unitOfWork.AssetLocationRepository.UpdateAssetLocationAsync(assetLocation);
 
-            _efCoreRepository.Update(assetLocation);
-            int rowsAffected = await _unitOfWork.CommitAsync(); // Returns the number of affected rows
-
-            if (rowsAffected > 0)
-                return true;
-            else
-                return false;
+            return true;
         }
 
         // Assigns a login account to a AssetLocation member (via UserService)
         public async Task<bool> AssignApplicationUserAsync(int assetLocationId, string email, string password)
         {
-            var assetLocation = await _efCoreRepository.GetByIdAsync(assetLocationId);
+            var assetLocation = await _unitOfWork.AssetLocationRepository.GetAssetLocationByIdAsync(assetLocationId);
             if (assetLocation == null)
             {
                 _logger.LogWarning($"AssetLocation with ID {assetLocationId} not found for user assignment.");
                 return false;
             }
 
-            _efCoreRepository.Update(assetLocation);
-            await _unitOfWork.CommitAsync();
+            await _unitOfWork.AssetLocationRepository.UpdateAssetLocationAsync(assetLocation);
             return true;
         }
 
         public async Task UpdateAssetLocationApplicationUserId(int assetLocationId, string applicationUserId)
         {
-            var assetLocation = await _efCoreRepository.GetByIdAsync(assetLocationId);
+            var assetLocation = await _unitOfWork.AssetLocationRepository.GetAssetLocationByIdAsync(assetLocationId);
 
             if (assetLocation == null)
             {
                 throw new KeyNotFoundException($"AssetLocation member with ID {assetLocationId} not found.");
             }
 
-            _efCoreRepository.Update(assetLocation);
-            await _unitOfWork.CommitAsync();
+            await _unitOfWork.AssetLocationRepository.UpdateAssetLocationAsync(assetLocation);
         }
 
     }

@@ -18,8 +18,10 @@ namespace CleanMe.Application.Interfaces
         Task<int> AddAssetLocationAsync(AssetLocationViewModel model, string addedById);
         // Updates an existing AssetLocation member using EF Core
         Task UpdateAssetLocationAsync(AssetLocationViewModel model, string updatedById);
-        Task UpdateAssetLocationApplicationUserId(int assetLocationId, string applicationUserId);
         Task<bool> SoftDeleteAssetLocationAsync(int assetLocationId, string updatedById);
+
+        Task<bool> AssignApplicationUserAsync(int assetLocationId, string email, string password);
+        Task UpdateAssetLocationApplicationUserId(int assetLocationId, string applicationUserId);
 
     }
 }

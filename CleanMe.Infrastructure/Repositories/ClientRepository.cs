@@ -1,62 +1,29 @@
-﻿using CleanMe.Application.Interfaces;
-using CleanMe.Application.ViewModels;
+﻿using CleanMe.Application.ViewModels;
 using CleanMe.Domain.Entities;
-using CleanMe.Domain.Enums;
 using CleanMe.Domain.Interfaces;
 using CleanMe.Infrastructure.Data;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CleanMe.Infrastructure.Repositories
 {
     public class ClientRepository : IClientRepository
     {
-        private readonly string _connectionString;
         private readonly ApplicationDbContext _context;
-        private readonly IDapperRepository _dapperRepository;
 
-        public ClientRepository(IConfiguration configuration, ApplicationDbContext context, IDapperRepository dapperRepository)
+        public ClientRepository(ApplicationDbContext context)
         {
-            _connectionString = configuration.GetConnectionString("DefaultConnection");
             _context = context;
-            _dapperRepository = dapperRepository;
         }
 
-        public async Task<IEnumerable<ClientIndexViewModel>> GetClientIndexAsync(
-                string? name, string? brand, int? accNo, string? isActive,
-                string sortColumn, string sortOrder, int pageNumber, int pageSize)
+        public async Task<IEnumerable<Client>> GetAllClientsAsync()
         {
-            try
-            {
-                using var connection = new SqlConnection(_connectionString);
-
-                var sql = "EXEC dbo.ClientGetIndexView @Name, @Brand, @AccNo, @IsActive, @SortColumn, @SortOrder, @PageNumber, @PageSize";
-                var parameters = new
-                {
-                    Name = name,
-                    Brand = brand,
-                    AccNo = accNo,
-                    IsActive = isActive,
-                    SortColumn = sortColumn,
-                    SortOrder = sortOrder,
-                    PageNumber = pageNumber,
-                    PageSize = pageSize
-                };
-
-                return await connection.QueryAsync<ClientIndexViewModel>(sql, parameters);
-            }
-            catch (Exception ex)
-            {
-                // Log error (you can inject a logger if needed)
-                throw new ApplicationException("Error fetching Clients from stored procedure", ex);
-            }
+            return await _context.Clients
+                .Where(c => !c.IsDeleted)
+                .OrderBy(c => c.Name)
+                .ToListAsync();
         }
 
         public async Task<Client?> GetClientByIdAsync(int clientId)
@@ -71,26 +38,16 @@ namespace CleanMe.Infrastructure.Repositories
                 .FirstOrDefaultAsync(c => c.clientId == clientId);
         }
 
-        public async Task AddClientAsync(Client Client, string createdById)
+        public async Task AddClientAsync(Client Client)
         {
             await _context.Clients.AddAsync(Client);
             await _context.SaveChangesAsync();
         }
 
-        public async Task UpdateClientAsync(Client Client, string updatedById)
+        public async Task UpdateClientAsync(Client Client)
         {
             _context.Clients.Update(Client);
             await _context.SaveChangesAsync();
-        }
-
-        public async Task SoftDeleteClientAsync(int id, string deletedById)
-        {
-            var Client = await _context.Clients.FindAsync(id);
-            if (Client != null)
-            {
-                _context.Clients.Remove(Client);
-                await _context.SaveChangesAsync();
-            }
         }
     }
 }

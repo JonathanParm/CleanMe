@@ -1,42 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using CleanMe.Application.Interfaces;
+﻿using CleanMe.Application.Interfaces;
 using CleanMe.Application.ViewModels;
-using CleanMe.Domain.Interfaces;
 using CleanMe.Domain.Entities;
-using CleanMe.Domain.Enums;
+using CleanMe.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
-using System.Reflection;
-using Microsoft.AspNetCore.Http.HttpResults;
-using CleanMe.Domain.Common;
-using CleanMe.Application.DTOs;
 
 namespace CleanMe.Application.Services
 {
     public class AssetTypeService : IAssetTypeService
     {
-        private readonly IRepository<AssetType> _efCoreRepository; // For EF Core CRUD
-        private readonly IAssetTypeRepository _assetTypeRepository; // For Dapper queries
-        private readonly IDapperRepository _dapperRepository;
-        private readonly IUserService _userService;
         private readonly IUnitOfWork _unitOfWork;
+
+        private readonly IUserService _userService;
         private readonly ILogger<StaffService> _logger;
 
         public AssetTypeService(
-            IRepository<AssetType> efCoreRepository,
-            IAssetTypeRepository assetTypeRepository,
-            IDapperRepository dapperRepository,
-            IUserService userService,
             IUnitOfWork unitOfWork,
+
+            IUserService userService,
             ILogger<StaffService> logger)
         {
-            _efCoreRepository = efCoreRepository;
-            _assetTypeRepository = assetTypeRepository;
-            _dapperRepository = dapperRepository;
-            _userService = userService;
             _unitOfWork = unitOfWork;
+
+            _userService = userService;
             _logger = logger;
         }
 
@@ -46,9 +31,26 @@ namespace CleanMe.Application.Services
             string sortColumn, string sortOrder, int pageNumber, int pageSize)
         {
             _logger.LogInformation("Fetching Asset Types list using Dapper.");
-            return await _assetTypeRepository.GetAssetTypeIndexAsync(
-                name, isActive,
-                sortColumn, sortOrder, pageNumber, pageSize);
+            try
+            {
+                var query = "EXEC dbo.AssetTypeGetIndexView @Name, @IsActive, @SortColumn, @SortOrder, @PageNumber, @PageSize";
+                var parameters = new
+                {
+                    Name = name,
+                    IsActive = isActive,
+                    SortColumn = sortColumn,
+                    SortOrder = sortOrder,
+                    PageNumber = pageNumber,
+                    PageSize = pageSize
+                };
+
+                return await _unitOfWork.DapperRepository.QueryAsync<AssetTypeIndexViewModel>(query, parameters);
+            }
+            catch (Exception ex)
+            {
+                // Log error (you can inject a logger if needed)
+                throw new ApplicationException("Error fetching Asset Types from stored procedure", ex);
+            }
         }
 
         public async Task<IEnumerable<AssetTypeViewModel>> FindDuplicateAssetTypeAsync(string name, int? assetTypeId = null)
@@ -63,12 +65,12 @@ namespace CleanMe.Application.Services
 
             var parameters = new { Name = name, AssetTypeId = assetTypeId };
 
-            return await _dapperRepository.QueryAsync<AssetTypeViewModel>(query, parameters);
+            return await _unitOfWork.DapperRepository.QueryAsync<AssetTypeViewModel>(query, parameters);
         }
 
-        public async Task<AssetTypeViewModel?> GetAssetTypeByIdAsync(int assetTypeId)
+        public async Task<AssetTypeViewModel?> GetAssetTypeViewModelByIdAsync(int assetTypeId)
         {
-            var assetType = await _assetTypeRepository.GetAssetTypeByIdAsync(assetTypeId);
+            var assetType = await _unitOfWork.AssetTypeRepository.GetAssetTypeByIdAsync(assetTypeId);
 
             if (assetType == null)
             {
@@ -99,8 +101,7 @@ namespace CleanMe.Application.Services
                 UpdatedById = addedById
             };
 
-            await _efCoreRepository.AddAsync(AssetType);
-            await _unitOfWork.CommitAsync();
+            await _unitOfWork.AssetTypeRepository.AddAssetTypeAsync(AssetType);
 
             return AssetType.assetTypeId;
         }
@@ -108,7 +109,7 @@ namespace CleanMe.Application.Services
         // Updates an existing AssetType (EF Core)
         public async Task UpdateAssetTypeAsync(AssetTypeViewModel model, string updatedById)
         {
-            var AssetType = await _efCoreRepository.GetByIdAsync(model.assetTypeId);
+            var AssetType = await _unitOfWork.AssetTypeRepository.GetAssetTypeByIdAsync(model.assetTypeId);
             if (AssetType == null)
             {
                 _logger.LogWarning($"Asset Type with ID {model.assetTypeId} not found.");
@@ -120,13 +121,12 @@ namespace CleanMe.Application.Services
             AssetType.UpdatedAt = DateTime.UtcNow;
             AssetType.UpdatedById = updatedById;
 
-            _efCoreRepository.Update(AssetType);
-            await _unitOfWork.CommitAsync();
+            await _unitOfWork.AssetTypeRepository.UpdateAssetTypeAsync(AssetType);
         }
 
         public async Task<bool> SoftDeleteAssetTypeAsync(int assetTypeId, string updatedById)
         {
-            var AssetType = await _efCoreRepository.GetByIdAsync(assetTypeId);
+            var AssetType = await _unitOfWork.AssetTypeRepository.GetAssetTypeByIdAsync(assetTypeId);
 
             if (AssetType == null)
             {
@@ -139,16 +139,9 @@ namespace CleanMe.Application.Services
             AssetType.UpdatedAt = DateTime.UtcNow;
             AssetType.UpdatedById = updatedById;
 
-            _efCoreRepository.Update(AssetType);
-            await _unitOfWork.CommitAsync();
+            await _unitOfWork.AssetTypeRepository.UpdateAssetTypeAsync(AssetType);
 
-            _efCoreRepository.Update(AssetType);
-            int rowsAffected = await _unitOfWork.CommitAsync(); // Returns the number of affected rows
-
-            if (rowsAffected > 0)
-                return true;
-            else
-                return false;
+            return true;
         }
     }
 }

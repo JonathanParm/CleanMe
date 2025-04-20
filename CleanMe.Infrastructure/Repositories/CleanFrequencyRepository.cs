@@ -6,6 +6,7 @@ using CleanMe.Domain.Interfaces;
 using CleanMe.Infrastructure.Data;
 using Dapper;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -28,61 +29,29 @@ namespace CleanMe.Infrastructure.Repositories
             _dapperRepository = dapperRepository;
         }
 
-        public async Task<IEnumerable<CleanFrequencyIndexViewModel>> GetCleanFrequencyIndexAsync(
-                string? name, string? description, string? code, string? isActive,
-                string sortColumn, string sortOrder, int pageNumber, int pageSize)
+        public async Task<IEnumerable<CleanFrequency>> GetAllCleanFrequenciesAsync()
         {
-            try
-            {
-                using var connection = new SqlConnection(_connectionString);
-
-                var sql = "EXEC dbo.CleanFrequencyGetIndexView @Name, @Description, @Code, @IsActive, @SortColumn, @SortOrder, @PageNumber, @PageSize";
-                var parameters = new
-                {
-                    Name = name,
-                    Description = description,
-                    Code = code,
-                    IsActive = isActive,
-                    SortColumn = sortColumn,
-                    SortOrder = sortOrder,
-                    PageNumber = pageNumber,
-                    PageSize = pageSize
-                };
-
-                return await connection.QueryAsync<CleanFrequencyIndexViewModel>(sql, parameters);
-            }
-            catch (Exception ex)
-            {
-                // Log error (you can inject a logger if needed)
-                throw new ApplicationException("Error fetching CleanFrequencys from stored procedure", ex);
-            }
+            return await _context.CleanFrequencies
+                .Where(c => !c.IsDeleted)
+                .OrderBy(c => c.Name)
+                .ToListAsync();
         }
 
-        public async Task<CleanFrequency?> GetCleanFrequencyByIdAsync(int id)
+        public async Task<CleanFrequency?> GetCleanFrequencyByIdAsync(int cleanFrequencyId)
         {
-            return await _context.CleanFrequencies.FindAsync(id);
+            return await _context.CleanFrequencies.FindAsync(cleanFrequencyId);
         }
 
-        public async Task AddCleanFrequencyAsync(CleanFrequency CleanFrequency, string createdById)
+        public async Task AddCleanFrequencyAsync(CleanFrequency cleanFrequency)
         {
-            await _context.CleanFrequencies.AddAsync(CleanFrequency);
+            await _context.CleanFrequencies.AddAsync(cleanFrequency);
             await _context.SaveChangesAsync();
         }
 
-        public async Task UpdateCleanFrequencyAsync(CleanFrequency CleanFrequency, string updatedById)
+        public async Task UpdateCleanFrequencyAsync(CleanFrequency cleanFrequency)
         {
-            _context.CleanFrequencies.Update(CleanFrequency);
+            _context.CleanFrequencies.Update(cleanFrequency);
             await _context.SaveChangesAsync();
-        }
-
-        public async Task SoftDeleteCleanFrequencyAsync(int id, string deletedById)
-        {
-            var CleanFrequency = await _context.CleanFrequencies.FindAsync(id);
-            if (CleanFrequency != null)
-            {
-                _context.CleanFrequencies.Remove(CleanFrequency);
-                await _context.SaveChangesAsync();
-            }
         }
     }
 }

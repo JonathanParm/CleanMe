@@ -66,7 +66,7 @@ namespace CleanMe.Web.Controllers
 
                 if (assetTypeId.HasValue) // Edit Mode
                 {
-                    model = await _assetTypeService.GetAssetTypeByIdAsync(assetTypeId.Value);
+                    model = await _assetTypeService.GetAssetTypeViewModelByIdAsync(assetTypeId.Value);
                     if (model == null)
                     {
                         return NotFound();
@@ -119,7 +119,7 @@ namespace CleanMe.Web.Controllers
                 }
                 else // Update Existing Asset Type
                 {
-                    var existingAssetType = await _assetTypeService.GetAssetTypeByIdAsync(model.assetTypeId);
+                    var existingAssetType = await _assetTypeService.GetAssetTypeViewModelByIdAsync(model.assetTypeId);
                     if (existingAssetType == null)
                     {
                         TempData["ErrorMessage"] = "Asset Type record not found.";
@@ -146,7 +146,7 @@ namespace CleanMe.Web.Controllers
         // GET: /AssetType/Delete?AssetTypeId=123
         public async Task<IActionResult> Delete(int assetTypeId)
         {
-            var AssetType = await _assetTypeService.GetAssetTypeByIdAsync(assetTypeId);
+            var AssetType = await _assetTypeService.GetAssetTypeViewModelByIdAsync(assetTypeId);
             if (AssetType == null)
             {
                 TempData["ErrorMessage"] = "Asset Type not found.";
@@ -163,7 +163,7 @@ namespace CleanMe.Web.Controllers
             try
             {
                 var userId = GetCurrentUserId();
-                var AssetType = await _assetTypeService.GetAssetTypeByIdAsync(assetTypeId);
+                var AssetType = await _assetTypeService.GetAssetTypeViewModelByIdAsync(assetTypeId);
                 if (AssetType == null)
                 {
                     TempData["ErrorMessage"] = "Asset Type not found.";

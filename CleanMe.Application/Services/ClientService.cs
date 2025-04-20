@@ -1,42 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using CleanMe.Application.DTOs;
 using CleanMe.Application.Interfaces;
 using CleanMe.Application.ViewModels;
-using CleanMe.Domain.Interfaces;
-using CleanMe.Domain.Entities;
-using CleanMe.Domain.Enums;
-using Microsoft.Extensions.Logging;
-using System.Reflection;
-using Microsoft.AspNetCore.Http.HttpResults;
 using CleanMe.Domain.Common;
-using CleanMe.Application.DTOs;
+using CleanMe.Domain.Entities;
+using CleanMe.Domain.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace CleanMe.Application.Services
 {
     public class ClientService : IClientService
     {
-        private readonly IRepository<Client> _efCoreRepository; // For EF Core CRUD
-        private readonly IClientRepository _clientRepository; // For Dapper queries
-        private readonly IDapperRepository _dapperRepository;
-        private readonly IUserService _userService;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IUserService _userService;
         private readonly ILogger<ClientService> _logger;
 
         public ClientService(
-            IRepository<Client> efCoreRepository,
-            IClientRepository clientRepository,
-            IDapperRepository dapperRepository,
-            IUserService userService,
             IUnitOfWork unitOfWork,
+            IUserService userService,
             ILogger<ClientService> logger)
         {
-            _efCoreRepository = efCoreRepository;
-            _clientRepository = clientRepository;
-            _dapperRepository = dapperRepository;
-            _userService = userService;
             _unitOfWork = unitOfWork;
+            _userService = userService;
             _logger = logger;
         }
 
@@ -46,9 +30,28 @@ namespace CleanMe.Application.Services
             string sortColumn, string sortOrder, int pageNumber, int pageSize)
         {
             _logger.LogInformation("Fetching Clients list using Dapper.");
-            return await _clientRepository.GetClientIndexAsync(
-                name, brand, accNo, isActive,
-                sortColumn, sortOrder, pageNumber, pageSize);
+            try
+            {
+                var query = "EXEC dbo.ClientGetIndexView @Name, @Brand, @AccNo, @IsActive, @SortColumn, @SortOrder, @PageNumber, @PageSize";
+                var parameters = new
+                {
+                    Name = name,
+                    Brand = brand,
+                    AccNo = accNo,
+                    IsActive = isActive,
+                    SortColumn = sortColumn,
+                    SortOrder = sortOrder,
+                    PageNumber = pageNumber,
+                    PageSize = pageSize
+                };
+
+                return await _unitOfWork.DapperRepository.QueryAsync<ClientIndexViewModel>(query, parameters);
+            }
+            catch (Exception ex)
+            {
+                // Log error (you can inject a logger if needed)
+                throw new ApplicationException("Error fetching Clients from stored procedure", ex);
+            }
         }
 
         public async Task<IEnumerable<ClientViewModel>> FindDuplicateClientAsync(string name, int? clientId = null)
@@ -63,7 +66,7 @@ namespace CleanMe.Application.Services
 
             var parameters = new { Name = name, clientId = clientId };
 
-            var duplicateClient = await _dapperRepository.QueryAsync<ClientWithAddressDto>(query, parameters);
+            var duplicateClient = await _unitOfWork.DapperRepository.QueryAsync<ClientWithAddressDto>(query, parameters);
 
             // Map `Client` entity to `ClientViewModel`
             return duplicateClient.Select(c => new ClientViewModel
@@ -84,9 +87,9 @@ namespace CleanMe.Application.Services
             });
         }
 
-        public async Task<ClientViewModel?> GetClientByIdAsync(int clientId)
+        public async Task<ClientViewModel?> GetClientViewModelByIdAsync(int clientId)
         {
-            var client = await _clientRepository.GetClientByIdAsync(clientId);
+            var client = await _unitOfWork.ClientRepository.GetClientByIdAsync(clientId);
 
             if (client == null)
             {
@@ -112,9 +115,9 @@ namespace CleanMe.Application.Services
             };
         }
 
-        public async Task<ClientViewModel?> GetClientWithContactsByIdAsync(int clientId)
+        public async Task<ClientViewModel?> GetClientViewModelWithContactsByIdAsync(int clientId)
         {
-            var client = await _clientRepository.GetClientWithContactsByIdAsync(clientId);
+            var client = await _unitOfWork.ClientRepository.GetClientWithContactsByIdAsync(clientId);
 
             if (client == null)
             {
@@ -154,8 +157,6 @@ namespace CleanMe.Application.Services
             };
         }
 
-
-        // Creates a new Client (EF Core)
         public async Task<int> AddClientAsync(ClientViewModel model, string addedById)
         {
             _logger.LogInformation($"Creating new Client: {model.Name}");
@@ -180,16 +181,14 @@ namespace CleanMe.Application.Services
                 UpdatedById = addedById
             };
 
-            await _efCoreRepository.AddAsync(client);
-            await _unitOfWork.CommitAsync();
+            await _unitOfWork.ClientRepository.AddClientAsync(client);
 
             return client.clientId;
         }
 
-        // Updates an existing Client (EF Core)
         public async Task UpdateClientAsync(ClientViewModel model, string updatedById)
         {
-            var client = await _efCoreRepository.GetByIdAsync(model.clientId);
+            var client = await _unitOfWork.ClientRepository.GetClientByIdAsync(model.clientId);
             if (client == null)
             {
                 _logger.LogWarning($"Client member with ID {model.clientId} not found.");
@@ -211,13 +210,12 @@ namespace CleanMe.Application.Services
             client.UpdatedAt = DateTime.UtcNow;
             client.UpdatedById = updatedById;
 
-            _efCoreRepository.Update(client);
-            await _unitOfWork.CommitAsync();
+            await _unitOfWork.ClientRepository.UpdateClientAsync(client);
         }
 
         public async Task<bool> SoftDeleteClientAsync(int clientId, string updatedById)
         {
-            var client = await _efCoreRepository.GetByIdAsync(clientId);
+            var client = await _unitOfWork.ClientRepository.GetClientByIdAsync(clientId);
 
             if (client == null)
             {
@@ -230,16 +228,9 @@ namespace CleanMe.Application.Services
             client.UpdatedAt = DateTime.UtcNow;
             client.UpdatedById = updatedById;
 
-            _efCoreRepository.Update(client);
-            await _unitOfWork.CommitAsync();
+            await _unitOfWork.ClientRepository.UpdateClientAsync(client);
 
-            _efCoreRepository.Update(client);
-            int rowsAffected = await _unitOfWork.CommitAsync(); // Returns the number of affected rows
-
-            if (rowsAffected > 0)
-                return true;
-            else
-                return false;
+            return true;
         }
     }
 }

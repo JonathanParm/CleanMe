@@ -23,6 +23,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Region> Regions { get; set; }
     public DbSet<Area> Areas { get; set; }
     public DbSet<CleanFrequency> CleanFrequencies { get; set; }
+    public DbSet<Asset> Assets { get; set; }
     public DbSet<AssetType> AssetTypes { get; set; }
     public DbSet<AssetLocation> AssetLocations { get; set; }
 
@@ -70,20 +71,38 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 
         builder.Entity<Client>()
             .HasMany(c => c.ClientContacts)
-            .WithOne(cc => cc.Client)
-            .HasForeignKey(cc => cc.clientId)
+            .WithOne(p => p.Client)
+            .HasForeignKey(p => p.clientId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<Client>()
+            .HasMany(c => c.Assets)
+            .WithOne(p => p.Client)
+            .HasForeignKey(p => p.clientId)
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.Entity<Region>()
-            .HasMany(r => r.Areas)
-            .WithOne(a => a.Region)
-            .HasForeignKey(a => a.regionId)
+            .HasMany(c => c.Areas)
+            .WithOne(p => p.Region)
+            .HasForeignKey(p => p.regionId)
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.Entity<Area>()
-            .HasMany(a => a.AssetLocations)
-            .WithOne(al => al.Area)
-            .HasForeignKey(al => al.areaId)
+            .HasMany(c => c.AssetLocations)
+            .WithOne(p => p.Area)
+            .HasForeignKey(p => p.areaId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<AssetLocation>()
+            .HasMany(c => c.Assets)
+            .WithOne(p => p.AssetLocation)
+            .HasForeignKey(p => p.assetLocationId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<AssetType>()
+            .HasMany(c => c.Assets)
+            .WithOne(p => p.AssetType)
+            .HasForeignKey(p => p.assetTypeId)
             .OnDelete(DeleteBehavior.Restrict);
 
 
