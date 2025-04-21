@@ -55,6 +55,16 @@ namespace CleanMe.Application.Services
             });
         }
 
+        public async Task<IEnumerable<SelectListItem>> GetAssetTypeRateSelectListAsync()
+        {
+            var types = await _unitOfWork.AssetTypeRateRepository.GetAllAssetTypeRatesAsync();
+            return types.Select(t => new SelectListItem
+            {
+                Value = t.assetTypeId.ToString(),
+                Text = t.Name
+            });
+        }
+
         public async Task<IEnumerable<SelectListItem>> GetCleanFrequencySelectListAsync()
         {
             var types = await _unitOfWork.CleanFrequencyRepository.GetAllCleanFrequenciesAsync();
@@ -92,6 +102,16 @@ namespace CleanMe.Application.Services
             {
                 Value = t.regionId.ToString(),
                 Text = t.Name
+            });
+        }
+
+        public async Task<IEnumerable<SelectListItem>> GetStaffSelectListAsync()
+        {
+            var types = await _unitOfWork.StaffRepository.GetAllStaffAsync();
+            return types.Select(t => new SelectListItem
+            {
+                Value = t.staffId.ToString(),
+                Text = $"{t.FirstName} {t.FamilyName}"
             });
         }
     }

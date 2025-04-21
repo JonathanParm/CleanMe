@@ -2,6 +2,7 @@
 using CleanMe.Domain.Entities;
 using CleanMe.Domain.Interfaces;
 using CleanMe.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace CleanMe.Infrastructure.Repositories
 {
@@ -12,6 +13,15 @@ namespace CleanMe.Infrastructure.Repositories
         public StaffRepository(ApplicationDbContext context)
         {
             _context = context;
+        }
+
+        public async Task<IEnumerable<Staff>> GetAllStaffAsync()
+        {
+            return await _context.Staff
+                .Where(c => !c.IsDeleted)
+                .OrderBy(c => c.FirstName)
+                .ThenBy(c => c.FamilyName)
+                .ToListAsync();
         }
 
         public async Task<Staff?> GetStaffByIdAsync(int staffId)

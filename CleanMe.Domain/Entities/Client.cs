@@ -72,5 +72,8 @@ namespace CleanMe.Domain.Entities
 
         // Navigation property
         public ICollection<Asset> Assets { get; set; } = new List<Asset>();
+
+        // Navigation property
+        public ICollection<AssetTypeRate> AssetTypeRates { get; set; } = new List<AssetTypeRate>();
     }
 }

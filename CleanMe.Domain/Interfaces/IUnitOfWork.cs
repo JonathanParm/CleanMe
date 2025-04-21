@@ -6,6 +6,7 @@
         IAssetLocationRepository AssetLocationRepository { get; }
         IAssetRepository AssetRepository { get; }
         IAssetTypeRepository AssetTypeRepository { get; }
+        IAssetTypeRateRepository AssetTypeRateRepository { get; }
         ICleanFrequencyRepository CleanFrequencyRepository { get; }
         IClientContactRepository ClientContactRepository { get; }
         IClientRepository ClientRepository { get; }

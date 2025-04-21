@@ -1,0 +1,50 @@
+﻿@model CleanMe.Application.ViewModels.AssetTypeRateViewModel
+
+@{
+    ViewData["Title"] = "Confirm Delete";
+}
+
+<h2>Delete Asset Type Rate</h2>
+
+<div class="alert alert-warning">
+    Are you sure you want to delete this Asset Type Rate?
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Name</label>
+    <p class="form-control-plaintext">@Model.Name</p>
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Description</label>
+    <p class="form-control-plaintext">@Model.Description</p>
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Rate</label>
+    <p class="form-control-plaintext">@Model.Rate</p>
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Client</label>
+    <p class="form-control-plaintext">@Model.ClientName</p>
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Asset Type</label>
+    <p class="form-control-plaintext">@Model.AssetTypeName</p>
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Clean frequency</label>
+    <p class="form-control-plaintext">@Model.CleanFreqName</p>
+</div>
+
+<!-- Add additional read-only fields if needed -->
+
+<form asp-action="ConfirmDelete" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="assetTypeRateId" />
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>

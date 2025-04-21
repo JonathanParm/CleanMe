@@ -25,6 +25,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<CleanFrequency> CleanFrequencies { get; set; }
     public DbSet<Asset> Assets { get; set; }
     public DbSet<AssetType> AssetTypes { get; set; }
+    public DbSet<AssetTypeRate> AssetTypeRates { get; set; }
     public DbSet<AssetLocation> AssetLocations { get; set; }
 
     public DbSet<ErrorExceptionsLog> ErrorExceptionsLogs { get; set; } = null!;
@@ -103,6 +104,24 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             .HasMany(c => c.Assets)
             .WithOne(p => p.AssetType)
             .HasForeignKey(p => p.assetTypeId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<AssetType>()
+            .HasMany(c => c.AssetTypeRates)
+            .WithOne(p => p.AssetType)
+            .HasForeignKey(p => p.assetTypeId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<Client>()
+            .HasMany(c => c.AssetTypeRates)
+            .WithOne(p => p.Client)
+            .HasForeignKey(p => p.clientId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<CleanFrequency>()
+            .HasMany(c => c.AssetTypeRates)
+            .WithOne(p => p.CleanFrequency)
+            .HasForeignKey(p => p.cleanFrequencyId)
             .OnDelete(DeleteBehavior.Restrict);
 
 

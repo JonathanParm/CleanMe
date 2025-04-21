@@ -1,0 +1,116 @@
+﻿@using CleanMe.Web.Helpers
+@model IEnumerable<CleanMe.Application.ViewModels.AssetTypeRateIndexViewModel>
+
+@{
+    ViewData["Title"] = "Asset Type Rate List";
+    string sortOrder = ViewBag.SortOrder as string ?? "ASC";
+    string sortColumn = ViewBag.SortColumn as string ?? "RateName";
+}
+
+<h2>Asset List</h2>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<!-- Add Button (Top-Right) -->
+<div class="text-end mb-3">
+    <a asp-action="AddEdit" class="btn btn-primary">Add Asset Type Rate</a>
+</div>
+
+<!-- Filtering Form -->
+<form method="get" id="filterForm">
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <!-- Column Headers with Sorting -->
+                <tr>
+                    <th>
+                        <a href="#" onclick="sortTable('RateName')">
+                            Rate name @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "RateName"))
+                        </a>
+                    </th>
+                    <th>
+                        <a href="#" onclick="sortTable('AssetTypeName')">
+                            Asset type @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "AssetTypeName"))
+                        </a>
+                    </th>
+                    <th>
+                        <a href="#" onclick="sortTable('CleanFreqName')">
+                            Clean frequency @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "CleanFreqName"))
+                        </a>
+                    </th>
+                    <th>
+                        <a href="#" onclick="sortTable('ClientName')">
+                            Client @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "ClientName"))
+                        </a>
+                    </th>
+                    <th>
+                        <a href="#" onclick="sortTable('Rate')">
+                            Rate @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "Rate"))
+                        </a>
+                    </th>
+                    <th>
+                        <a href="#" onclick="sortTable('IsDefault')">
+                            Default rate @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "IsDefault"))
+                        </a>
+                    </th>
+                    <th>
+                        <a href="#" onclick="sortTable('IsActive')">
+                            Active @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "IsActive"))
+                        </a>
+                    </th>
+                    <th>Actions</th>
+                </tr>
+
+                <!-- Filter Row -->
+                <tr>
+                    <td><input type="text" name="RateName" class="form-control" value="@ViewBag.RateName" placeholder="Search Rate Name"></td>
+                    <td><input type="text" name="AssetTypeName" class="form-control" value="@ViewBag.AssetTypeName" placeholder="Search Type"></td>
+                    <td><input type="text" name="CleanFreqName" class="form-control" value="@ViewBag.CleanFreqName" placeholder="Search Clean freq."></td>
+                    <td><input type="text" name="clientName" class="form-control" value="@ViewBag.ClientName" placeholder="Search Client"></td>
+                    <td><input type="text" name="Rate" class="form-control" value="@ViewBag.Rate" placeholder="Search Rate"></td>
+                    <td><input type="text" name="IsDefault" class="form-control" value="@ViewBag.IsDefault" placeholder="Search Is Default"></td>
+                    <td><input type="text" name="IsActive" class="form-control" value="@ViewBag.IsActive" placeholder="Search Active"></td>
+                    <td>
+                        <button type="submit" class="btn btn-success">Filter</button>
+                        <a href="@Url.Action("Index", "AssetTypeRate")" class="btn btn-secondary">Clear</a>
+                    </td>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var Asset in Model)
+                {
+                    <tr>
+                        <td>@Asset.RateName</td>
+                        <td>@Asset.AssetTypeName</td>
+                        <td>@Asset.CleanFreqName</td>
+                        <td>@Asset.ClientName</td>
+                        <td>@Asset.Rate</td>
+                        <td>@Asset.IsDefault</td>
+                        <td>@Asset.IsActive</td>
+                        <td>
+                            <a asp-action="AddEdit" asp-route-assetTypeRateId="@Asset.assetTypeRateId" class="btn btn-warning btn-sm">Edit</a>
+                            <a asp-action="Delete" asp-route-assetTypeRateId="@Asset.assetTypeRateId" class="btn btn-danger btn-sm">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</form>
+
+<!-- JavaScript for Sorting -->
+@section Scripts {
+    <script src="~/js/shared/index-view-sort-table.js"></script>
+}
+

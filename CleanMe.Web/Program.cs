@@ -83,6 +83,8 @@ builder.Services.AddScoped<IAssetService, AssetService>();
 builder.Services.AddScoped<IAssetRepository, AssetRepository>();
 builder.Services.AddScoped<IAssetTypeService, AssetTypeService>();
 builder.Services.AddScoped<IAssetTypeRepository, AssetTypeRepository>();
+builder.Services.AddScoped<IAssetTypeRateService, AssetTypeRateService>();
+builder.Services.AddScoped<IAssetTypeRateRepository, AssetTypeRateRepository>();
 builder.Services.AddScoped<ICleanFrequencyService, CleanFrequencyService>();
 builder.Services.AddScoped<ICleanFrequencyRepository, CleanFrequencyRepository>();
 builder.Services.AddScoped<IClientContactService, ClientContactService>();

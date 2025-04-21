@@ -39,15 +39,6 @@ namespace CleanMe.Domain.Entities
         [DisplayName("Sort order")]
         public int SequenceOrder { get; set; }
 
-        //// Navigation property representing the collection of children
-        //public ICollection<Asset>? Assets { get; set; }
-
-        //// Navigation property representing the collection of children
-        //public ICollection<AssetAmendment>? AssetAmendments { get; set; }
-
-        //// Navigation property representing the collection of children
-        //public ICollection<ServiceRate>? ServiceRates { get; set; }
-
         [Required]
         [DisplayName("Active")]
         public bool IsActive { get; set; } = true;
@@ -75,5 +66,11 @@ namespace CleanMe.Domain.Entities
         [Column(TypeName = "NVARCHAR")]
         [StringLength(450)]
         public string UpdatedById { get; set; }
+
+        // Navigation property
+        public ICollection<AssetTypeRate> AssetTypeRates { get; set; } = new List<AssetTypeRate>();
+
+        //// Navigation property
+        //public ICollection<ScheduleAmendment> ScheduleAmendments { get; set; } = new List<ScheduleAmendment>();
     }
 }

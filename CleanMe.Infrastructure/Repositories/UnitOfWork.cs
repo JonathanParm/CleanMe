@@ -11,6 +11,7 @@ namespace CleanMe.Infrastructure.Repositories
         public IAssetLocationRepository AssetLocationRepository { get; }
         public IAssetRepository AssetRepository { get; }
         public IAssetTypeRepository AssetTypeRepository { get; }
+        public IAssetTypeRateRepository AssetTypeRateRepository { get; }
         public ICleanFrequencyRepository CleanFrequencyRepository { get; }
         public IClientContactRepository ClientContactRepository { get; }
         public IClientRepository ClientRepository { get; }
@@ -24,6 +25,7 @@ namespace CleanMe.Infrastructure.Repositories
                 IAssetLocationRepository assetLocationRepository,
                 IAssetRepository assetRepository,
                 IAssetTypeRepository assetTypeRepository,
+                IAssetTypeRateRepository assetTypeRateRepository,
                 ICleanFrequencyRepository cleanFrequencyRepository,
                 IClientContactRepository clientContactRepository,
                 IClientRepository clientRepository,
@@ -37,6 +39,7 @@ namespace CleanMe.Infrastructure.Repositories
             AssetLocationRepository = assetLocationRepository;
             AssetRepository = assetRepository;
             AssetTypeRepository = assetTypeRepository;
+            AssetTypeRateRepository = assetTypeRateRepository;
             CleanFrequencyRepository = cleanFrequencyRepository;
             ClientContactRepository = clientContactRepository;
             ClientRepository = clientRepository;

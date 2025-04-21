@@ -56,8 +56,8 @@ namespace CleanMe.Application.ViewModels
         [Display(Name = "Access to asset")]
         public string? Access { get; set; }
 
-        [Display(Name = "Inaccessable")]
-        public bool Inaccessable { get; set; } = false;
+        [Display(Name = "Is Accessable")]
+        public bool IsAccessable { get; set; } = true;
 
         public IEnumerable<SelectListItem> Clients { get; set; } = new List<SelectListItem>();
         public IEnumerable<SelectListItem> AssetLocations { get; set; } = new List<SelectListItem>();
