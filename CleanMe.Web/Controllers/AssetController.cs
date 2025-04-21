@@ -74,37 +74,11 @@ namespace CleanMe.Web.Controllers
         {
             try
             {
-                AssetViewModel model;
+                var model = assetId > 0
+                    ? await _assetService.GetAssetViewModelByIdAsync(assetId)
+                    : new AssetViewModel();
 
-                if (assetId > 0)
-                {
-                    model = await _assetService.GetAssetViewModelByIdAsync(assetId);
-                    if (model == null)
-                    {
-                        TempData["ErrorMessage"] = "Asset record not found.";
-                        if (!string.IsNullOrEmpty(returnUrl))
-                            return Redirect(returnUrl);
-                        return RedirectToAction("Index");
-                    }
-
-                    model.Clients = await _lookupService.GetClientSelectListAsync();
-                    model.AssetLocations = await _lookupService.GetAssetLocationSelectListAsync();
-                    model.AssetTypes = await _lookupService.GetAssetTypeSelectListAsync();
-                }
-                else
-                {
-                    model = new AssetViewModel();
-
-                    model.Clients = new[] {
-                                new SelectListItem { Value = "", Text = "-- Select Client --" }
-                            }.Concat(await _lookupService.GetClientSelectListAsync());
-                    model.AssetLocations = new[] {
-                                new SelectListItem { Value = "", Text = "-- Select Location --" }
-                            }.Concat(await _lookupService.GetAssetLocationSelectListAsync());
-                    model.AssetTypes = new[] {
-                                new SelectListItem { Value = "", Text = "-- Select Type --" }
-                            }.Concat(await _lookupService.GetAssetTypeSelectListAsync());
-                };
+                await PopulateSelectListsAsync(model, assetId > 0);
 
                 ViewBag.ReturnUrl = string.IsNullOrWhiteSpace(returnUrl) ? "Index" : returnUrl;
                 return View(model);
@@ -126,10 +100,26 @@ namespace CleanMe.Web.Controllers
             {
                 Console.WriteLine("DEBUG: Entering AddEdit method.");
 
+                if (model.clientId == null)
+                {
+                    ModelState.AddModelError("clientId", "Client is required.");
+                }
+
+                if (model.assetLocationId == null)
+                {
+                    ModelState.AddModelError("assetLocationId", "Asset location is required.");
+                }
+
+                if (model.assetTypeId == null)
+                {
+                    ModelState.AddModelError("assetTypeId", "Asset type is required.");
+                }
+
                 if (!ModelState.IsValid)
                 {
                     TempData["ErrorMessage"] = "Please fix the errors below.";
                     ViewBag.ReturnUrl = returnUrl;
+                    await PopulateSelectListsAsync(model, model.assetId > 0);
                     return View(model);
                 }
 
@@ -226,5 +216,33 @@ namespace CleanMe.Web.Controllers
         {
             return User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
         }
+
+        private async Task PopulateSelectListsAsync(AssetViewModel model, bool isEditMode)
+        {
+            if (isEditMode)
+            {
+                model.Clients = await _lookupService.GetClientSelectListAsync();
+                model.AssetLocations = await _lookupService.GetAssetLocationSelectListAsync();
+                model.AssetTypes = await _lookupService.GetAssetTypeSelectListAsync();
+            }
+            else
+            {
+                model.Clients = new[]
+                {
+            new SelectListItem { Value = "", Text = "-- Select Client --" }
+        }.Concat(await _lookupService.GetClientSelectListAsync());
+
+                model.AssetLocations = new[]
+                {
+            new SelectListItem { Value = "", Text = "-- Select Location --" }
+        }.Concat(await _lookupService.GetAssetLocationSelectListAsync());
+
+                model.AssetTypes = new[]
+                {
+            new SelectListItem { Value = "", Text = "-- Select Type --" }
+        }.Concat(await _lookupService.GetAssetTypeSelectListAsync());
+            }
+        }
+
     }
 }

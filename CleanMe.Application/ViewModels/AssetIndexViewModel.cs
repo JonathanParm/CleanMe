@@ -22,15 +22,15 @@ namespace CleanMe.Application.ViewModels
         public string MdReference { get; set; }
 
         [Display(Name = "Client Name")]
-        public int ClientName { get; set; }
+        public string ClientName { get; set; }
 
         [Display(Name = "Client Reference")]
-        public int ClientReference { get; set; }
+        public string ClientReference { get; set; }
 
         [Display(Name = "Asset Location")]
-        public int AssetLocation { get; set; }
+        public string AssetLocation { get; set; }
 
         [Display(Name = "Asset Type")]
-        public int AssetType { get; set; }
+        public string AssetType { get; set; }
     }
 }

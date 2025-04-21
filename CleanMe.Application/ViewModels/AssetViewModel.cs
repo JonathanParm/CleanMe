@@ -15,27 +15,27 @@ namespace CleanMe.Application.ViewModels
         public int assetId { get; set; }
 
         [Required]
-        [StringLength(50, MinimumLength = 2, ErrorMessage = "Area name must have between 2 and 50 letters")]
-        [Display(Name = "Area name")]
+        [StringLength(50, MinimumLength = 2, ErrorMessage = "Asset name must have between 2 and 50 letters")]
+        [Display(Name = "Asset name")]
         public string Name { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Client is requred")]
         [Display(Name = "Client")]
-        public int clientId { get; set; }
+        public int? clientId { get; set; }  // nullable int to allow for no selection in the dropdown
 
         [Display(Name = "Client")]
         public string? ClientName { get; set; }
 
-        [Required]
+        [Range(1, int.MaxValue, ErrorMessage = "Asset location is required")]
         [Display(Name = "Asset Location")]
-        public int assetLocationId { get; set; }
+        public int? assetLocationId { get; set; }  // nullable int to allow for no selection in the dropdown
 
         [Display(Name = "Asset Location")]
         public string? AssetLocationName { get; set; }
 
-        [Required]
+        [Range(1, int.MaxValue, ErrorMessage = "Asset type is required")]
         [Display(Name = "Asset Type")]
-        public int assetTypeId { get; set; }
+        public int? assetTypeId { get; set; }  // nullable int to allow for no selection in the dropdown
 
         [Display(Name = "Asset Type")]
         public string? AssetTypeName { get; set; }

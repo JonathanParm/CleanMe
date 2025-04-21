@@ -34,7 +34,7 @@ namespace CleanMe.Application.Services
             _logger.LogInformation("Fetching Assets list using Dapper.");
             try
             {
-                var query = "EXEC dbo.AssetGetIndexView @AssetName @RegionName, @MdReference, @ClientName, @ClientReference, @AssetLocation, @AssetType, @SortColumn, @SortOrder, @PageNumber, @PageSize";
+                var query = "EXEC dbo.AssetGetIndexView @AssetName, @RegionName, @MdReference, @ClientName, @ClientReference, @AssetLocation, @AssetType, @SortColumn, @SortOrder, @PageNumber, @PageSize";
                 var parameters = new
                 {
                     AssetName = assetName,
@@ -64,7 +64,7 @@ namespace CleanMe.Application.Services
             // Exclude any soft deletes
             var query = "SELECT * FROM Assets WHERE IsDeleted = 0 AND Name = @name";
 
-            if (assetId.HasValue)
+            if (assetId.HasValue && assetId > 0)
             {
                 query += " AND assetId != @assetId"; // Exclude a specific Asset (useful when updating)
             }
@@ -106,6 +106,7 @@ namespace CleanMe.Application.Services
         {
             _logger.LogInformation($"Adding new Asset: {model.Name}");
 
+            // using .Value to ensure the nullable int is not null
             var Asset = new Asset
             {
                 MdReference = model.MdReference,
@@ -114,9 +115,9 @@ namespace CleanMe.Application.Services
                 Position = model.Position,
                 Access = model.Access,
                 Inaccessable = model.Inaccessable,
-                clientId = model.clientId,
-                assetLocationId = model.assetLocationId,
-                assetTypeId = model.assetTypeId,
+                clientId = model.clientId.Value,
+                assetLocationId = model.assetLocationId.Value,
+                assetTypeId = model.assetTypeId.Value,
                 AddedAt = DateTime.UtcNow,
                 AddedById = addedById,
                 UpdatedAt = DateTime.UtcNow,
@@ -143,9 +144,9 @@ namespace CleanMe.Application.Services
             asset.Position = model.Position;
             asset.Access = model.Access;
             asset.Inaccessable = model.Inaccessable;
-            asset.clientId = model.clientId;
-            asset.assetLocationId = model.assetLocationId;
-            asset.assetTypeId = model.assetTypeId;
+            asset.clientId = model.clientId.Value;
+            asset.assetLocationId = model.assetLocationId.Value;
+            asset.assetTypeId = model.assetTypeId.Value;
             asset.UpdatedAt = DateTime.UtcNow;
             asset.UpdatedById = updatedById;
 
