@@ -1,0 +1,109 @@
+﻿@using CleanMe.Application.ViewModels
+@using CleanMe.Domain.Enums
+@using CleanMe.Shared.Helpers
+
+@model CleanMe.Application.ViewModels.StockCodeViewModel
+
+@{
+    ViewData["Title"] = Model.stockCodeId == 0 ? "Add Stock Code" : "Edit Stock Code";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form asp-action="AddEdit" method="post" id="StockCodeForm" novalidate>
+    @Html.AntiForgeryToken()
+
+    @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+
+    @Html.HiddenFor(m => m.stockCodeId)
+    @* <input asp-for="stockCodeId" type="hidden" /> *@
+
+    <div class="form-group">
+        <label asp-for="Name" class="form-label"></label>
+        <input asp-for="Name" class="form-control" required />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Description" class="form-label"></label>
+        <input asp-for="Description" class="form-control" required />
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Is Active</label>
+        <select asp-for="IsActive" class="form-control">
+            <option value="true">Active</option>
+            <option value="false">Inactive</option>
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>
+
+<h3 class="mt-4">Areas</h3>
+
+<!-- Add Area Button -->
+<div class="text-start mb-3">
+    <button type="button"
+            class="btn btn-sm btn-primary"
+            data-redirect="@Url.Action("AddEdit", "AssetType", new
+            {
+                stockCodeId = Model.stockCodeId,
+                returnUrl = Url.Action("AddEdit", "StockCode", new { stockCodeId = Model.stockCodeId })
+            })"
+            data-form="StockCodeForm">
+            ➕ Add Asset Type
+    </button>
+</div>
+
+<!-- Areas Table -->
+<div class="table-responsive">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Asset type</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var assetType in Model.AssetTypesList)
+            {
+                <tr>
+                    <td>@assetType.Name</td>
+                    <td>@(assetType.IsActive ? "Yes" : "No")</td>
+                    <td>
+                        <button type="button"
+                                class="btn btn-sm btn-warning redirect-after-save"
+                                data-redirect="@Url.Action("AddEdit", "AssetType", new
+                            {
+                                assetTypeId = assetType.assetTypeId,
+                                stockCodeId = Model.stockCodeId,
+                                    returnUrl = Url.Action("AddEdit", "StockCode", new { stockCodeId = Model.stockCodeId })
+                                })"
+                                data-form="StockCodeForm">
+                                ✏️ Edit
+                        </button>
+
+                        <button type="button"
+                                class="btn btn-sm btn-danger redirect-after-save"
+                                data-redirect="@Url.Action("Delete", "AssetType", new
+                            {
+                                assetTypeId = assetType.assetTypeId,
+                                stockCodeId = Model.stockCodeId,
+                                    returnUrl = Url.Action("AddEdit", "StockCode", new { stockCodeId = Model.stockCodeId })
+                                })"
+                                data-form="StockCodeForm">
+                                🗑 Delete
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script src="~/js/shared/redirect-on-submit.js"></script>
+}

@@ -44,9 +44,6 @@ namespace CleanMe.Domain.Entities
         [Display(Name = "Access to asset")]
         public string? Access { get; set; }
 
-        [Display(Name = "Is Accessable")]
-        public bool IsAccessable { get; set; } = true;
-
         [ForeignKey("Client")]
         [DisplayName("Client")]
         public int clientId { get; set; }
@@ -97,5 +94,8 @@ namespace CleanMe.Domain.Entities
         [Column(TypeName = "NVARCHAR")]
         [StringLength(450)]
         public string UpdatedById { get; set; }
+
+        // Navigation property
+        public ICollection<Amendment> Amendments { get; set; } = new List<Amendment>();
     }
 }

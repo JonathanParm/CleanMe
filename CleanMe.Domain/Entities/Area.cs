@@ -75,6 +75,8 @@ namespace CleanMe.Domain.Entities
         // Navigation property
         public ICollection<AssetLocation> AssetLocations { get; set; } = new List<AssetLocation>();
 
+        // Navigation property
+        public ICollection<Amendment> Amendments { get; set; } = new List<Amendment>();
     }
 }
 

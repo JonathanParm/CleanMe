@@ -4,6 +4,7 @@ using CleanMe.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CleanMe.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250421235838_DropIsAccessableFromAssetTable")]
+    partial class DropIsAccessableFromAssetTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,95 +24,6 @@ namespace CleanMe.Infrastructure.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("CleanMe.Domain.Entities.Amendment", b =>
-                {
-                    b.Property<int>("amendmentId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("amendmentId"));
-
-                    b.Property<string>("Access")
-                        .HasMaxLength(200)
-                        .HasColumnType("VARCHAR");
-
-                    b.Property<DateTime>("AddedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("AddedById")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("NVARCHAR");
-
-                    b.Property<string>("AmendmentSourceName")
-                        .HasMaxLength(100)
-                        .HasColumnType("VARCHAR");
-
-                    b.Property<string>("Comment")
-                        .HasMaxLength(2000)
-                        .HasColumnType("VARCHAR");
-
-                    b.Property<DateOnly?>("FinishOn")
-                        .HasColumnType("date");
-
-                    b.Property<DateOnly?>("Invoiced")
-                        .HasColumnType("date");
-
-                    b.Property<bool>("IsAccessable")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<decimal?>("Rate")
-                        .HasColumnType("decimal(5, 2)");
-
-                    b.Property<DateOnly?>("StartOn")
-                        .HasColumnType("date");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UpdatedById")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("NVARCHAR");
-
-                    b.Property<int?>("areaId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("assetId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("assetLocationId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("cleanFrequencyId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("clientId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("staffId")
-                        .HasColumnType("int");
-
-                    b.HasKey("amendmentId");
-
-                    b.HasIndex("areaId");
-
-                    b.HasIndex("assetId");
-
-                    b.HasIndex("assetLocationId");
-
-                    b.HasIndex("cleanFrequencyId");
-
-                    b.HasIndex("clientId");
-
-                    b.HasIndex("staffId");
-
-                    b.ToTable("Amendments");
-                });
 
             modelBuilder.Entity("CleanMe.Domain.Entities.Area", b =>
                 {
@@ -320,6 +234,9 @@ namespace CleanMe.Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("VARCHAR");
 
+                    b.Property<int>("StockCodeId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -328,15 +245,7 @@ namespace CleanMe.Infrastructure.Migrations
                         .HasMaxLength(450)
                         .HasColumnType("NVARCHAR");
 
-                    b.Property<int>("regionId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("stockCodeId")
-                        .HasColumnType("int");
-
                     b.HasKey("assetTypeId");
-
-                    b.HasIndex("stockCodeId");
 
                     b.ToTable("AssetTypes");
                 });
@@ -745,51 +654,6 @@ namespace CleanMe.Infrastructure.Migrations
                     b.ToTable("Staff");
                 });
 
-            modelBuilder.Entity("CleanMe.Domain.Entities.StockCode", b =>
-                {
-                    b.Property<int>("stockCodeId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("stockCodeId"));
-
-                    b.Property<DateTime>("AddedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("AddedById")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("NVARCHAR");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("VARCHAR");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("VARCHAR");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UpdatedById")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("NVARCHAR");
-
-                    b.HasKey("stockCodeId");
-
-                    b.ToTable("StockCodes");
-                });
-
             modelBuilder.Entity("CleanMe.Shared.Models.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
@@ -988,51 +852,6 @@ namespace CleanMe.Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("CleanMe.Domain.Entities.Amendment", b =>
-                {
-                    b.HasOne("CleanMe.Domain.Entities.Area", "Area")
-                        .WithMany("Amendments")
-                        .HasForeignKey("areaId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("CleanMe.Domain.Entities.Asset", "Asset")
-                        .WithMany("Amendments")
-                        .HasForeignKey("assetId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("CleanMe.Domain.Entities.AssetLocation", "AssetLocation")
-                        .WithMany("Amendments")
-                        .HasForeignKey("assetLocationId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("CleanMe.Domain.Entities.CleanFrequency", "CleanFrequency")
-                        .WithMany("Amendments")
-                        .HasForeignKey("cleanFrequencyId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("CleanMe.Domain.Entities.Client", "Client")
-                        .WithMany("Amendments")
-                        .HasForeignKey("clientId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("CleanMe.Domain.Entities.Staff", "Staff")
-                        .WithMany("Amendments")
-                        .HasForeignKey("staffId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Area");
-
-                    b.Navigation("Asset");
-
-                    b.Navigation("AssetLocation");
-
-                    b.Navigation("CleanFrequency");
-
-                    b.Navigation("Client");
-
-                    b.Navigation("Staff");
-                });
-
             modelBuilder.Entity("CleanMe.Domain.Entities.Area", b =>
                 {
                     b.HasOne("CleanMe.Domain.Entities.Region", "Region")
@@ -1124,17 +943,6 @@ namespace CleanMe.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Area");
-                });
-
-            modelBuilder.Entity("CleanMe.Domain.Entities.AssetType", b =>
-                {
-                    b.HasOne("CleanMe.Domain.Entities.StockCode", "StockCode")
-                        .WithMany("AssetTypes")
-                        .HasForeignKey("stockCodeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("StockCode");
                 });
 
             modelBuilder.Entity("CleanMe.Domain.Entities.AssetTypeRate", b =>
@@ -1326,20 +1134,11 @@ namespace CleanMe.Infrastructure.Migrations
 
             modelBuilder.Entity("CleanMe.Domain.Entities.Area", b =>
                 {
-                    b.Navigation("Amendments");
-
                     b.Navigation("AssetLocations");
-                });
-
-            modelBuilder.Entity("CleanMe.Domain.Entities.Asset", b =>
-                {
-                    b.Navigation("Amendments");
                 });
 
             modelBuilder.Entity("CleanMe.Domain.Entities.AssetLocation", b =>
                 {
-                    b.Navigation("Amendments");
-
                     b.Navigation("Assets");
                 });
 
@@ -1352,15 +1151,11 @@ namespace CleanMe.Infrastructure.Migrations
 
             modelBuilder.Entity("CleanMe.Domain.Entities.CleanFrequency", b =>
                 {
-                    b.Navigation("Amendments");
-
                     b.Navigation("AssetTypeRates");
                 });
 
             modelBuilder.Entity("CleanMe.Domain.Entities.Client", b =>
                 {
-                    b.Navigation("Amendments");
-
                     b.Navigation("AssetTypeRates");
 
                     b.Navigation("Assets");
@@ -1371,16 +1166,6 @@ namespace CleanMe.Infrastructure.Migrations
             modelBuilder.Entity("CleanMe.Domain.Entities.Region", b =>
                 {
                     b.Navigation("Areas");
-                });
-
-            modelBuilder.Entity("CleanMe.Domain.Entities.Staff", b =>
-                {
-                    b.Navigation("Amendments");
-                });
-
-            modelBuilder.Entity("CleanMe.Domain.Entities.StockCode", b =>
-                {
-                    b.Navigation("AssetTypes");
                 });
 #pragma warning restore 612, 618
         }

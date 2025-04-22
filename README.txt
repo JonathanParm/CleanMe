@@ -86,3 +86,7 @@ When generating Schedule do not override existing schedule PDF files once amendm
 Generating Schedule screen option to display on screen or PDF. IMPORTANT.   
 
 Generating Schedule screen option to select 2 or more cleaners and show their schedule possibly as summaries. Needs more definition.
+
+From Asset can view asset amendment history.
+
+When first import assets create amendment. When all imported then mark all amendments as invoiced.

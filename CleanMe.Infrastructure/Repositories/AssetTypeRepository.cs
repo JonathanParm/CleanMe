@@ -30,9 +30,11 @@ namespace CleanMe.Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        public async Task<AssetType?> GetAssetTypeByIdAsync(int id)
+        public async Task<AssetType?> GetAssetTypeByIdAsync(int assetTypeId)
         {
-            return await _context.AssetTypes.FindAsync(id);
+            return await _context.AssetTypes
+                .Include(a => a.StockCode)  // eager load
+                .FirstOrDefaultAsync(a => a.assetTypeId == assetTypeId);
         }
 
         public async Task AddAssetTypeAsync(AssetType AssetType)

@@ -97,8 +97,7 @@ namespace CleanMe.Application.Services
                 MdReference = asset.MdReference,
                 ClientReference = asset.ClientReference,
                 Position = asset.Position,
-                Access = asset.Access,
-                IsAccessable = asset.IsAccessable
+                Access = asset.Access
             };
         }
 
@@ -114,7 +113,6 @@ namespace CleanMe.Application.Services
                 ClientReference = model.ClientReference,
                 Position = model.Position,
                 Access = model.Access,
-                IsAccessable = model.IsAccessable,
                 clientId = model.clientId.Value,
                 assetLocationId = model.assetLocationId.Value,
                 assetTypeId = model.assetTypeId.Value,
@@ -143,7 +141,6 @@ namespace CleanMe.Application.Services
             asset.ClientReference = model.ClientReference;
             asset.Position = model.Position;
             asset.Access = model.Access;
-            asset.IsAccessable = model.IsAccessable;
             asset.clientId = model.clientId.Value;
             asset.assetLocationId = model.assetLocationId.Value;
             asset.assetTypeId = model.assetTypeId.Value;

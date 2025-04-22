@@ -4,6 +4,7 @@ using CleanMe.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CleanMe.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250422001852_InvoicedNotRequiredAmendmentTable")]
+    partial class InvoicedNotRequiredAmendmentTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -62,7 +65,7 @@ namespace CleanMe.Infrastructure.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<decimal?>("Rate")
+                    b.Property<decimal>("Rate")
                         .HasColumnType("decimal(5, 2)");
 
                     b.Property<DateOnly?>("StartOn")
@@ -75,9 +78,6 @@ namespace CleanMe.Infrastructure.Migrations
                         .IsRequired()
                         .HasMaxLength(450)
                         .HasColumnType("NVARCHAR");
-
-                    b.Property<int?>("areaId")
-                        .HasColumnType("int");
 
                     b.Property<int?>("assetId")
                         .HasColumnType("int");
@@ -95,8 +95,6 @@ namespace CleanMe.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("amendmentId");
-
-                    b.HasIndex("areaId");
 
                     b.HasIndex("assetId");
 
@@ -320,6 +318,9 @@ namespace CleanMe.Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("VARCHAR");
 
+                    b.Property<int>("StockCodeId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -328,15 +329,7 @@ namespace CleanMe.Infrastructure.Migrations
                         .HasMaxLength(450)
                         .HasColumnType("NVARCHAR");
 
-                    b.Property<int>("regionId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("stockCodeId")
-                        .HasColumnType("int");
-
                     b.HasKey("assetTypeId");
-
-                    b.HasIndex("stockCodeId");
 
                     b.ToTable("AssetTypes");
                 });
@@ -745,51 +738,6 @@ namespace CleanMe.Infrastructure.Migrations
                     b.ToTable("Staff");
                 });
 
-            modelBuilder.Entity("CleanMe.Domain.Entities.StockCode", b =>
-                {
-                    b.Property<int>("stockCodeId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("stockCodeId"));
-
-                    b.Property<DateTime>("AddedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("AddedById")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("NVARCHAR");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("VARCHAR");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("VARCHAR");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UpdatedById")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("NVARCHAR");
-
-                    b.HasKey("stockCodeId");
-
-                    b.ToTable("StockCodes");
-                });
-
             modelBuilder.Entity("CleanMe.Shared.Models.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
@@ -990,11 +938,6 @@ namespace CleanMe.Infrastructure.Migrations
 
             modelBuilder.Entity("CleanMe.Domain.Entities.Amendment", b =>
                 {
-                    b.HasOne("CleanMe.Domain.Entities.Area", "Area")
-                        .WithMany("Amendments")
-                        .HasForeignKey("areaId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("CleanMe.Domain.Entities.Asset", "Asset")
                         .WithMany("Amendments")
                         .HasForeignKey("assetId")
@@ -1019,8 +962,6 @@ namespace CleanMe.Infrastructure.Migrations
                         .WithMany("Amendments")
                         .HasForeignKey("staffId")
                         .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Area");
 
                     b.Navigation("Asset");
 
@@ -1124,17 +1065,6 @@ namespace CleanMe.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Area");
-                });
-
-            modelBuilder.Entity("CleanMe.Domain.Entities.AssetType", b =>
-                {
-                    b.HasOne("CleanMe.Domain.Entities.StockCode", "StockCode")
-                        .WithMany("AssetTypes")
-                        .HasForeignKey("stockCodeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("StockCode");
                 });
 
             modelBuilder.Entity("CleanMe.Domain.Entities.AssetTypeRate", b =>
@@ -1326,8 +1256,6 @@ namespace CleanMe.Infrastructure.Migrations
 
             modelBuilder.Entity("CleanMe.Domain.Entities.Area", b =>
                 {
-                    b.Navigation("Amendments");
-
                     b.Navigation("AssetLocations");
                 });
 
@@ -1376,11 +1304,6 @@ namespace CleanMe.Infrastructure.Migrations
             modelBuilder.Entity("CleanMe.Domain.Entities.Staff", b =>
                 {
                     b.Navigation("Amendments");
-                });
-
-            modelBuilder.Entity("CleanMe.Domain.Entities.StockCode", b =>
-                {
-                    b.Navigation("AssetTypes");
                 });
 #pragma warning restore 612, 618
         }

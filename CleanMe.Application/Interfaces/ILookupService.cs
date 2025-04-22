@@ -19,5 +19,6 @@ namespace CleanMe.Application.Interfaces
         Task<IEnumerable<SelectListItem>> GetClientSelectListAsync();
         Task<IEnumerable<SelectListItem>> GetRegionSelectListAsync();
         Task<IEnumerable<SelectListItem>> GetStaffSelectListAsync();
+        Task<IEnumerable<SelectListItem>> GetStockCodeSelectListAsync();
     }
 }

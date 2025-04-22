@@ -12,6 +12,7 @@
         IClientRepository ClientRepository { get; }
         IRegionRepository RegionRepository { get; }
         IStaffRepository StaffRepository { get; }
+        IStockCodeRepository StockCodeRepository { get; }
 
         IDapperRepository DapperRepository { get; }
 

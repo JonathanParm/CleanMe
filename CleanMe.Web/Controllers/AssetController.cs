@@ -131,6 +131,7 @@ namespace CleanMe.Web.Controllers
                     //TempData["MatchingStaffIds"] = duplicateAsset.Select(s => s.assetId).ToArray();
                     ModelState.AddModelError("Name", "An Asset with the same name already exists.");
                     ViewBag.ReturnUrl = returnUrl;
+                    await PopulateSelectListsAsync(model, model.assetId > 0);
                     return View(model);
                 }
 
@@ -229,18 +230,18 @@ namespace CleanMe.Web.Controllers
             {
                 model.Clients = new[]
                 {
-            new SelectListItem { Value = "", Text = "-- Select Client --" }
-        }.Concat(await _lookupService.GetClientSelectListAsync());
+                    new SelectListItem { Value = "", Text = "-- Select Client --" }
+                }.Concat(await _lookupService.GetClientSelectListAsync());
 
                 model.AssetLocations = new[]
                 {
-            new SelectListItem { Value = "", Text = "-- Select Location --" }
-        }.Concat(await _lookupService.GetAssetLocationSelectListAsync());
+                    new SelectListItem { Value = "", Text = "-- Select Location --" }
+                }.Concat(await _lookupService.GetAssetLocationSelectListAsync());
 
                 model.AssetTypes = new[]
                 {
-            new SelectListItem { Value = "", Text = "-- Select Type --" }
-        }.Concat(await _lookupService.GetAssetTypeSelectListAsync());
+                    new SelectListItem { Value = "", Text = "-- Select Type --" }
+                }.Concat(await _lookupService.GetAssetTypeSelectListAsync());
             }
         }
 

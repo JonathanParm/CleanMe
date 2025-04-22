@@ -82,7 +82,24 @@ namespace CleanMe.Application.Services
             {
                 assetTypeId = assetType.assetTypeId,
                 Name = assetType.Name,
+                stockCodeId = assetType.stockCodeId,
+                StockCodeName = assetType.StockCode.Name,
                 IsActive = assetType.IsActive
+            };
+        }
+
+        public async Task<AssetTypeViewModel> PrepareNewAssetTypeViewModelAsync(int stockCodeId)
+        {
+            var stockCode = await _unitOfWork.StockCodeRepository.GetStockCodeByIdAsync(stockCodeId);
+
+            if (stockCode == null)
+                throw new Exception("Stock Code not found.");
+
+            return new AssetTypeViewModel
+            {
+                stockCodeId = stockCode.stockCodeId,
+                StockCodeName = stockCode.Name,
+                IsActive = true
             };
         }
 
@@ -94,6 +111,7 @@ namespace CleanMe.Application.Services
             var AssetType = new AssetType
             {
                 Name = model.Name,
+                stockCodeId = model.stockCodeId,
                 IsActive = model.IsActive,
                 AddedAt = DateTime.UtcNow,
                 AddedById = addedById,
@@ -117,6 +135,7 @@ namespace CleanMe.Application.Services
             }
 
             AssetType.Name = model.Name;
+            AssetType.stockCodeId = model.stockCodeId;
             AssetType.IsActive = model.IsActive;
             AssetType.UpdatedAt = DateTime.UtcNow;
             AssetType.UpdatedById = updatedById;

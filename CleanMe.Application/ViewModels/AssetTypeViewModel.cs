@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace CleanMe.Application.ViewModels
 {
@@ -19,7 +20,16 @@ namespace CleanMe.Application.ViewModels
         public string Name { get; set; }
 
         [Required]
+        [Display(Name = "Stock code")]
+        public int stockCodeId { get; set; }
+
+        [Required]
         [DisplayName("Active")]
         public bool IsActive { get; set; } = true;
+
+        public string? StockCodeName { get; set; }
+
+        public IEnumerable<SelectListItem> StockCodes { get; set; } = new List<SelectListItem>();
+
     }
 }

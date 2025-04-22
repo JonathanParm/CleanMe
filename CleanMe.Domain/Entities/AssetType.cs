@@ -23,15 +23,17 @@ namespace CleanMe.Domain.Entities
         public bool IsActive { get; set; } = true;
 
         // Foreign key property linking to the parent
-        //[ForeignKey("StockCode")]
+        [ForeignKey("StockCode")]
         [DisplayName("Stock code")]
-        public int StockCodeId { get; set; }
+        public int stockCodeId { get; set; }
         // Navigation property representing the parent
-        //[DisplayName("Stock code")]
-        //public StockCode? StockCode { get; set; }
+        [DisplayName("Stock code")]
+        [ForeignKey(nameof(stockCodeId))]
+        public StockCode? StockCode { get; set; }
 
-        //// Navigation property representing the collection of children
-        //public ICollection<ServiceRate>? ServiceRates { get; set; }
+        [ForeignKey("Region")]
+        [DisplayName("Region")]
+        public int regionId { get; set; }
 
         [Required]
         [DisplayName("Deleted")]

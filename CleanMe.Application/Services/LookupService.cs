@@ -114,5 +114,15 @@ namespace CleanMe.Application.Services
                 Text = $"{t.FirstName} {t.FamilyName}"
             });
         }
+
+        public async Task<IEnumerable<SelectListItem>> GetStockCodeSelectListAsync()
+        {
+            var types = await _unitOfWork.StockCodeRepository.GetAllStockCodesAsync();
+            return types.Select(t => new SelectListItem
+            {
+                Value = t.stockCodeId.ToString(),
+                Text = t.Name
+            });
+        }
     }
 }

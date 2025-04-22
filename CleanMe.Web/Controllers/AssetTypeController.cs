@@ -1,10 +1,12 @@
 ﻿using CleanMe.Application.Interfaces;
 using CleanMe.Application.Services;
 using CleanMe.Application.ViewModels;
+using CleanMe.Domain.Entities;
 using CleanMe.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace CleanMe.Web.Controllers
 {
@@ -12,6 +14,7 @@ namespace CleanMe.Web.Controllers
     public class AssetTypeController : Controller
     {
         private readonly IAssetTypeService _assetTypeService;
+        private readonly ILookupService _lookupService;
         private readonly IUserService _userService;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<AssetTypeController> _logger;
@@ -19,12 +22,14 @@ namespace CleanMe.Web.Controllers
 
         public AssetTypeController(
             IAssetTypeService assetTypeService,
+            ILookupService lookupService,
             IUserService userService,
             UserManager<ApplicationUser> userManager,
             ILogger<AssetTypeController> logger,
             IErrorLoggingService errorLoggingService)
         {
             _assetTypeService = assetTypeService;
+            _lookupService = lookupService;
             _userService = userService;
             _userManager = userManager;
             _logger = logger;
@@ -58,25 +63,19 @@ namespace CleanMe.Web.Controllers
             }
         }
         // AddEdit Action (Handles Both Add & Edit)
-        public async Task<IActionResult> AddEdit(int? assetTypeId)
+        public async Task<IActionResult> AddEdit(int? assetTypeId, int stockCodeId = 0, string? returnUrl = null)
         {
             try
             {
-                AssetTypeViewModel model;
 
-                if (assetTypeId.HasValue) // Edit Mode
-                {
-                    model = await _assetTypeService.GetAssetTypeViewModelByIdAsync(assetTypeId.Value);
-                    if (model == null)
-                    {
-                        return NotFound();
-                    }
-                }
-                else // Create Mode
-                {
-                    model = new AssetTypeViewModel();
-                }
+                var model = assetTypeId.Value > 0
+                    ? await _assetTypeService.GetAssetTypeViewModelByIdAsync(assetTypeId.Value)
+                    : await _assetTypeService.PrepareNewAssetTypeViewModelAsync(stockCodeId);
 
+
+                await PopulateSelectListsAsync(model, assetTypeId > 0);
+
+                ViewBag.ReturnUrl = string.IsNullOrWhiteSpace(returnUrl) ? "Index" : returnUrl;
                 return View(model);
             }
             catch (Exception ex)
@@ -90,7 +89,7 @@ namespace CleanMe.Web.Controllers
         // Post: Create or Update AssetType
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddEdit(AssetTypeViewModel model)
+        public async Task<IActionResult> AddEdit(AssetTypeViewModel model, string? returnUrl = null)
         {
             try
             {
@@ -99,6 +98,8 @@ namespace CleanMe.Web.Controllers
                 if (!ModelState.IsValid)
                 {
                     TempData["ErrorMessage"] = "Please fix the errors below.";
+                    await PopulateSelectListsAsync(model, model.assetTypeId > 0);
+                    ViewBag.ReturnUrl = returnUrl;
                     return View(model);
                 }
 
@@ -109,6 +110,8 @@ namespace CleanMe.Web.Controllers
                     //TempData["WarningMessage"] = "A Asset Type with the same name or code already exists.";
                     //TempData["MatchingStaffIds"] = duplicateAssetType.Select(s => s.assetTypeId).ToArray();
                     ModelState.AddModelError("Name", "A Asset Type with the same name or code already exists.");
+                    await PopulateSelectListsAsync(model, model.assetTypeId > 0);
+                    ViewBag.ReturnUrl = returnUrl;
                     return View(model);
                 }
 
@@ -123,6 +126,9 @@ namespace CleanMe.Web.Controllers
                     if (existingAssetType == null)
                     {
                         TempData["ErrorMessage"] = "Asset Type record not found.";
+                        if (!string.IsNullOrEmpty(returnUrl))
+                            return Redirect(returnUrl);
+
                         return RedirectToAction("Index");
                     }
 
@@ -132,6 +138,9 @@ namespace CleanMe.Web.Controllers
                 }
 
                 Console.WriteLine("DEBUG: Returning RedirectToAction('Index').");
+                if (!string.IsNullOrEmpty(returnUrl))
+                    return Redirect(returnUrl);
+
                 return RedirectToAction("Index"); // This is always reached
 
             }
@@ -158,7 +167,7 @@ namespace CleanMe.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ConfirmDelete(int assetTypeId)
+        public async Task<IActionResult> ConfirmDelete(int assetTypeId, string? returnUrl = null)
         {
             try
             {
@@ -167,6 +176,9 @@ namespace CleanMe.Web.Controllers
                 if (AssetType == null)
                 {
                     TempData["ErrorMessage"] = "Asset Type not found.";
+                    if (!string.IsNullOrEmpty(returnUrl))
+                        return Redirect(returnUrl);
+
                     return RedirectToAction("Index");
                 }
 
@@ -181,12 +193,28 @@ namespace CleanMe.Web.Controllers
                 return RedirectToAction("HandleError", "Error");
             }
 
+            ViewBag.ReturnUrl = returnUrl; 
             return RedirectToAction("Index");
         }
 
         private string GetCurrentUserId()
         {
             return User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
+        }
+
+        private async Task PopulateSelectListsAsync(AssetTypeViewModel model, bool isEditMode)
+        {
+            if (isEditMode)
+            {
+                model.StockCodes = await _lookupService.GetStockCodeSelectListAsync();
+            }
+            else
+            {
+                model.StockCodes = new[]
+                {
+                    new SelectListItem { Value = "", Text = "-- Select Stock Code --" }
+                }.Concat(await _lookupService.GetStockCodeSelectListAsync());
+            }
         }
     }
 }

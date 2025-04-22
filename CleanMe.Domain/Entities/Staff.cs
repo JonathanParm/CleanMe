@@ -140,5 +140,8 @@ namespace CleanMe.Domain.Entities
             FamilyName = familyName;
             WorkRole = WorkRole.Cleaner;
         }
+
+        // Navigation property
+        public ICollection<Amendment> Amendments { get; set; } = new List<Amendment>();
     }
 }

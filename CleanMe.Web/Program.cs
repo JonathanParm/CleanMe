@@ -95,6 +95,8 @@ builder.Services.AddScoped<IRegionService, RegionService>();
 builder.Services.AddScoped<IRegionRepository, RegionRepository>();
 builder.Services.AddScoped<IStaffService, StaffService>();
 builder.Services.AddScoped<IStaffRepository, StaffRepository>();
+builder.Services.AddScoped<IStockCodeService, StockCodeService>();
+builder.Services.AddScoped<IStockCodeRepository, StockCodeRepository>();
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<ILookupService, LookupService>();

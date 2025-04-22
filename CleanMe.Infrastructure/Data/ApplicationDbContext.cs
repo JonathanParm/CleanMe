@@ -27,6 +27,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<AssetType> AssetTypes { get; set; }
     public DbSet<AssetTypeRate> AssetTypeRates { get; set; }
     public DbSet<AssetLocation> AssetLocations { get; set; }
+    public DbSet<StockCode> StockCodes { get; set; }
+    public DbSet<Amendment> Amendments { get; set; }
 
     public DbSet<ErrorExceptionsLog> ErrorExceptionsLogs { get; set; } = null!;
 
@@ -71,15 +73,15 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         });
 
         builder.Entity<Client>()
-            .HasMany(c => c.ClientContacts)
-            .WithOne(p => p.Client)
-            .HasForeignKey(p => p.clientId)
+            .HasMany(p => p.ClientContacts)
+            .WithOne(c => c.Client)
+            .HasForeignKey(c => c.clientId)
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.Entity<Client>()
-            .HasMany(c => c.Assets)
-            .WithOne(p => p.Client)
-            .HasForeignKey(p => p.clientId)
+            .HasMany(p => p.Assets)
+            .WithOne(c => c.Client)
+            .HasForeignKey(c => c.clientId)
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.Entity<Region>()
@@ -123,6 +125,48 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             .WithOne(p => p.CleanFrequency)
             .HasForeignKey(p => p.cleanFrequencyId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<Client>()
+            .HasMany(c => c.Amendments)
+            .WithOne(p => p.Client)
+            .HasForeignKey(p => p.clientId)
+            .IsRequired(false)                     // marks the FK as optional
+            .OnDelete(DeleteBehavior.Restrict);    // prevents cascade deletes
+
+        builder.Entity<AssetLocation>()
+            .HasMany(c => c.Amendments)
+            .WithOne(p => p.AssetLocation)
+            .HasForeignKey(p => p.assetLocationId)
+            .IsRequired(false)                     // marks the FK as optional
+            .OnDelete(DeleteBehavior.Restrict);    // prevents cascade deletes
+
+        builder.Entity<Area>()
+            .HasMany(c => c.Amendments)
+            .WithOne(p => p.Area)
+            .HasForeignKey(p => p.areaId)
+            .IsRequired(false)                     // marks the FK as optional
+            .OnDelete(DeleteBehavior.Restrict);    // prevents cascade deletes
+
+        builder.Entity<Asset>()
+            .HasMany(c => c.Amendments)
+            .WithOne(p => p.Asset)
+            .HasForeignKey(p => p.assetId)
+            .IsRequired(false)                     // marks the FK as optional
+            .OnDelete(DeleteBehavior.Restrict);    // prevents cascade deletes
+
+        builder.Entity<Staff>()
+            .HasMany(c => c.Amendments)
+            .WithOne(p => p.Staff)
+            .HasForeignKey(p => p.staffId)
+            .IsRequired(false)                     // marks the FK as optional
+            .OnDelete(DeleteBehavior.Restrict);    // prevents cascade deletes
+
+        builder.Entity<CleanFrequency>()
+            .HasMany(c => c.Amendments)
+            .WithOne(p => p.CleanFrequency)
+            .HasForeignKey(p => p.cleanFrequencyId)
+            .IsRequired(false)                     // marks the FK as optional
+            .OnDelete(DeleteBehavior.Restrict);    // prevents cascade deletes
 
 
         // Configure ErrorExceptionsLog table (if needed)

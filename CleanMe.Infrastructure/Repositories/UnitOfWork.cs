@@ -18,6 +18,7 @@ namespace CleanMe.Infrastructure.Repositories
         public IDapperRepository DapperRepository { get; }
         public IRegionRepository RegionRepository { get; }
         public IStaffRepository StaffRepository { get; }
+        public IStockCodeRepository StockCodeRepository { get; }
 
         public UnitOfWork(
                 ApplicationDbContext context,
@@ -31,7 +32,8 @@ namespace CleanMe.Infrastructure.Repositories
                 IClientRepository clientRepository,
                 IDapperRepository dapperRepository,
                 IRegionRepository regionRepository,
-                IStaffRepository staffRepository
+                IStaffRepository staffRepository,
+                IStockCodeRepository stockCodeRepository
             )
         {
             _context = context;
@@ -46,6 +48,7 @@ namespace CleanMe.Infrastructure.Repositories
             DapperRepository = dapperRepository;
             RegionRepository = regionRepository;
             StaffRepository = staffRepository;
+            StockCodeRepository = stockCodeRepository;
         }
 
         public async Task<int> CommitAsync()

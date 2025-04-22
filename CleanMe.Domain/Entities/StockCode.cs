@@ -9,35 +9,25 @@ using System.Threading.Tasks;
 
 namespace CleanMe.Domain.Entities
 {
-    [Table("CleanFrequencies")]
-    public class CleanFrequency
+    [Table("StockCodes")]
+    public class StockCode
     {
         [Key]
+        [DisplayName("Stock code")]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        [Display(Name = "ID")]
-        public int cleanFrequencyId { get; set; }
+        public int stockCodeId { get; set; }
 
-        [Required(ErrorMessage = "Must have frequency")]
-        [DisplayName("Name")]
+        [Required(ErrorMessage = "Must have code")]
+        [DisplayName("Code")]
         [Column(TypeName = "VARCHAR")]
-        [StringLength(50, MinimumLength = 3, ErrorMessage = "Frequency must have between 3 and 50 letters")]
+        [StringLength(50, MinimumLength = 3, ErrorMessage = "Code must have between 3 and 50 letters")]
         public string Name { get; set; }
 
-        [Required]
-        [Display(Name = "Description")]
+        [Required(ErrorMessage = "Must have description")]
+        [DisplayName("Description")]
         [Column(TypeName = "VARCHAR")]
-        [StringLength(500, MinimumLength = 2, ErrorMessage = "Description must have between 2 and 50 letters")]
+        [StringLength(500, MinimumLength = 3, ErrorMessage = "Description must have between 3 and 500 letters")]
         public string Description { get; set; }
-
-        [Required]
-        [Display(Name = "Code")]
-        [Column(TypeName = "VARCHAR")]
-        [StringLength(2, ErrorMessage = "Code must have between 1 and 2 letters")]
-        public string Code { get; set; }
-
-        [Required]
-        [DisplayName("Sort order")]
-        public int SequenceOrder { get; set; }
 
         [Required]
         [DisplayName("Active")]
@@ -68,9 +58,6 @@ namespace CleanMe.Domain.Entities
         public string UpdatedById { get; set; }
 
         // Navigation property
-        public ICollection<AssetTypeRate> AssetTypeRates { get; set; } = new List<AssetTypeRate>();
-
-        // Navigation property
-        public ICollection<Amendment> Amendments { get; set; } = new List<Amendment>();
+        public ICollection<AssetType> AssetTypes { get; set; } = new List<AssetType>();
     }
 }

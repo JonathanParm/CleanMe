@@ -80,5 +80,8 @@ namespace CleanMe.Domain.Entities
 
         //Navigation property
         public ICollection<Asset> Assets { get; set; } = new List<Asset>();
+
+        // Navigation property
+        public ICollection<Amendment> Amendments { get; set; } = new List<Amendment>();
     }
 }
