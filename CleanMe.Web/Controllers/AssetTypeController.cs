@@ -95,6 +95,11 @@ namespace CleanMe.Web.Controllers
             {
                 Console.WriteLine("DEBUG: Entering AddEdit method.");
 
+                if (model.stockCodeId == null)
+                {
+                    ModelState.AddModelError("stockCodeId", "Stock code is required.");
+                }
+
                 if (!ModelState.IsValid)
                 {
                     TempData["ErrorMessage"] = "Please fix the errors below.";

@@ -100,20 +100,20 @@ namespace CleanMe.Web.Controllers
             {
                 Console.WriteLine("DEBUG: Entering AddEdit method.");
 
-                if (model.assetTypeId == null)
-                {
-                    ModelState.AddModelError("assetTypeId", "Asset type is required.");
-                }
+                //if (model.clientId == null)
+                //{
+                //    ModelState.AddModelError("clientId", "Client is required.");
+                //}
 
-                if (model.cleanFrequencyId == null)
-                {
-                    ModelState.AddModelError("cleanFrequencyId", "Clean frequency is required.");
-                }
+                //if (model.assetTypeId == null)
+                //{
+                //    ModelState.AddModelError("assetTypeId", "Asset type is required.");
+                //}
 
-                if (model.clientId == null)
-                {
-                    ModelState.AddModelError("clientId", "Client is required.");
-                }
+                //if (model.cleanFrequencyId == null)
+                //{
+                //    ModelState.AddModelError("cleanFrequencyId", "Clean frequency is required.");
+                //}
 
                 if (!ModelState.IsValid)
                 {
@@ -124,7 +124,7 @@ namespace CleanMe.Web.Controllers
                 }
 
                 // Check for duplicate AssetTypeRate (excluding current record)
-                var duplicateAssetTypeRate = await _assetTypeRateService.FindDuplicateAssetTypeRateAsync(model.assetTypeId, model.cleanFrequencyId, model.clientId, model.assetTypeRateId);
+                var duplicateAssetTypeRate = await _assetTypeRateService.FindDuplicateAssetTypeRateAsync(model.assetTypeId.Value, model.cleanFrequencyId.Value, model.clientId.Value, model.assetTypeRateId);
                 if (duplicateAssetTypeRate.Any())
                 {
                     //TempData["WarningMessage"] = "A AssetTypeRate with the same name or code already exists.";

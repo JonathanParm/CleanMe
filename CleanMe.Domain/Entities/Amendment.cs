@@ -24,6 +24,14 @@ namespace CleanMe.Domain.Entities
         public string? AmendmentSourceName { get; set; }
 
         // Optional Foreign key property linking to the parent
+        [ForeignKey("AmendmentType")]
+        [DisplayName("Amendment type")]
+        public int? amendmentTypeId { get; set; }
+        // Navigation property representing the parent
+        [DisplayName("AmendmentType")]
+        public AmendmentType? AmendmentType { get; set; }
+
+        // Optional Foreign key property linking to the parent
         [ForeignKey("Client")]
         [DisplayName("Client")]
         public int? clientId { get; set; }
@@ -95,7 +103,7 @@ namespace CleanMe.Domain.Entities
         public string? Comment { get; set; }
 
         [DisplayName("Invoiced")]
-        public DateOnly? Invoiced { get; set; }
+        public DateOnly? InvoicedOn { get; set; }
 
         [Required]
         [DisplayName("Deleted")]

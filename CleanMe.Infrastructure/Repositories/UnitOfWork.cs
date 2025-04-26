@@ -7,6 +7,8 @@ namespace CleanMe.Infrastructure.Repositories
     {
         private readonly ApplicationDbContext _context;
 
+        public IAmendmentRepository AmendmentRepository { get; }
+        public IAmendmentTypeRepository AmendmentTypeRepository { get; }
         public IAreaRepository AreaRepository { get; }
         public IAssetLocationRepository AssetLocationRepository { get; }
         public IAssetRepository AssetRepository { get; }
@@ -22,6 +24,8 @@ namespace CleanMe.Infrastructure.Repositories
 
         public UnitOfWork(
                 ApplicationDbContext context,
+                IAmendmentRepository amendmentRepository,
+                IAmendmentTypeRepository amendmentTypeRepository,
                 IAreaRepository areaRepository,
                 IAssetLocationRepository assetLocationRepository,
                 IAssetRepository assetRepository,
@@ -37,6 +41,8 @@ namespace CleanMe.Infrastructure.Repositories
             )
         {
             _context = context;
+            AmendmentRepository = amendmentRepository;
+            AmendmentTypeRepository = amendmentTypeRepository;
             AreaRepository = areaRepository;
             AssetLocationRepository = assetLocationRepository;
             AssetRepository = assetRepository;

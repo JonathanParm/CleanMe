@@ -154,9 +154,9 @@ namespace CleanMe.Application.Services
             var AssetTypeRate = new AssetTypeRate
             {
                 Name = model.Name,
-                assetTypeId = model.assetTypeId,
-                cleanFrequencyId = model.cleanFrequencyId,
-                clientId = model.clientId,
+                assetTypeId = model.assetTypeId.Value,
+                cleanFrequencyId = model.cleanFrequencyId.Value,
+                clientId = model.clientId.Value,
                 Rate = model.Rate,
                 IsDefault = model.IsDefault,
                 IsActive = model.IsActive,
@@ -182,9 +182,9 @@ namespace CleanMe.Application.Services
             }
 
             AssetTypeRate.Name = model.Name;
-            AssetTypeRate.assetTypeId = model.assetTypeId;
-            AssetTypeRate.cleanFrequencyId = model.cleanFrequencyId;
-            AssetTypeRate.clientId = model.clientId;
+            AssetTypeRate.assetTypeId = model.assetTypeId.Value;
+            AssetTypeRate.cleanFrequencyId = model.cleanFrequencyId.Value;
+            AssetTypeRate.clientId = model.clientId.Value;
             AssetTypeRate.Rate = model.Rate;
             AssetTypeRate.IsDefault = model.IsDefault;
             AssetTypeRate.IsActive = model.IsActive;

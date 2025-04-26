@@ -4,6 +4,7 @@ using CleanMe.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CleanMe.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250423200322_AddAmendmentTypeTable")]
+    partial class AddAmendmentTypeTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -77,7 +80,6 @@ namespace CleanMe.Infrastructure.Migrations
                         .HasColumnType("NVARCHAR");
 
                     b.Property<int?>("amendmentTypeId")
-                        .IsRequired()
                         .HasColumnType("int");
 
                     b.Property<int?>("areaId")
@@ -1044,8 +1046,7 @@ namespace CleanMe.Infrastructure.Migrations
                     b.HasOne("CleanMe.Domain.Entities.AmendmentType", "AmendmentType")
                         .WithMany("Amendments")
                         .HasForeignKey("amendmentTypeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("CleanMe.Domain.Entities.Area", "Area")
                         .WithMany("Amendments")

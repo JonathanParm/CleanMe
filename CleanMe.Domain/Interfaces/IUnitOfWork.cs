@@ -2,6 +2,8 @@
 {
     public interface IUnitOfWork : IDisposable
     {
+        IAmendmentRepository AmendmentRepository { get; }
+        IAmendmentTypeRepository AmendmentTypeRepository { get; }
         IAreaRepository AreaRepository { get; }
         IAssetLocationRepository AssetLocationRepository { get; }
         IAssetRepository AssetRepository { get; }

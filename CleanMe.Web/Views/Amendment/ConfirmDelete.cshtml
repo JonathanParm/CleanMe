@@ -1,0 +1,55 @@
+﻿@model CleanMe.Application.ViewModels.AmendmentViewModel
+
+@{
+    ViewData["Title"] = "Confirm Delete";
+}
+
+<h2>Delete Amendment</h2>
+
+<div class="alert alert-warning">
+    Are you sure you want to delete this Amendment?
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Source name</label>
+    <p class="form-control-plaintext">@Model.AmendmentSourceName</p>
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Amendment type</label>
+    <p class="form-control-plaintext">@Model.AmendmentTypeName</p>
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Client name</label>
+    <p class="form-control-plaintext">@Model.ClientName</p>
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Area name</label>
+    <p class="form-control-plaintext">@Model.AreaName</p>
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Asset location</label>
+    <p class="form-control-plaintext">@Model.AssetLocationName</p>
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Asset</label>
+    <p class="form-control-plaintext">@Model.AssetName</p>
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Amendment summary</label>
+    <p class="form-control-plaintext">@Model.AmendmentSummary</p>
+</div>
+
+<!-- Add additional read-only fields if needed -->
+
+<form asp-action="ConfirmDelete" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="amendmentId" />
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>

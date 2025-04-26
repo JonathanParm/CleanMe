@@ -38,8 +38,7 @@ namespace CleanMe.Infrastructure.Repositories
 
         public async Task<AssetLocation?> GetAssetLocationByIdAsync(int assetLocationId)
         {
-            return await _context.AssetLocations
-                .FirstOrDefaultAsync(al => al.assetLocationId == assetLocationId);
+            return await _context.AssetLocations.FindAsync(assetLocationId);
         }
 
         public async Task<AssetLocationViewModel> PrepareNewAssetLocationViewModelAsync(int areaId)

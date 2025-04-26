@@ -1,0 +1,148 @@
+﻿@using CleanMe.Application.ViewModels
+@using CleanMe.Domain.Enums
+@using CleanMe.Shared.Helpers
+
+@model CleanMe.Application.ViewModels.AmendmentAddEditViewModel
+
+@{
+    ViewData["Title"] = Model.IsEdit ? "Edit Amendment" : "Add Amendment";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form asp-action="AddEdit" method="post" id="AmendmentForm" novalidate>
+    @Html.AntiForgeryToken()
+
+    @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+
+    @Html.HiddenFor(m => m.amendmentId)
+
+    @if (!Model.IsEdit)
+    {
+        <div class="form-group">
+            <label for="ClientId">Client</label>
+            <select asp-for="AmendmentCurrent.clientId" asp-items="Model.Clients" class="form-control" id="clientId"></select>
+        </div>
+        <div class="form-group">
+            <label for="AmendmentCurrent.areaId">Area</label>
+            <select asp-for="AmendmentCurrent.areaId" asp-items="Model.Areas" class="form-control" id="areaId"></select>
+        </div>
+        <div class="form-group">
+            <label for="AmendmentCurrent.assetLocationId">Asset Location</label>
+            <select asp-for="AmendmentCurrent.assetLocationId" asp-items="Model.AssetLocations" class="form-control" id="assetLocationId"></select>
+        </div>
+        <div class="form-group">
+            <label for="AmendmentCurrent.assetId">Asset</label>
+            <select asp-for="AmendmentCurrent.assetId" asp-items="Model.Assets" class="form-control" id="assetId"></select>
+        </div>
+        <div class="form-group">
+            <label for="AmendmentCurrent.amendmentTypeId">Amendment type</label>
+            <select asp-for="AmendmentCurrent.amendmentTypeId" asp-items="Model.AmendmentTypes" class="form-control" id="amendmentTypeId"></select>
+        </div>
+    }
+    else
+    {
+        <!-- Read-only Labels (Edit mode) -->
+        <div class="form-group">
+            <label>Client</label>
+            <p class="form-control-static">@Model.AmendmentCurrent.ClientName</p>
+        </div>
+        <div class="form-group">
+            <label>Area</label>
+            <p class="form-control-static">@Model.AmendmentCurrent.AreaName</p>
+        </div>
+        <div class="form-group">
+            <label>Asset location</label>
+            <p class="form-control-static">@Model.AmendmentCurrent.AssetLocationName</p>
+        </div>
+        <div class="form-group">
+            <label>Asset</label>
+            <p class="form-control-static">@Model.AmendmentCurrent.AssetName</p>
+        </div>
+        <div class="form-group">
+            <label>Amendment type</label>
+            <p class="form-control-static">@Model.AmendmentCurrent.AmendmentTypeName</p>
+        </div>
+    }
+
+    <h5 class="mt-4">Amendment Details</h5>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Invoiced @(Model.AmendmentLastInvoiced.StartOn?.ToString("d MMM yyyy") ?? "")</th>
+                <th>Current Amendment</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Cleaning Frequency</td>
+                <td>@Model.AmendmentLastInvoiced.CleanFrequencyName</td>
+                <td>
+                    <select asp-for="AmendmentCurrent.cleanFrequencyId" asp-items="Model.CleanFrequencies" class="form-control" id="cleanFrequencyId"></select>
+                    <span asp-validation-for="AmendmentCurrent.cleanFrequencyId" class="text-danger"></span>
+                </td>
+            </tr>
+            <tr>
+                <td>Cleaner</td>
+                <td>@Model.AmendmentLastInvoiced.StaffName</td>
+                <td>
+                    <select asp-for="AmendmentCurrent.staffId" asp-items="Model.Staff" class="form-control" id="staffId"></select>
+                    <span asp-validation-for="AmendmentCurrent.staffId" class="text-danger"></span>
+                </td>
+            </tr>
+            <tr>
+                <td>Rate</td>
+                <td>@(Model.AmendmentLastInvoiced.Rate?.ToString("C"))</td>
+                <td>
+                    <input asp-for="AmendmentCurrent.Rate" class="form-control" />
+                    <span asp-validation-for="AmendmentCurrent.Rate" class="text-danger"></span>
+                </td>
+            </tr>
+            <tr>
+                <td>Is Accessable</td>
+                <td>@(Model.AmendmentLastInvoiced.IsAccessable ? "Yes" : "No")
+                <td>
+                    <select asp-for="AmendmentLastInvoiced.IsAccessable" class="form-control">
+                        <option value="true">Yes</option>
+                        <option value="false">No</option>
+                    </select>
+                    <span asp-validation-for="AmendmentLastInvoiced.IsAccessable" class="text-danger"></span>
+                </td>
+            </tr>
+            <tr>
+                <td>Start Date</td>
+                <td>@(Model.AmendmentLastInvoiced.StartOn?.ToString("d MMM yyyy") ?? "")</td>
+                <td>
+                    <input asp-for="AmendmentCurrent.StartOn" type="date" class="form-control" />
+                    <span asp-validation-for="AmendmentCurrent.StartOn" class="text-danger"></span>
+                </td>
+            </tr>
+            <tr>
+                <td>Finish Date</td>
+                <td>@(Model.AmendmentLastInvoiced.FinishOn?.ToString("d MMM yyyy") ?? "")</td>
+                <td>
+                    <input asp-for="AmendmentCurrent.FinishOn" type="date" class="form-control" />
+                    <span asp-validation-for="AmendmentCurrent.FinishOn" class="text-danger"></span>
+                </td>
+            </tr>
+            <tr>
+                <td>Comment</td>
+                <td>@(Model.AmendmentLastInvoiced.Comment)</td>
+                <td>
+                    <textarea asp-for="AmendmentCurrent.Comment" class="form-control" rows="4"></textarea>
+                    <span asp-validation-for="AmendmentCurrent.FinishOn" class="text-danger"></span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>
+
+
+@section Scripts {
+    <script src="~/js/amendment/addedit-cascade-select.js"></script>
+    <script src="~/js/shared/redirect-on-submit.js"></script>
+}

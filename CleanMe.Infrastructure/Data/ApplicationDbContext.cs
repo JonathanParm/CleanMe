@@ -17,18 +17,19 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
     }
 
-    public DbSet<Staff> Staff { get; set; }
-    public DbSet<Client> Clients { get; set; }
-    public DbSet<ClientContact> ClientContacts { get; set; }
-    public DbSet<Region> Regions { get; set; }
+    public DbSet<Amendment> Amendments { get; set; }
+    public DbSet<AmendmentType> AmendmentTypes { get; set; }
     public DbSet<Area> Areas { get; set; }
-    public DbSet<CleanFrequency> CleanFrequencies { get; set; }
+    public DbSet<AssetLocation> AssetLocations { get; set; }
     public DbSet<Asset> Assets { get; set; }
     public DbSet<AssetType> AssetTypes { get; set; }
     public DbSet<AssetTypeRate> AssetTypeRates { get; set; }
-    public DbSet<AssetLocation> AssetLocations { get; set; }
+    public DbSet<CleanFrequency> CleanFrequencies { get; set; }
+    public DbSet<ClientContact> ClientContacts { get; set; }
+    public DbSet<Client> Clients { get; set; }
+    public DbSet<Region> Regions { get; set; }
     public DbSet<StockCode> StockCodes { get; set; }
-    public DbSet<Amendment> Amendments { get; set; }
+    public DbSet<Staff> Staff { get; set; }
 
     public DbSet<ErrorExceptionsLog> ErrorExceptionsLogs { get; set; } = null!;
 
@@ -82,36 +83,42 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             .HasMany(p => p.Assets)
             .WithOne(c => c.Client)
             .HasForeignKey(c => c.clientId)
+            .IsRequired(true)
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.Entity<Region>()
             .HasMany(c => c.Areas)
             .WithOne(p => p.Region)
             .HasForeignKey(p => p.regionId)
+            .IsRequired(true)
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.Entity<Area>()
             .HasMany(c => c.AssetLocations)
             .WithOne(p => p.Area)
             .HasForeignKey(p => p.areaId)
+            .IsRequired(true)
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.Entity<AssetLocation>()
             .HasMany(c => c.Assets)
             .WithOne(p => p.AssetLocation)
             .HasForeignKey(p => p.assetLocationId)
+            .IsRequired(true)
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.Entity<AssetType>()
             .HasMany(c => c.Assets)
             .WithOne(p => p.AssetType)
             .HasForeignKey(p => p.assetTypeId)
+            .IsRequired(true)
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.Entity<AssetType>()
             .HasMany(c => c.AssetTypeRates)
             .WithOne(p => p.AssetType)
             .HasForeignKey(p => p.assetTypeId)
+            .IsRequired(true)
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.Entity<Client>()
@@ -124,6 +131,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             .HasMany(c => c.AssetTypeRates)
             .WithOne(p => p.CleanFrequency)
             .HasForeignKey(p => p.cleanFrequencyId)
+            .IsRequired(true)
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.Entity<Client>()
@@ -168,6 +176,13 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             .IsRequired(false)                     // marks the FK as optional
             .OnDelete(DeleteBehavior.Restrict);    // prevents cascade deletes
 
+
+        builder.Entity<AmendmentType>()
+            .HasMany(p => p.Amendments)
+            .WithOne(c => c.AmendmentType)
+            .HasForeignKey(c => c.amendmentTypeId)
+            .IsRequired(true)                     
+            .OnDelete(DeleteBehavior.Restrict);
 
         // Configure ErrorExceptionsLog table (if needed)
         builder.Entity<ErrorExceptionsLog>()

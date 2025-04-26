@@ -23,6 +23,11 @@ namespace CleanMe.Infrastructure.Repositories
             return await _dbConnection.QuerySingleOrDefaultAsync<T>(sql, parameters, commandType: commandType);
         }
 
+        public async Task<T?> QueryFirstOrDefaultAsync<T>(string sql, object? parameters = null, CommandType commandType = CommandType.Text)
+        {
+            return await _dbConnection.QueryFirstOrDefaultAsync<T>(sql, parameters, commandType: commandType);
+        }
+
         public async Task<int> ExecuteAsync(string sql, object? parameters = null, CommandType commandType = CommandType.Text)
         {
             return await _dbConnection.ExecuteAsync(sql, parameters, commandType: commandType);

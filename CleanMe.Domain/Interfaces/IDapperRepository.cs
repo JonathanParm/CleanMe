@@ -6,6 +6,7 @@ namespace CleanMe.Domain.Interfaces
     {
         Task<IEnumerable<T>> QueryAsync<T>(string sql, object? parameters = null, CommandType commandType = CommandType.Text);
         Task<T?> QuerySingleOrDefaultAsync<T>(string sql, object? parameters = null, CommandType commandType = CommandType.Text);
+        Task<T?> QueryFirstOrDefaultAsync<T>(string sql, object? parameters = null, CommandType commandType = CommandType.Text);
         Task<int> ExecuteAsync(string sql, object? parameters = null, CommandType commandType = CommandType.Text);
         Task<int> ExecuteScalarAsync<TScalar>(string sql, object? parameters = null, CommandType commandType = CommandType.Text);
     }

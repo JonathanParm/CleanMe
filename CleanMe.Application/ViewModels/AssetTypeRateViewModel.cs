@@ -26,15 +26,15 @@ namespace CleanMe.Application.ViewModels
 
         [Required]
         [Display(Name = "Asset Type")]
-        public int assetTypeId { get; set; }
+        public int? assetTypeId { get; set; }
 
         [Required]
         [Display(Name = "Clean Frequency")]
-        public int cleanFrequencyId { get; set; }
+        public int? cleanFrequencyId { get; set; }
 
         [Required]
         [Display(Name = "Client")]
-        public int clientId { get; set; }
+        public int? clientId { get; set; }
 
         [Required]
         [DisplayName("Rate")]

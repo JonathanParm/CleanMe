@@ -1,4 +1,5 @@
 ﻿using CleanMe.Application.Interfaces;
+using CleanMe.Application.ViewModels;
 using CleanMe.Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Linq;
@@ -13,6 +14,16 @@ namespace CleanMe.Application.Services
         public LookupService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
+        }
+
+        public async Task<IEnumerable<SelectListItem>> GetAmendmentTypeSelectListAsync()
+        {
+            var types = await _unitOfWork.AmendmentTypeRepository.GetAllAmendmentTypesAsync();
+            return types.Select(t => new SelectListItem
+            {
+                Value = t.amendmentTypeId.ToString(),
+                Text = t.Name
+            });
         }
 
         public async Task<IEnumerable<SelectListItem>> GetAreaSelectListAsync()
@@ -123,6 +134,80 @@ namespace CleanMe.Application.Services
                 Value = t.stockCodeId.ToString(),
                 Text = t.Name
             });
+        }
+
+        public async Task<IEnumerable<SelectListItem>> GetAreasByClientAsync(int? clientId = 0)
+        {
+            try
+            {
+                var query = "EXEC dbo.AreaLookupByClient @clientId";
+                var parameters = new
+                {
+                    clientId = clientId,
+                };
+
+                return await GetSelectListAsync(query, parameters);
+            }
+            catch (Exception ex)
+            {
+                // Log error (you can inject a logger if needed)
+                throw new ApplicationException("Error Area lookup list Id and Name from stored procedure", ex);
+            }
+        }
+
+        public async Task<IEnumerable<SelectListItem>> GetAssetLocationsByClientAndAreaAsync(int? clientId = 0, int? areaId = 0)
+        {
+            try
+            {
+                var query = "EXEC dbo.AssetLocationLookupByClientAndArea @clientId, @areaId";
+                var parameters = new
+                {
+                    clientId = clientId,
+                    areaId = areaId
+                };
+
+                return await GetSelectListAsync(query, parameters);
+            }
+            catch (Exception ex)
+            {
+                // Log error (you can inject a logger if needed)
+                throw new ApplicationException("Error Asset location lookup list Id and Name from stored procedure", ex);
+            }
+        }
+
+        public async Task<IEnumerable<SelectListItem>> GetAssetsByClientAreaAndLocationAsync(int? clientId = 0, int? areaId = 0, int? assetLocationId = 0)
+        {
+            try
+            {
+                var query = "EXEC dbo.AssetLookupByClientAreaAndLocation @clientId, @areaId, @assetLocationId";
+                var parameters = new
+                {
+                    clientId = clientId,
+                    areaId = areaId,
+                    assetLocationId = assetLocationId
+                };
+
+                return await GetSelectListAsync(query, parameters);
+            }
+            catch (Exception ex)
+            {
+                // Log error (you can inject a logger if needed)
+                throw new ApplicationException("Error Asset lookup list Id and Name from stored procedure", ex);
+            }
+        }
+
+        private async Task<IEnumerable<SelectListItem>> GetSelectListAsync(string query, object? parameters)
+        {
+            var items = await _unitOfWork.DapperRepository.QueryAsync<IdNameLookupViewModel>(query, parameters);
+
+            return items
+                .OrderByDescending(al => al.Name)
+                .ThenBy(al => al.Name)
+                .Select(l => new SelectListItem
+                {
+                    Value = l.Id.ToString(),
+                    Text = l.IsActive ? l.Name : $"{l.Name} (Inactive)"
+                });
         }
     }
 }

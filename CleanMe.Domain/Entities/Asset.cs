@@ -51,7 +51,7 @@ namespace CleanMe.Domain.Entities
         // Navigation property
         [DisplayName("Client")]
         [ForeignKey(nameof(clientId))]
-        public virtual Client? Client { get; set; }
+        public Client? Client { get; set; }
 
         [ForeignKey("AssetLocation")]
         [DisplayName("Asset Location")]
@@ -60,7 +60,7 @@ namespace CleanMe.Domain.Entities
         // Navigation property
         [DisplayName("Asset Location")]
         [ForeignKey(nameof(assetLocationId))]
-        public virtual AssetLocation? AssetLocation { get; set; }
+        public AssetLocation? AssetLocation { get; set; }
 
         [ForeignKey("AssetType")]
         [DisplayName("Asset Type")]
@@ -69,7 +69,7 @@ namespace CleanMe.Domain.Entities
         // Navigation property
         [DisplayName("Asset Type")]
         [ForeignKey(nameof(assetTypeId))]
-        public virtual AssetType? AssetType { get; set; }
+        public AssetType? AssetType { get; set; }
 
         [Required]
         [DisplayName("Deleted")]

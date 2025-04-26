@@ -35,7 +35,7 @@ namespace CleanMe.Domain.Entities
         // Navigation property
         [DisplayName("Asset Type")]
         [ForeignKey(nameof(assetTypeId))]
-        public virtual AssetType? AssetType { get; set; }
+        public AssetType? AssetType { get; set; }
 
         [ForeignKey("Frequency")]
         [DisplayName("Clean Frequency")]
@@ -44,7 +44,7 @@ namespace CleanMe.Domain.Entities
         // Navigation property
         [DisplayName("Clean Frequency")]
         [ForeignKey(nameof(cleanFrequencyId))]
-        public virtual CleanFrequency? CleanFrequency { get; set; }
+        public CleanFrequency? CleanFrequency { get; set; }
 
         [ForeignKey("Client")]
         [DisplayName("Client")]
@@ -53,7 +53,7 @@ namespace CleanMe.Domain.Entities
         // Navigation property
         [DisplayName("Client")]
         [ForeignKey(nameof(clientId))]
-        public virtual Client? Client { get; set; }
+        public Client? Client { get; set; }
 
         [Required]
         [DisplayName("Rate")]

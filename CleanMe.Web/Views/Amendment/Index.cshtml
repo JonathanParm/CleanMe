@@ -1,0 +1,116 @@
+﻿@using CleanMe.Web.Helpers
+@model IEnumerable<CleanMe.Application.ViewModels.AmendmentIndexViewModel>
+
+@{
+    ViewData["Title"] = "Amendment List";
+    string sortOrder = ViewBag.SortOrder as string ?? "ASC";
+    string sortColumn = ViewBag.SortColumn as string ?? "SourceName";
+}
+
+<h2>Amendment Type List</h2>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<!-- Add Button (Top-Right) -->
+<div class="text-end mb-3">
+    <a asp-action="AddEdit" class="btn btn-primary">Add Amendment</a>
+</div>
+
+<!-- Filtering Form -->
+<form method="get" id="filterForm">
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <!-- Column Headers with Sorting -->
+                <tr>
+                    <th>
+                        <a href="#" onclick="sortTable('SourceName')">
+                            Source name @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "SourceName"))
+                        </a>
+                    </th>
+                    <th>
+                        <a href="#" onclick="sortTable('ClientName')">
+                            Client @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "ClientName"))
+                        </a>
+                    </th>
+                    <th>
+                        <a href="#" onclick="sortTable('AreaName')">
+                            Area @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "AreaName"))
+                        </a>
+                    </th>
+                    <th>
+                        <a href="#" onclick="sortTable('LocationName')">
+                            Location @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "LocationName"))
+                        </a>
+                    </th>
+                    <th>
+                        <a href="#" onclick="sortTable('MdReference')">
+                            MD reference @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "MdReference"))
+                        </a>
+                    </th>
+                    <th>
+                        <a href="#" onclick="sortTable('ClientReference')">
+                            Client reference @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "ClientReference"))
+                        </a>
+                    </th>
+                    <th>
+                        <a href="#" onclick="sortTable('AmendmentSummary')">
+                            Amendment summary @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "AmendmentSummary"))
+                        </a>
+                    </th>
+                    <th></th>
+                    <th>Actions</th>
+                </tr>
+
+                <!-- Filter Row -->
+                <tr>
+                    <td><input type="text" name="SourceName" class="form-control" value="@ViewBag.SourceName" placeholder="Search source name"></td>
+                    <td><input type="text" name="ClientName" class="form-control" value="@ViewBag.ClientName" placeholder="Search client"></td>
+                    <td><input type="text" name="AreaName" class="form-control" value="@ViewBag.AreaName" placeholder="Search area"></td>
+                    <td><input type="text" name="LocationName" class="form-control" value="@ViewBag.LocationName" placeholder="Search location"></td>
+                    <td><input type="text" name="MdReference" class="form-control" value="@ViewBag.MdReference" placeholder="Search MD reference"></td>
+                    <td><input type="text" name="ClientReference" class="form-control" value="@ViewBag.ClientReference" placeholder="Search client reference"></td>
+                    <td></td>
+                    <td>
+                        <button type="submit" class="btn btn-success">Filter</button>
+                        <a href="@Url.Action("Index", "AmendmentType")" class="btn btn-secondary">Clear</a>
+                    </td>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var amendment in Model)
+                {
+                    <tr>
+                        <td>@amendment.SourceName</td>
+                        <td>@amendment.ClientName</td>
+                        <td>@amendment.AreaName</td>
+                        <td>@amendment.LocationName</td>
+                        <td>@amendment.MdReference</td>
+                        <td>@amendment.ClientReference</td>
+                        <td>@amendment.AmendmentSummary</td>
+                        <td>
+                            <a asp-action="AddEdit" asp-route-amendmentTypeId="@amendment.amendmentId" class="btn btn-warning btn-sm">Edit</a>
+                            <a asp-action="Delete" asp-route-amendmentTypeId="@amendment.amendmentId" class="btn btn-danger btn-sm">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</form>
+
+<!-- JavaScript for Sorting -->
+@section Scripts {
+    <script src="~/js/shared/index-view-sort-table.js"></script>
+}

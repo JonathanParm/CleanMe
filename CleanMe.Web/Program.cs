@@ -75,6 +75,10 @@ builder.Services.AddScoped<IErrorLoggingService, ErrorLoggingService>();
 builder.Services.AddScoped<UserManager<ApplicationUser>>();
 builder.Services.AddScoped<IDapperRepository, DapperRepository>();
 
+builder.Services.AddScoped<IAmendmentService, AmendmentService>();
+builder.Services.AddScoped<IAmendmentRepository, AmendmentRepository>();
+builder.Services.AddScoped<IAmendmentTypeService, AmendmentTypeService>();
+builder.Services.AddScoped<IAmendmentTypeRepository, AmendmentTypeRepository>();
 builder.Services.AddScoped<IAreaService, AreaService>();
 builder.Services.AddScoped<IAreaRepository, AreaRepository>();
 builder.Services.AddScoped<IAssetLocationService, AssetLocationService>();

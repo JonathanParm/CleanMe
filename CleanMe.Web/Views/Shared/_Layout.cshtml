@@ -60,9 +60,14 @@
 
                         @if (isAdmin)
                         {
-                            <!-- Schedule -->
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Schedule" asp-action="Index">Schedule</a>
+                            <!-- Schedule Dropdown -->
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="scheduleDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Schedule
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="setupDropdown">
+                                    <li><a class="dropdown-item" asp-controller="Amendment" asp-action="Index">Cleaning amendment</a></li>
+                                </ul>
                             </li>
 
                             <!-- Setup Dropdown -->
@@ -79,6 +84,7 @@
                                     <li><a class="dropdown-item" asp-controller="AssetTypeRate" asp-action="Index">Asset type rate</a></li>
                                     <li><a class="dropdown-item" asp-controller="CleanFrequency" asp-action="Index">Cleaning frequency</a></li>
                                     <li><a class="dropdown-item" asp-controller="StockCode" asp-action="Index">Stock code</a></li>
+                                    <li><a class="dropdown-item" asp-controller="AmendmentType" asp-action="Index">Amendment type</a></li>
                                     <li><a class="dropdown-item" asp-controller="Staff" asp-action="Index">Staff</a></li>
                                     <li><a class="dropdown-item" asp-controller="Client" asp-action="Index">Client</a></li>
                                     <li><a class="dropdown-item" asp-controller="ClientContact" asp-action="Index">Client Contact</a></li>

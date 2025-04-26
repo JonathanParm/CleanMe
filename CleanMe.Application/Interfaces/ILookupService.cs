@@ -9,6 +9,7 @@ namespace CleanMe.Application.Interfaces
 {
     public interface ILookupService
     {
+        Task<IEnumerable<SelectListItem>> GetAmendmentTypeSelectListAsync();
         Task<IEnumerable<SelectListItem>> GetAreaSelectListAsync();
         Task<IEnumerable<SelectListItem>> GetAssetLocationSelectListAsync();
         Task<IEnumerable<SelectListItem>> GetAssetSelectListAsync();
@@ -20,5 +21,9 @@ namespace CleanMe.Application.Interfaces
         Task<IEnumerable<SelectListItem>> GetRegionSelectListAsync();
         Task<IEnumerable<SelectListItem>> GetStaffSelectListAsync();
         Task<IEnumerable<SelectListItem>> GetStockCodeSelectListAsync();
+
+        Task<IEnumerable<SelectListItem>> GetAreasByClientAsync(int? clientId);
+        Task<IEnumerable<SelectListItem>> GetAssetLocationsByClientAndAreaAsync(int? clientId, int? areaId);
+        Task<IEnumerable<SelectListItem>> GetAssetsByClientAreaAndLocationAsync(int? clientId, int? areaId, int? assetLocationId);
     }
 }

@@ -1,0 +1,93 @@
+﻿@using CleanMe.Web.Helpers
+@model IEnumerable<CleanMe.Application.ViewModels.AmendmentTypeIndexViewModel>
+
+@{
+    ViewData["Title"] = "Amendment Type List";
+    string sortOrder = ViewBag.SortOrder as string ?? "ASC";
+    string sortColumn = ViewBag.SortColumn as string ?? "Name";
+}
+
+<h2>Amendment Type List</h2>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<!-- Add Button (Top-Right) -->
+<div class="text-end mb-3">
+    <a asp-action="AddEdit" class="btn btn-primary">Add Amendment Type</a>
+</div>
+
+<!-- Filtering Form -->
+<form method="get" id="filterForm">
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <!-- Column Headers with Sorting -->
+                <tr>
+                    <th>
+                        <a href="#" onclick="sortTable('Name')">
+                            Name @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "Name"))
+                        </a>
+                    </th>
+                    <th>
+                        <a href="#" onclick="sortTable('Description')">
+                            Description @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "Description"))
+                        </a>
+                    </th>
+                    <th>
+                        <a href="#" onclick="sortTable('IsActive')">
+                            Active @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "IsActive"))
+                        </a>
+                    </th>
+                    <th>Actions</th>
+                </tr>
+
+                <!-- Filter Row -->
+                <tr>
+                    <td><input type="text" name="name" class="form-control" value="@ViewBag.Name" placeholder="Search Amendment Type"></td>
+                    <td><input type="text" name="description" class="form-control" value="@ViewBag.Description" placeholder="Search description"></td>
+                    <td>
+                        <select name="isActive" class="form-control">
+                            <option value="">All</option>
+                            <option value="1" selected="@(ViewBag.IsActive == "1" ? "selected" : null)">Active</option>
+                            <option value="0" selected="@(ViewBag.IsActive == "0" ? "selected" : null)">Inactive</option>
+                        </select>
+                    </td>
+                    <td>
+                        <button type="submit" class="btn btn-success">Filter</button>
+                        <a href="@Url.Action("Index", "AmendmentType")" class="btn btn-secondary">Clear</a>
+                    </td>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var AmendmentType in Model)
+                {
+                    <tr>
+                        <td>@AmendmentType.Name</td>
+                        <td>@AmendmentType.Description</td>
+                        <td>@(AmendmentType.IsActive ? "Yes" : "No")</td>
+                        <td>
+                            <a asp-action="AddEdit" asp-route-amendmentTypeId="@AmendmentType.amendmentTypeId" class="btn btn-warning btn-sm">Edit</a>
+                            <a asp-action="Delete" asp-route-amendmentTypeId="@AmendmentType.amendmentTypeId" class="btn btn-danger btn-sm">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</form>
+
+<!-- JavaScript for Sorting -->
+@section Scripts {
+    <script src="~/js/shared/index-view-sort-table.js"></script>
+}
