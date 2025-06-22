@@ -36,7 +36,7 @@
                 <tr>
                     <th>
                         <a href="#" onclick="sortTable('StaffNo')">
-                            Staff No @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "StaffNo"))
+                            Staff No @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "staffId"))
                         </a>
                     </th>
                     <th>
@@ -64,7 +64,7 @@
 
                 <!-- Filter Row -->
                 <tr>
-                    <td><input type="text" name="staffNo" class="form-control" value="@ViewBag.StaffNo" placeholder="Search Staff No"></td>
+                    <td><input type="text" name="staffId" class="form-control" value="@ViewBag.StaffNo" placeholder="Search Staff No"></td>
                     <td><input type="text" name="fullName" class="form-control" value="@ViewBag.FullName" placeholder="Search Full Name"></td>
                     <td><input type="text" name="workRole" class="form-control" value="@ViewBag.WorkRole" placeholder="Search Work Role"></td>
                     <td><input type="text" name="contactDetail" class="form-control" value="@ViewBag.ContactDetail" placeholder="Search Contact"></td>
@@ -85,7 +85,7 @@
                 @foreach (var staff in Model)
                 {
                     <tr>
-                        <td>@staff.StaffNo</td>
+                        <td>@staff.staffId</td>
                         <td>@staff.FullName</td>
                         <td>@staff.WorkRole</td>
                         <td>@staff.ContactDetail</td>

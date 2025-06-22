@@ -20,5 +20,6 @@ namespace CleanMe.Application.Interfaces
         Task<IEnumerable<AreaIndexViewModel>> GetAreaIndexAsync(
                 string? regionName, string? name, int? reportCode, string? isActive,
                 string sortColumn, string sortOrder, int pageNumber, int pageSize);
+        //object GetAreaByIdAsync(int v);
     }
 }

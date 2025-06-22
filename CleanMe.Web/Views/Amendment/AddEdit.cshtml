@@ -10,12 +10,27 @@
 
 <h2>@ViewData["Title"]</h2>
 
-<form asp-action="AddEdit" method="post" id="AmendmentForm" novalidate>
+<form asp-action="AddEdit" asp-controller="Amendment" method="post" id="AmendmentForm" novalidate>
+
     @Html.AntiForgeryToken()
 
     @Html.ValidationSummary(false, "", new { @class = "text-danger" })
 
     @Html.HiddenFor(m => m.amendmentId)
+
+    @Html.HiddenFor(m => m.AmendmentLastInvoiced.amendmentId)
+    @Html.HiddenFor(m => m.AmendmentLastInvoiced.clientId)
+    @Html.HiddenFor(m => m.AmendmentLastInvoiced.areaId)
+    @Html.HiddenFor(m => m.AmendmentLastInvoiced.assetLocationId)
+    @Html.HiddenFor(m => m.AmendmentLastInvoiced.assetId)
+    @Html.HiddenFor(m => m.AmendmentLastInvoiced.amendmentTypeId)
+    @Html.HiddenFor(m => m.AmendmentLastInvoiced.CleanFrequencyName)
+    @Html.HiddenFor(m => m.AmendmentLastInvoiced.StaffName)
+    @Html.HiddenFor(m => m.AmendmentLastInvoiced.Rate)
+    @Html.HiddenFor(m => m.AmendmentLastInvoiced.IsAccessable)
+    @Html.HiddenFor(m => m.AmendmentLastInvoiced.StartOn)
+    @Html.HiddenFor(m => m.AmendmentLastInvoiced.FinishOn)
+    @Html.HiddenFor(m => m.AmendmentLastInvoiced.Comment)
 
     @if (!Model.IsEdit)
     {
@@ -43,6 +58,13 @@
     else
     {
         <!-- Read-only Labels (Edit mode) -->
+        @Html.HiddenFor(m => m.AmendmentCurrent.amendmentId)
+        @Html.HiddenFor(m => m.AmendmentCurrent.clientId)
+        @Html.HiddenFor(m => m.AmendmentCurrent.areaId)
+        @Html.HiddenFor(m => m.AmendmentCurrent.assetLocationId)
+        @Html.HiddenFor(m => m.AmendmentCurrent.assetId)
+        @Html.HiddenFor(m => m.AmendmentCurrent.amendmentTypeId)
+
         <div class="form-group">
             <label>Client</label>
             <p class="form-control-static">@Model.AmendmentCurrent.ClientName</p>
@@ -141,8 +163,7 @@
     <a asp-action="Index" class="btn btn-secondary">Cancel</a>
 </form>
 
-
 @section Scripts {
-    <script src="~/js/amendment/addedit-cascade-select.js"></script>
-    <script src="~/js/shared/redirect-on-submit.js"></script>
+    <script src="@Url.Content("~/js/amendment/addedit-cascade-select.js")"></script>
+   @*  <script src="@Url.Content("~/js/shared/redirect-on-submit.js")"></script> *@
 }

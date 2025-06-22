@@ -19,25 +19,25 @@ namespace CleanMe.Domain.Entities
 
         [Required(ErrorMessage = "Must have frequency")]
         [DisplayName("Name")]
-        [Column(TypeName = "VARCHAR")]
+        [Column(TypeName = "varchar")]
         [StringLength(50, MinimumLength = 3, ErrorMessage = "Frequency must have between 3 and 50 letters")]
         public string Name { get; set; }
 
         [Required]
         [Display(Name = "Description")]
-        [Column(TypeName = "VARCHAR")]
+        [Column(TypeName = "varchar")]
         [StringLength(500, MinimumLength = 2, ErrorMessage = "Description must have between 2 and 50 letters")]
         public string Description { get; set; }
 
         [Required]
         [Display(Name = "Code")]
-        [Column(TypeName = "VARCHAR")]
+        [Column(TypeName = "varchar")]
         [StringLength(2, ErrorMessage = "Code must have between 1 and 2 letters")]
         public string Code { get; set; }
 
         [Required]
         [DisplayName("Sort order")]
-        public int SequenceOrder { get; set; }
+        public int SortOrder { get; set; }
 
         [Required]
         [DisplayName("Active")]
@@ -68,7 +68,7 @@ namespace CleanMe.Domain.Entities
         public string UpdatedById { get; set; }
 
         // Navigation property
-        public ICollection<AssetTypeRate> AssetTypeRates { get; set; } = new List<AssetTypeRate>();
+        public ICollection<ItemCodeRate> AssetTypeRates { get; set; } = new List<ItemCodeRate>();
 
         // Navigation property
         public ICollection<Amendment> Amendments { get; set; } = new List<Amendment>();

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using CleanMe.Application.Filters;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,20 +11,19 @@ namespace CleanMe.Application.Interfaces
     public interface ILookupService
     {
         Task<IEnumerable<SelectListItem>> GetAmendmentTypeSelectListAsync();
-        Task<IEnumerable<SelectListItem>> GetAreaSelectListAsync();
-        Task<IEnumerable<SelectListItem>> GetAssetLocationSelectListAsync();
-        Task<IEnumerable<SelectListItem>> GetAssetSelectListAsync();
-        Task<IEnumerable<SelectListItem>> GetAssetTypeSelectListAsync();
-        Task<IEnumerable<SelectListItem>> GetAssetTypeRateSelectListAsync();
+        Task<IEnumerable<SelectListItem>> GetAreaSelectListAsync(AreaLookupFilter filter);
+        Task<IEnumerable<SelectListItem>> GetAssetLocationSelectListAsync(AssetLocationLookupFilter filter);
+        Task<IEnumerable<SelectListItem>> GetAssetSelectListAsync(AssetLookupFilter filter);
         Task<IEnumerable<SelectListItem>> GetCleanFrequencySelectListAsync();
-        Task<IEnumerable<SelectListItem>> GetClientContactSelectListAsync();
+        Task<IEnumerable<SelectListItem>> GetClientContactSelectListAsync(ClientContactLookupFilter filter);
         Task<IEnumerable<SelectListItem>> GetClientSelectListAsync();
-        Task<IEnumerable<SelectListItem>> GetRegionSelectListAsync();
-        Task<IEnumerable<SelectListItem>> GetStaffSelectListAsync();
-        Task<IEnumerable<SelectListItem>> GetStockCodeSelectListAsync();
+        Task<IEnumerable<SelectListItem>> GetItemCodeRateSelectListAsync();
+        Task<IEnumerable<SelectListItem>> GetItemCodeSelectListAsync();
+        Task<IEnumerable<SelectListItem>> GetRegionSelectListAsync(RegionLookupFilter filter);
+        Task<IEnumerable<SelectListItem>> GetStaffSelectListAsync(StaffLookupFilter filter);
 
-        Task<IEnumerable<SelectListItem>> GetAreasByClientAsync(int? clientId);
-        Task<IEnumerable<SelectListItem>> GetAssetLocationsByClientAndAreaAsync(int? clientId, int? areaId);
-        Task<IEnumerable<SelectListItem>> GetAssetsByClientAreaAndLocationAsync(int? clientId, int? areaId, int? assetLocationId);
+        //Task<IEnumerable<SelectListItem>> GetAreasByClientAsync(int? clientId);
+        //Task<IEnumerable<SelectListItem>> GetAssetLocationsByClientAndAreaAsync(int? clientId, int? areaId);
+        //Task<IEnumerable<SelectListItem>> GetAssetsByClientAreaAndLocationAsync(int? clientId, int? areaId, int? assetLocationId);
     }
 }

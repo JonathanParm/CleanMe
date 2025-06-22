@@ -75,7 +75,7 @@
 //                IrdNumber = "123456",
 //                BankAccount = "012 345 567 00",
 //                PayrollId = "876",
-//                WorkRole = WorkRole.Cleaner,
+//                WorkRole = WorkRole.Employee,
 //                IsActive = true,
 //                ShowPasswordSection = false
 //            };
@@ -125,7 +125,7 @@
 //                IrdNumber = "123456",
 //                BankAccount = "012 345 567 00",
 //                PayrollId = "876",
-//                WorkRole = WorkRole.Cleaner,
+//                WorkRole = WorkRole.Employee,
 //                IsActive = true,
 //                ShowPasswordSection = false
 //            };
@@ -191,7 +191,7 @@
 //                IrdNumber = "123456",
 //                BankAccount = "012 345 567 00",
 //                PayrollId = "876",
-//                WorkRole = WorkRole.Cleaner,
+//                WorkRole = WorkRole.Employee,
 //                IsActive = true,
 //                ShowPasswordSection = true
 //            };
@@ -252,7 +252,7 @@
 //                IrdNumber = "123456",
 //                BankAccount = "012 345 567 00",
 //                PayrollId = "876",
-//                WorkRole = WorkRole.Cleaner,
+//                WorkRole = WorkRole.Employee,
 //                IsActive = true,
 //                ShowPasswordSection = true
 //            };
@@ -309,7 +309,7 @@
 //                IrdNumber = "123456",
 //                BankAccount = "012 345 567 00",
 //                PayrollId = "876",
-//                WorkRole = WorkRole.Cleaner,
+//                WorkRole = WorkRole.Employee,
 //                IsActive = true,
 //                ShowPasswordSection = false
 //            };
@@ -369,7 +369,7 @@
 //                IrdNumber = "123456",
 //                BankAccount = "012 345 567 00",
 //                PayrollId = "876",
-//                WorkRole = WorkRole.Cleaner,
+//                WorkRole = WorkRole.Employee,
 //                IsActive = true,
 //                ShowPasswordSection = false
 //            };

@@ -1,4 +1,5 @@
-﻿using CleanMe.Application.Interfaces;
+﻿using CleanMe.Application.Filters;
+using CleanMe.Application.Interfaces;
 using CleanMe.Application.Services;
 using CleanMe.Application.ViewModels;
 using CleanMe.Shared.Models;
@@ -83,6 +84,8 @@ namespace CleanMe.Web.Controllers
                     {
                         return NotFound();
                     }
+                    modelCurrent.amendmentId = amendmentId.Value;
+
                 }
                 else // Create Mode
                 {
@@ -96,7 +99,7 @@ namespace CleanMe.Web.Controllers
                 if (modelCurrent.amendmentTypeId.HasValue)
                 {
                     var amendmentTypeId = modelCurrent.amendmentTypeId.Value;
-                    var amendmentLastInvoicedId = await _amendmentService.GetAmendmentLastInvoicedByIdAsync(amendmentId.Value, amendmentTypeId);
+                    var amendmentLastInvoicedId = await _amendmentService.GetAmendmentLastInvoicedOnByIdAsync(amendmentId.Value, amendmentTypeId);
                     if (amendmentLastInvoicedId.HasValue)
                     {
                         model.AmendmentLastInvoiced = await _amendmentService.GetAmendmentViewModelByIdAsync(amendmentId.Value);
@@ -134,12 +137,16 @@ namespace CleanMe.Web.Controllers
                 }
 
                 // Check for duplicate Amendment (excluding current record)
-                var duplicateAmendment = await _amendmentService.FindDuplicateAmendmentAsync(model.AmendmentCurrent.amendmentTypeId.Value, model.AmendmentCurrent.amendmentId);
+                var duplicateAmendment = await _amendmentService.FindDuplicateAmendmentAsync(
+                        model.AmendmentCurrent.amendmentTypeId.Value,
+                        model.AmendmentCurrent.assetId.Value,
+                        model.AmendmentCurrent.amendmentId
+                    );
                 if (duplicateAmendment.Any())
                 {
                     //TempData["WarningMessage"] = "An Amendment Type with the same name or code already exists.";
                     //TempData["MatchingStaffIds"] = duplicateAmendment.Select(s => s.amendmentId).ToArray();
-                    ModelState.AddModelError("Name", "An Amendment with the amendment type already exists.");
+                    ModelState.AddModelError("Name", "An Amendment for this amendment type already exists.");
                     await PopulateSelectListsAsync(model, model.amendmentId > 0);
 
                     return View(model);
@@ -230,12 +237,12 @@ namespace CleanMe.Web.Controllers
             if (isEditMode)
             {
                 model.AmendmentTypes = await _lookupService.GetAmendmentTypeSelectListAsync();
-                model.Areas = await _lookupService.GetAreaSelectListAsync();
-                model.AssetLocations = await _lookupService.GetAssetLocationSelectListAsync();
-                model.Assets = await _lookupService.GetAssetSelectListAsync();
+                model.Areas = await _lookupService.GetAreaSelectListAsync(new AreaLookupFilter());
+                model.AssetLocations = await _lookupService.GetAssetLocationSelectListAsync(new AssetLocationLookupFilter());
+                model.Assets = await _lookupService.GetAssetSelectListAsync(new AssetLookupFilter());
                 model.CleanFrequencies = await _lookupService.GetCleanFrequencySelectListAsync();
                 model.Clients = await _lookupService.GetClientSelectListAsync();
-                model.Staff = await _lookupService.GetStaffSelectListAsync();
+                model.Staff = await _lookupService.GetStaffSelectListAsync(new StaffLookupFilter());
             }
             else
             {
@@ -247,17 +254,17 @@ namespace CleanMe.Web.Controllers
                 model.Areas = new[]
                 {
                     new SelectListItem { Value = "", Text = "-- Select area --" }
-                }.Concat(await _lookupService.GetAreaSelectListAsync());
+                }.Concat(await _lookupService.GetAreaSelectListAsync(new AreaLookupFilter()));
 
                 model.AssetLocations = new[]
                 {
                     new SelectListItem { Value = "", Text = "-- Select location --" }
-                }.Concat(await _lookupService.GetAssetLocationSelectListAsync());
+                }.Concat(await _lookupService.GetAssetLocationSelectListAsync(new AssetLocationLookupFilter()));
 
                 model.Assets = new[]
                 {
                     new SelectListItem { Value = "", Text = "-- Select asset --" }
-                }.Concat(await _lookupService.GetAssetSelectListAsync());
+                }.Concat(await _lookupService.GetAssetSelectListAsync(new AssetLookupFilter()));
 
                 model.CleanFrequencies = new[]
                 {
@@ -273,28 +280,52 @@ namespace CleanMe.Web.Controllers
                 model.Staff = new[]
                 {
                     new SelectListItem { Value = "", Text = "-- Select staff --" }
-                }.Concat(await _lookupService.GetStaffSelectListAsync());
+                }.Concat(await _lookupService.GetStaffSelectListAsync(new StaffLookupFilter()));
             }
         }
 
         [HttpGet]
         public async Task<JsonResult> GetAreas(int clientId)
         {
-            var locations = await _lookupService.GetAreasByClientAsync(clientId);
+            var areaLookupFilter = new AreaLookupFilter
+            {
+                StaffId = 0,
+                ClientId = clientId,
+                RegionId = 0,
+            };
+
+            var locations = await _lookupService.GetAreaSelectListAsync(areaLookupFilter);
             return Json(locations);
         }
 
         [HttpGet]
-        public async Task<JsonResult> GetAssetLocations(int clientId, int? assetLocationId)
+        public async Task<JsonResult> GetAssetLocations(int clientId, int? areaId = 0)
         {
-            var locations = await _lookupService.GetAssetLocationsByClientAndAreaAsync(clientId, assetLocationId);
+            var assetLocationLookupFilter = new AssetLocationLookupFilter
+            {
+                StaffId = 0,
+                ClientId = clientId,
+                RegionId = 0,
+                AreaId = areaId
+            };
+
+            var locations = await _lookupService.GetAssetLocationSelectListAsync(assetLocationLookupFilter);
             return Json(locations);
         }
 
         [HttpGet]
-        public async Task<JsonResult> GetAssets(int clientId, int? areaId, int? assetLocationId)
+        public async Task<JsonResult> GetAssets(int clientId, int? areaId = 0, int? assetLocationId = 0)
         {
-            var assets = await _lookupService.GetAssetsByClientAreaAndLocationAsync(clientId, areaId, assetLocationId);
+            var assetLookupFilter = new AssetLookupFilter
+            {
+                StaffId = 0,
+                ClientId = clientId,
+                RegionId = 0,
+                AreaId = areaId,
+                AssetLocationId = assetLocationId
+            };
+
+            var assets = await _lookupService.GetAssetSelectListAsync(assetLookupFilter);
             return Json(assets);
         }
     }

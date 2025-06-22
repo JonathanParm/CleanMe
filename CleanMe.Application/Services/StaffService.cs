@@ -75,7 +75,6 @@ namespace CleanMe.Application.Services
             return duplicateStaff.Select(s => new StaffViewModel
             {
                 StaffId = s.staffId,
-                StaffNo = s.StaffNo,
                 FirstName = s.FirstName,
                 FamilyName = s.FamilyName,
                 PhoneHome = s.PhoneHome,
@@ -90,7 +89,11 @@ namespace CleanMe.Application.Services
                     Postcode = s.AddressPostcode,
                 },
                 IrdNumber = s.IrdNumber,
-                BankAccount = s.BankAccount,
+                BankAccountName = s.BankAccountName,
+                BankAccountNumber = s.BankAccountNumber,
+                BankAccountParticulars = s.BankAccountParticulars,
+                BankAccountCode = s.BankAccountCode,
+                BankAccountReference = s.BankAccountReference,
                 PayrollId = s.PayrollId,
                 JobTitle = s.JobTitle,
                 WorkRole = s.WorkRole,
@@ -112,7 +115,6 @@ namespace CleanMe.Application.Services
             return new StaffViewModel
             {
                 StaffId = row.staffId,
-                StaffNo = row.StaffNo,
                 FirstName = row.FirstName,
                 FamilyName = row.FamilyName,
                 PhoneHome = row.PhoneHome,
@@ -127,7 +129,11 @@ namespace CleanMe.Application.Services
                     Postcode = row.AddressPostcode
                 },
                 IrdNumber = row.IrdNumber,
-                BankAccount = row.BankAccount,
+                BankAccountName = row.BankAccountName,
+                BankAccountNumber = row.BankAccountNumber,
+                BankAccountParticulars = row.BankAccountParticulars,
+                BankAccountCode = row.BankAccountCode,
+                BankAccountReference = row.BankAccountReference,
                 PayrollId = row.PayrollId,
                 JobTitle = row.JobTitle,
                 WorkRole = row.WorkRole,
@@ -158,7 +164,6 @@ namespace CleanMe.Application.Services
 
             var staff = new Staff
             {
-                StaffNo = model.StaffNo,
                 FirstName = model.FirstName,
                 FamilyName = model.FamilyName,
                 PhoneHome = model.PhoneHome,
@@ -173,7 +178,11 @@ namespace CleanMe.Application.Services
                     Postcode = model.Address.Postcode,
                 },
                 IrdNumber = model.IrdNumber,
-                BankAccount = model.BankAccount,
+                BankAccountName = model.BankAccountName,
+                BankAccountNumber = model.BankAccountNumber,
+                BankAccountParticulars = model.BankAccountParticulars,
+                BankAccountCode = model.BankAccountCode,
+                BankAccountReference = model.BankAccountReference,
                 PayrollId = model.PayrollId,
                 JobTitle = model.JobTitle,
                 WorkRole = model.WorkRole,
@@ -200,7 +209,6 @@ namespace CleanMe.Application.Services
                 throw new Exception("Staff member not found.");
             }
 
-            staff.StaffNo = model.StaffNo;
             staff.FirstName = model.FirstName;
             staff.FamilyName = model.FamilyName;
             staff.PhoneHome = model.PhoneHome;
@@ -215,7 +223,11 @@ namespace CleanMe.Application.Services
                 Postcode = model.Address.Postcode,
             };
             staff.IrdNumber = model.IrdNumber;
-            staff.BankAccount = model.BankAccount;
+            staff.BankAccountName = model.BankAccountName;
+            staff.BankAccountNumber = model.BankAccountNumber;
+            staff.BankAccountParticulars = model.BankAccountParticulars;
+            staff.BankAccountCode = model.BankAccountCode;
+            staff.BankAccountReference = model.BankAccountReference;
             staff.PayrollId = model.PayrollId;
             staff.JobTitle = model.JobTitle;
             staff.WorkRole = model.WorkRole;

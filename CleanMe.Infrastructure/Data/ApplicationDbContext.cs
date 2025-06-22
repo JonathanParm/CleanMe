@@ -7,6 +7,7 @@ using CleanMe.Domain.Enums;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection.Emit;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using CleanMe.Domain.Common;
 
 namespace CleanMe.Infrastructure.Data;
 
@@ -22,13 +23,14 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Area> Areas { get; set; }
     public DbSet<AssetLocation> AssetLocations { get; set; }
     public DbSet<Asset> Assets { get; set; }
-    public DbSet<AssetType> AssetTypes { get; set; }
-    public DbSet<AssetTypeRate> AssetTypeRates { get; set; }
     public DbSet<CleanFrequency> CleanFrequencies { get; set; }
     public DbSet<ClientContact> ClientContacts { get; set; }
     public DbSet<Client> Clients { get; set; }
+    public DbSet<CompanyInfo> CompanyInfo { get; set; }
+    public DbSet<Setting> Settings { get; set; }
+    public DbSet<ItemCodeRate> ItemCodeRates { get; set; }
+    public DbSet<ItemCode> ItemCodes { get; set; }
     public DbSet<Region> Regions { get; set; }
-    public DbSet<StockCode> StockCodes { get; set; }
     public DbSet<Staff> Staff { get; set; }
 
     public DbSet<ErrorExceptionsLog> ErrorExceptionsLogs { get; set; } = null!;
@@ -39,15 +41,50 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         base.OnModelCreating(builder);
 
-        // Define relationship between Staff and ApplicationUser
-        builder.Entity<Staff>()
-            .HasOne<ApplicationUser>()
-            .WithOne()
-            .HasForeignKey<Staff>(s => s.ApplicationUserId)
-            .IsRequired(false); // Optional login account
+        builder.Entity<AmendmentType>()
+            .HasMany(p => p.Amendments)
+            .WithOne(c => c.AmendmentType)
+            .HasForeignKey(c => c.amendmentTypeId)
+            .IsRequired(true)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<Area>()
+            .HasMany(c => c.AssetLocations)
+            .WithOne(p => p.Area)
+            .HasForeignKey(p => p.areaId)
+            .IsRequired(true)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<Area>()
+            .HasMany(c => c.Amendments)
+            .WithOne(p => p.Area)
+            .HasForeignKey(p => p.areaId)
+            .IsRequired(false)                     // marks the FK as optional
+            .OnDelete(DeleteBehavior.Restrict);    // prevents cascade deletes
+
+        builder.Entity<Asset>()
+            .HasMany(c => c.Amendments)
+            .WithOne(p => p.Asset)
+            .HasForeignKey(p => p.assetId)
+            .IsRequired(false)                     // marks the FK as optional
+            .OnDelete(DeleteBehavior.Restrict);    // prevents cascade deletes
+
+        builder.Entity<AssetLocation>()
+            .HasMany(c => c.Assets)
+            .WithOne(p => p.AssetLocation)
+            .HasForeignKey(p => p.assetLocationId)
+            .IsRequired(true)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<AssetLocation>()
+            .HasMany(c => c.Amendments)
+            .WithOne(p => p.AssetLocation)
+            .HasForeignKey(p => p.assetLocationId)
+            .IsRequired(false)                     // marks the FK as optional
+            .OnDelete(DeleteBehavior.Restrict);    // prevents cascade deletes
 
         // Configure Address as an Owned Type (Embedded Value Object)
-        builder.Entity<Staff>().OwnsOne(s => s.Address, address =>
+        builder.Entity<AssetLocation>().OwnsOne(c => c.Address, address =>
         {
             address.Property(a => a.Line1).HasColumnName("Address_Line1");
             address.Property(a => a.Line2).HasColumnName("Address_Line2");
@@ -56,12 +93,33 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             address.Property(a => a.Postcode).HasColumnName("Address_Postcode");
         });
 
-        builder.Entity<Staff>(entity =>
-        {
-            entity.Property(s => s.WorkRole)
-                  .HasConversion(new EnumToStringConverter<WorkRole>()) // Store WorkRole as string
-                  .HasMaxLength(50);
-        });
+        builder.Entity<ItemCode>()
+            .HasMany(c => c.Assets)
+            .WithOne(p => p.ItemCode)
+            .HasForeignKey(p => p.itemCodeId)
+            .IsRequired(true)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<ItemCode>()
+            .HasMany(c => c.ItemCodeRates)
+            .WithOne(p => p.ItemCode)
+            .HasForeignKey(p => p.itemCodeId)
+            .IsRequired(true)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<CleanFrequency>()
+            .HasMany(c => c.AssetTypeRates)
+            .WithOne(p => p.CleanFrequency)
+            .HasForeignKey(p => p.cleanFrequencyId)
+            .IsRequired(true)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<CleanFrequency>()
+            .HasMany(c => c.Amendments)
+            .WithOne(p => p.CleanFrequency)
+            .HasForeignKey(p => p.cleanFrequencyId)
+            .IsRequired(false)                     // marks the FK as optional
+            .OnDelete(DeleteBehavior.Restrict);    // prevents cascade deletes
 
         // Configure Address as an Owned Type (Embedded Value Object)
         builder.Entity<Client>().OwnsOne(c => c.Address, address =>
@@ -86,52 +144,10 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             .IsRequired(true)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.Entity<Region>()
-            .HasMany(c => c.Areas)
-            .WithOne(p => p.Region)
-            .HasForeignKey(p => p.regionId)
-            .IsRequired(true)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        builder.Entity<Area>()
-            .HasMany(c => c.AssetLocations)
-            .WithOne(p => p.Area)
-            .HasForeignKey(p => p.areaId)
-            .IsRequired(true)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        builder.Entity<AssetLocation>()
-            .HasMany(c => c.Assets)
-            .WithOne(p => p.AssetLocation)
-            .HasForeignKey(p => p.assetLocationId)
-            .IsRequired(true)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        builder.Entity<AssetType>()
-            .HasMany(c => c.Assets)
-            .WithOne(p => p.AssetType)
-            .HasForeignKey(p => p.assetTypeId)
-            .IsRequired(true)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        builder.Entity<AssetType>()
-            .HasMany(c => c.AssetTypeRates)
-            .WithOne(p => p.AssetType)
-            .HasForeignKey(p => p.assetTypeId)
-            .IsRequired(true)
-            .OnDelete(DeleteBehavior.Restrict);
-
         builder.Entity<Client>()
             .HasMany(c => c.AssetTypeRates)
             .WithOne(p => p.Client)
             .HasForeignKey(p => p.clientId)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        builder.Entity<CleanFrequency>()
-            .HasMany(c => c.AssetTypeRates)
-            .WithOne(p => p.CleanFrequency)
-            .HasForeignKey(p => p.cleanFrequencyId)
-            .IsRequired(true)
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.Entity<Client>()
@@ -140,57 +156,9 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             .HasForeignKey(p => p.clientId)
             .IsRequired(false)                     // marks the FK as optional
             .OnDelete(DeleteBehavior.Restrict);    // prevents cascade deletes
-
-        builder.Entity<AssetLocation>()
-            .HasMany(c => c.Amendments)
-            .WithOne(p => p.AssetLocation)
-            .HasForeignKey(p => p.assetLocationId)
-            .IsRequired(false)                     // marks the FK as optional
-            .OnDelete(DeleteBehavior.Restrict);    // prevents cascade deletes
-
-        builder.Entity<Area>()
-            .HasMany(c => c.Amendments)
-            .WithOne(p => p.Area)
-            .HasForeignKey(p => p.areaId)
-            .IsRequired(false)                     // marks the FK as optional
-            .OnDelete(DeleteBehavior.Restrict);    // prevents cascade deletes
-
-        builder.Entity<Asset>()
-            .HasMany(c => c.Amendments)
-            .WithOne(p => p.Asset)
-            .HasForeignKey(p => p.assetId)
-            .IsRequired(false)                     // marks the FK as optional
-            .OnDelete(DeleteBehavior.Restrict);    // prevents cascade deletes
-
-        builder.Entity<Staff>()
-            .HasMany(c => c.Amendments)
-            .WithOne(p => p.Staff)
-            .HasForeignKey(p => p.staffId)
-            .IsRequired(false)                     // marks the FK as optional
-            .OnDelete(DeleteBehavior.Restrict);    // prevents cascade deletes
-
-        builder.Entity<CleanFrequency>()
-            .HasMany(c => c.Amendments)
-            .WithOne(p => p.CleanFrequency)
-            .HasForeignKey(p => p.cleanFrequencyId)
-            .IsRequired(false)                     // marks the FK as optional
-            .OnDelete(DeleteBehavior.Restrict);    // prevents cascade deletes
-
-
-        builder.Entity<AmendmentType>()
-            .HasMany(p => p.Amendments)
-            .WithOne(c => c.AmendmentType)
-            .HasForeignKey(c => c.amendmentTypeId)
-            .IsRequired(true)                     
-            .OnDelete(DeleteBehavior.Restrict);
-
-        // Configure ErrorExceptionsLog table (if needed)
-        builder.Entity<ErrorExceptionsLog>()
-            .Property(e => e.Message)
-            .HasMaxLength(2000);
 
         // Configure Address as an Owned Type (Embedded Value Object)
-        builder.Entity<AssetLocation>().OwnsOne(c => c.Address, address =>
+        builder.Entity<CompanyInfo>().OwnsOne(c => c.Address, address =>
         {
             address.Property(a => a.Line1).HasColumnName("Address_Line1");
             address.Property(a => a.Line2).HasColumnName("Address_Line2");
@@ -199,6 +167,55 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             address.Property(a => a.Postcode).HasColumnName("Address_Postcode");
         });
 
+        builder.Entity<Region>()
+            .HasMany(c => c.Areas)
+            .WithOne(p => p.Region)
+            .HasForeignKey(p => p.regionId)
+            .IsRequired(true)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<ItemCode>()
+            .HasMany(c => c.Assets)
+            .WithOne(p => p.ItemCode)
+            .HasForeignKey(p => p.itemCodeId)
+            .IsRequired(true)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<Staff>()
+            .HasMany(c => c.Amendments)
+            .WithOne(p => p.Staff)
+            .HasForeignKey(p => p.staffId)
+            .IsRequired(false)                     // marks the FK as optional
+            .OnDelete(DeleteBehavior.Restrict);    // prevents cascade deletes
+
+        // Configure ErrorExceptionsLog table (if needed)
+        builder.Entity<ErrorExceptionsLog>()
+            .Property(e => e.Message)
+            .HasMaxLength(2000);
+
+        // Define relationship between Staff and ApplicationUser
+        builder.Entity<Staff>()
+            .HasOne<ApplicationUser>()
+            .WithOne()
+            .HasForeignKey<Staff>(s => s.ApplicationUserId)
+            .IsRequired(false); // Optional login account
+
+        // Configure Address as an Owned Type (Embedded Value Object)
+        builder.Entity<Staff>().OwnsOne(s => s.Address, address =>
+        {
+            address.Property(a => a.Line1).HasColumnName("Address_Line1");
+            address.Property(a => a.Line2).HasColumnName("Address_Line2");
+            address.Property(a => a.Suburb).HasColumnName("Address_Suburb");
+            address.Property(a => a.TownOrCity).HasColumnName("Address_TownOrCity");
+            address.Property(a => a.Postcode).HasColumnName("Address_Postcode");
+        });
+
+        builder.Entity<Staff>(entity =>
+        {
+            entity.Property(s => s.WorkRole)
+                  .HasConversion(new EnumToStringConverter<WorkRole>()) // Store WorkRole as string
+                  .HasMaxLength(50);
+        });
     }
 
     public static async Task SeedAdminUser(IServiceProvider serviceProvider)
@@ -239,19 +256,75 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
                     // Create Staff entry linked to ApplicationUser
                     var adminStaff = new Staff
                     {
-                        StaffNo = 331,
+                        staffId = 331,
                         FirstName = "Annette",
                         FamilyName = "Parminter",
+                        Email = "aparminter.ap@gmail.com",
                         WorkRole = WorkRole.Admin,
                         ApplicationUserId = adminUser.Id,
+                        Address = new Address
+                        {
+                            Line1 = "33 Gilshennan Valley",
+                            Suburb = "Red Beach",
+                            TownOrCity = "Auckland",
+                            Postcode = "0932"
+                        },
+                        IsActive = true,
+                        IsDeleted = false,
                         AddedAt = DateTime.Now,
                         AddedById = "1",
                         UpdatedAt = DateTime.Now,
                         UpdatedById = "1"
                     };
 
-                    dbContext.Staff.Add(adminStaff);
-                    await dbContext.SaveChangesAsync();
+                    //dbContext.Staff.Add(adminStaff);
+                    //await dbContext.SaveChangesAsync();
+                    var tableName = "Staff";
+
+                    using var transaction = await dbContext.Database.BeginTransactionAsync();
+
+                    try
+                    {
+                        await dbContext.Database.ExecuteSqlRawAsync($"SET IDENTITY_INSERT dbo.{tableName} ON;");
+
+                        // Use raw SQL to insert the record
+                        await dbContext.Database.ExecuteSqlRawAsync(
+                            @$"INSERT INTO dbo.{tableName} 
+                                (
+                                    staffId, FirstName, FamilyName, 
+                                    Email, WorkRole, WorkRole, ApplicationUserId,
+                                    Address_Line1, Address_Suburb, Address_TownOrCity, Address_Postcode,
+                                    IsActive, IsDeleted,
+                                    AddedAt, AddedById, UpdatedAt, UpdatedById) 
+                              VALUES 
+                                ({adminStaff.staffId}, 
+                                 {{0}}, {{1}}, {{2}}, {{3}}, {{4}}, {{5}}, {{6}}, {{7}}, {{8}}, {{9}}, {{10}}, {{11}},
+                                 {{12}}, {{13}}, {{14}}, {{15}});",
+                            adminStaff.FirstName,
+                            adminStaff.FamilyName,
+                            adminStaff.Email,
+                            adminStaff.WorkRole.ToString(),
+                            adminStaff.ApplicationUserId,
+                            adminStaff.Address.Line1,
+                            adminStaff.Address.Suburb,
+                            adminStaff.Address.TownOrCity,
+                            adminStaff.Address.Postcode,
+                            adminStaff.IsActive,
+                            adminStaff.IsDeleted,
+                            adminStaff.AddedAt,
+                            adminStaff.AddedById,
+                            adminStaff.UpdatedAt,
+                            adminStaff.UpdatedById
+                        );
+
+                        await dbContext.Database.ExecuteSqlRawAsync($"SET IDENTITY_INSERT dbo.{tableName} OFF;");
+                        await transaction.CommitAsync();
+                    }
+                    catch
+                    {
+                        await transaction.RollbackAsync();
+                        throw;
+                    }
                 }
             }
         }

@@ -181,9 +181,9 @@ namespace CleanMe.Infrastructure.Migrations
                     WorkRole = table.Column<string>(type: "varchar(20)", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2(0)", nullable: false),
                     CreatedById = table.Column<string>(type: "NVARCHAR(450)", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2(0)", nullable: false),
                     UpdatedById = table.Column<string>(type: "NVARCHAR(450)", nullable: false)
                 },
                 constraints: table =>

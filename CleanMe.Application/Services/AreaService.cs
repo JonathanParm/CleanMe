@@ -85,8 +85,7 @@ namespace CleanMe.Application.Services
                 Name = area.Name,
                 regionId = area.regionId,
                 RegionName = area.Region?.Name,
-                SequenceOrder = area.SequenceOrder,
-                SeqNo = area.SeqNo,
+                SortOrder = area.SortOrder,
                 ReportCode = area.ReportCode,
                 IsActive = area.IsActive
             };
@@ -108,12 +107,11 @@ namespace CleanMe.Application.Services
                 Name = area.Name,
                 regionId = area.regionId,
                 RegionName = area.Region?.Name,
-                SequenceOrder = area.SequenceOrder,
-                SeqNo = area.SeqNo,
+                SortOrder = area.SortOrder,
                 ReportCode = area.ReportCode,
                 IsActive = area.IsActive,
                 AssetLocationsList = area.AssetLocations
-                .OrderBy(al => al.SequenceOrder)
+                .OrderBy(al => al.SortOrder)
                 .Select(al => new AssetLocationIndexViewModel
                 {
                     assetLocationId = al.assetLocationId,
@@ -153,8 +151,7 @@ namespace CleanMe.Application.Services
                 Name = model.Name,
                 regionId = model.regionId,
                 ReportCode = model.ReportCode,
-                SequenceOrder = model.SequenceOrder,
-                SeqNo = model.SeqNo,
+                SortOrder = model.SortOrder,
                 IsActive = model.IsActive,
                 AddedAt = DateTime.UtcNow,
                 AddedById = addedById,
@@ -180,8 +177,7 @@ namespace CleanMe.Application.Services
             Area.Name = model.Name;
             Area.regionId = model.regionId;
             Area.ReportCode = model.ReportCode;
-            Area.SequenceOrder = model.SequenceOrder;
-            Area.SeqNo = model.SeqNo;
+            Area.SortOrder = model.SortOrder;
             Area.IsActive = model.IsActive;
             Area.UpdatedAt = DateTime.UtcNow;
             Area.UpdatedById = updatedById;

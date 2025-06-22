@@ -18,28 +18,28 @@ namespace CleanMe.Domain.Entities
         public int assetId { get; set; }
 
         [Required]
-        [Column(TypeName = "VARCHAR")]
+        [Column(TypeName = "varchar")]
         [StringLength(50, MinimumLength = 2, ErrorMessage = "MD reference must have between 2 and 50 letters")]
         [Display(Name = "MD reference")]
         public string MdReference { get; set; }
 
         [Required]
-        [Column(TypeName = "VARCHAR")]
+        [Column(TypeName = "varchar")]
         [StringLength(50, MinimumLength = 2, ErrorMessage = "Asset name must have between 2 and 50 letters")]
         [Display(Name = "Asset name")]
         public string Name { get; set; }
 
-        [Column(TypeName = "VARCHAR")]
+        [Column(TypeName = "varchar")]
         [StringLength(50, MinimumLength = 2, ErrorMessage = "Client reference must have between 2 and 50 letters")]
         [Display(Name = "Client Reference")]
         public string? ClientReference { get; set; }
 
-        [Column(TypeName = "VARCHAR")]
+        [Column(TypeName = "varchar")]
         [StringLength(50, MinimumLength = 2, ErrorMessage = "Asset position must have between 2 and 50 letters")]
         [Display(Name = "Asset position")]
         public string? Position { get; set; }
 
-        [Column(TypeName = "VARCHAR")]
+        [Column(TypeName = "varchar")]
         [StringLength(200, MinimumLength = 2, ErrorMessage = "Description of how to find asset must have between 2 and 200 letters")]
         [Display(Name = "Access to asset")]
         public string? Access { get; set; }
@@ -62,14 +62,14 @@ namespace CleanMe.Domain.Entities
         [ForeignKey(nameof(assetLocationId))]
         public AssetLocation? AssetLocation { get; set; }
 
-        [ForeignKey("AssetType")]
-        [DisplayName("Asset Type")]
-        public int assetTypeId { get; set; }
+        [ForeignKey("ItemCode")]
+        [DisplayName("Item code")]
+        public int itemCodeId { get; set; }
 
         // Navigation property
-        [DisplayName("Asset Type")]
-        [ForeignKey(nameof(assetTypeId))]
-        public AssetType? AssetType { get; set; }
+        [DisplayName("Item code")]
+        [ForeignKey(nameof(itemCodeId))]
+        public ItemCode? ItemCode { get; set; }
 
         [Required]
         [DisplayName("Deleted")]
@@ -80,7 +80,7 @@ namespace CleanMe.Domain.Entities
         public DateTime AddedAt { get; set; }
 
         [Required]
-        [DisplayName("Created by")]
+        [DisplayName("Added by")]
         [Column(TypeName = "NVARCHAR")]
         [StringLength(450)]
         public string AddedById { get; set; }

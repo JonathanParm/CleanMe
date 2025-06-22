@@ -11,16 +11,19 @@ namespace CleanMe.Application.Services
     public class AmendmentService : IAmendmentService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IAssetService _assetService;
 
         private readonly IUserService _userService;
         private readonly ILogger<StaffService> _logger;
 
         public AmendmentService(
             IUnitOfWork unitOfWork,
+            IAssetService assetService,
             IUserService userService,
             ILogger<StaffService> logger)
         {
             _unitOfWork = unitOfWork;
+            _assetService = assetService;
 
             _userService = userService;
             _logger = logger;
@@ -61,24 +64,43 @@ namespace CleanMe.Application.Services
             }
         }
 
-        public async Task<IEnumerable<AmendmentViewModel>> FindDuplicateAmendmentAsync(int amendmentTypeId, int? excludeamendmentId = null)
+        public async Task<IEnumerable<AmendmentViewModel>> FindDuplicateAmendmentAsync(int amendmentTypeId, int assetId, int? excludeAmendmentId = null)
         {
-            // Exclude any soft deletes
-            var query = "SELECT * FROM Amendments WHERE IsDeleted = 0 AND Invoiced IS NULL AND amendmentTypeId = @amendmentTypeId";
-
-            if (excludeamendmentId.HasValue)
+            try
             {
-                query += " AND amendmentId != @excludeamendmentId"; // Exclude a specific Amendment (useful when updating)
+                //_logger.LogInformation($"Finding duplicate Amendments for AmendmentTypeId: {amendmentTypeId}, ExcludeAmendmentId: {excludeAmendmentId}.");
+
+                // Exclude any soft deletes
+                var query = "SELECT * FROM Amendments " +
+                    "WHERE IsDeleted = 0 " +
+                    "AND InvoicedOn IS NULL " +
+                    "AND assetId = @assetId " +
+                    "AND amendmentTypeId = @amendmentTypeId";
+
+                if (excludeAmendmentId.HasValue)
+                {
+                    query += " AND amendmentId != @excludeAmendmentId"; // Exclude a specific Amendment (when updating)
+                }
+
+                var parameters = new
+                {
+                    amendmentTypeId = amendmentTypeId,
+                    assetId = assetId,
+                    excludeAmendmentId = excludeAmendmentId
+                };
+
+                return await _unitOfWork.DapperRepository.QueryAsync<AmendmentViewModel>(query, parameters);
             }
-
-            var parameters = new { amendmentTypeId = amendmentTypeId, amendmentId = excludeamendmentId };
-
-            return await _unitOfWork.DapperRepository.QueryAsync<AmendmentViewModel>(query, parameters);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error finding duplicate Amendments.");
+                throw new ApplicationException("Error finding duplicate Amendments", ex);
+            }
         }
 
-        public async Task<int?> GetAmendmentLastInvoicedByIdAsync(int amendmentId, int amendmentTypeId)
+        public async Task<int?> GetAmendmentLastInvoicedOnByIdAsync(int amendmentId, int amendmentTypeId)
         {
-            var query = "SELECT TOP 1 * FROM Amendments WHERE IsDeleted = 0 AND amendmentId = @amendmentId AND amendmentTypeId = @amendmentTypeId AND Invoiced IS NOT NULL ORDER BY Invoiced DESC";
+            var query = "SELECT TOP 1 * FROM Amendments WHERE IsDeleted = 0 AND amendmentId = @amendmentId AND amendmentTypeId = @amendmentTypeId AND InvoicedOn IS NOT NULL ORDER BY InvoicedOn DESC";
             var parameters = new { amendmentId = amendmentId, amendmentTypeId = amendmentTypeId };
             var amendment = await _unitOfWork.DapperRepository.QueryFirstOrDefaultAsync<Amendment>(query, parameters);
             if (amendment == null)
@@ -102,11 +124,19 @@ namespace CleanMe.Application.Services
             {
                 amendmentId = amendment.amendmentId,
                 AmendmentSourceName = amendment?.AmendmentSourceName,
+                clientId = amendment.clientId,
                 ClientName = amendment.Client?.Brand,
+                areaId = amendment.areaId,
                 AreaName = amendment.Area?.Name,
+                assetLocationId = amendment.assetLocationId,
                 AssetLocationName = amendment.AssetLocation?.Description,
+                assetId = amendment.assetId,
                 AssetName = amendment.Asset?.Name,
+                amendmentTypeId = amendment.amendmentTypeId,
+                AmendmentTypeName = amendment.AmendmentType?.Name,
+                cleanFrequencyId = amendment.cleanFrequencyId,
                 CleanFrequencyName = amendment.CleanFrequency?.Name,
+                staffId = amendment.staffId,
                 StaffName = amendment.Staff?.Fullname,
                 Rate = amendment.Rate,
                 Access = amendment.Access,
@@ -162,12 +192,34 @@ namespace CleanMe.Application.Services
         {
             _logger.LogInformation($"Adding new Amendment: {model.AssetName}");
 
+            int? clientId;
+            int? areaId;
+            int? assetLocationId;
+
+            if (model.assetId.HasValue)
+            {
+                var assetHierarchy = await _assetService.GetHierarchyIdsByAssetIdAsync(model.assetId.Value);
+
+                if (assetHierarchy == null)
+                    throw new Exception("Asset not found or missing hierarchy data.");
+
+                clientId = assetHierarchy.ClientId;
+                areaId = assetHierarchy.AreaId;
+                assetLocationId = assetHierarchy.AssetLocationId;
+            }
+            else
+            {
+                clientId = model.clientId;
+                areaId = model.areaId;
+                assetLocationId = model.assetLocationId;
+            }
+
             var Amendment = new Amendment
             {
                 amendmentTypeId = model.amendmentTypeId,
-                clientId = model.clientId,
-                areaId = model.areaId,
-                assetLocationId = model.assetLocationId,
+                clientId = clientId,
+                areaId = areaId,
+                assetLocationId = assetLocationId,
                 assetId = model.assetId,
                 cleanFrequencyId = model.cleanFrequencyId,
                 staffId = model.staffId,
@@ -199,10 +251,32 @@ namespace CleanMe.Application.Services
                 throw new Exception("Amendment not found.");
             }
 
+            int? clientId;
+            int? areaId;
+            int? assetLocationId;
+
+            if (model.assetId.HasValue)
+            {
+                var assetHierarchy = await _assetService.GetHierarchyIdsByAssetIdAsync(model.assetId.Value);
+
+                if (assetHierarchy == null)
+                    throw new Exception("Asset not found or missing hierarchy data.");
+
+                clientId = assetHierarchy.ClientId;
+                areaId = assetHierarchy.AreaId;
+                assetLocationId = assetHierarchy.AssetLocationId;
+            }
+            else
+            {
+                clientId = model.clientId;
+                areaId = model.areaId;
+                assetLocationId = model.assetLocationId;
+            }
+
             amendment.amendmentTypeId = model.amendmentTypeId;
-            amendment.clientId = model.clientId;
-            amendment.areaId = model.areaId;
-            amendment.assetLocationId = model.assetLocationId;
+            amendment.clientId = clientId;
+            amendment.areaId = areaId;
+            amendment.assetLocationId = assetLocationId;
             amendment.assetId = model.assetId;
             amendment.cleanFrequencyId = model.cleanFrequencyId;
             amendment.staffId = model.staffId;

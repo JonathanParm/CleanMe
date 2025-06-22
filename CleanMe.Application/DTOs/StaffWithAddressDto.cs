@@ -15,7 +15,6 @@ namespace CleanMe.Application.DTOs
     {
         public int staffId { get; set; }
         public string? ApplicationUserId { get; set; }
-        public int StaffNo { get; set; }
         public string FirstName { get; set; }
         public string FamilyName { get; set; }
         public string? PhoneHome { get; set; }
@@ -27,10 +26,14 @@ namespace CleanMe.Application.DTOs
         public string AddressTownOrCity { get; set; } = string.Empty;
         public string AddressPostcode { get; set; } = string.Empty;
         public string? IrdNumber { get; set; }
-        public string? BankAccount { get; set; }
+        public string? BankAccountName { get; set; }
+        public string? BankAccountNumber { get; set; }
+        public string? BankAccountParticulars { get; set; }
+        public string? BankAccountCode { get; set; }
+        public string? BankAccountReference { get; set; }
         public string? PayrollId { get; set; }
         public string? JobTitle { get; set; }
-        public WorkRole WorkRole { get; set; } // Admin, Contractor, Cleaner
+        public WorkRole WorkRole { get; set; } // Admin, Supplier, Employee, Client
         public bool IsActive { get; set; } = true;
         public bool IsDeleted { get; set; } = false;
         public DateTime AddedAt { get; set; }

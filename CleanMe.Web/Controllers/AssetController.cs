@@ -1,7 +1,6 @@
-﻿using CleanMe.Application.Interfaces;
-using CleanMe.Application.Services;
+﻿using CleanMe.Application.Filters;
+using CleanMe.Application.Interfaces;
 using CleanMe.Application.ViewModels;
-using CleanMe.Domain.Entities;
 using CleanMe.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -110,9 +109,9 @@ namespace CleanMe.Web.Controllers
                     ModelState.AddModelError("assetLocationId", "Asset location is required.");
                 }
 
-                if (model.assetTypeId == null)
+                if (model.itemCodeId == null)
                 {
-                    ModelState.AddModelError("assetTypeId", "Asset type is required.");
+                    ModelState.AddModelError("itemCodeId", "Item code is required.");
                 }
 
                 if (!ModelState.IsValid)
@@ -223,25 +222,25 @@ namespace CleanMe.Web.Controllers
             if (isEditMode)
             {
                 model.Clients = await _lookupService.GetClientSelectListAsync();
-                model.AssetLocations = await _lookupService.GetAssetLocationSelectListAsync();
-                model.AssetTypes = await _lookupService.GetAssetTypeSelectListAsync();
+                model.AssetLocations = await _lookupService.GetAssetLocationSelectListAsync(new AssetLocationLookupFilter());
+                model.ItemCodes = await _lookupService.GetItemCodeSelectListAsync();
             }
             else
             {
                 model.Clients = new[]
                 {
-                    new SelectListItem { Value = "", Text = "-- Select Client --" }
+                    new SelectListItem { Value = "", Text = "-- Select client --" }
                 }.Concat(await _lookupService.GetClientSelectListAsync());
 
                 model.AssetLocations = new[]
                 {
-                    new SelectListItem { Value = "", Text = "-- Select Location --" }
-                }.Concat(await _lookupService.GetAssetLocationSelectListAsync());
+                    new SelectListItem { Value = "", Text = "-- Select location --" }
+                }.Concat(await _lookupService.GetAssetLocationSelectListAsync(new AssetLocationLookupFilter()));
 
-                model.AssetTypes = new[]
+                model.ItemCodes = new[]
                 {
-                    new SelectListItem { Value = "", Text = "-- Select Type --" }
-                }.Concat(await _lookupService.GetAssetTypeSelectListAsync());
+                    new SelectListItem { Value = "", Text = "-- Select item code --" }
+                }.Concat(await _lookupService.GetItemCodeSelectListAsync());
             }
         }
 

@@ -18,7 +18,7 @@ namespace CleanMe.Domain.Entities
         public int regionId { get; set; }
 
         [Required]
-        [Column(TypeName = "VARCHAR")]
+        [Column(TypeName = "varchar")]
         [StringLength(50, MinimumLength = 2, ErrorMessage = "Region name must have between 2 and 50 letters")]
         [Display(Name = "Region name")]
         public string Name { get; set; }
@@ -31,7 +31,7 @@ namespace CleanMe.Domain.Entities
 
         [Required]
         [Display(Name = "Sort order")]
-        public int SequenceOrder { get; set; }
+        public int SortOrder { get; set; }
 
         [Required]
         [DisplayName("Active")]

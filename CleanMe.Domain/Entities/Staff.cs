@@ -17,11 +17,6 @@ namespace CleanMe.Domain.Entities
         [StringLength(450)]
         public string? ApplicationUserId { get; set; }
 
-        [Required]
-        [RegularExpression("[1-9]", ErrorMessage = "Staff number cannot be zero.")]
-        [Display(Name = "Staff Number")]
-        public int StaffNo { get; set; }
-
         [DisplayName("First name")]
         [Required(ErrorMessage = "Must have first name")]
         [Column(TypeName = "varchar(50)")]
@@ -49,19 +44,19 @@ namespace CleanMe.Domain.Entities
         }
 
         [DisplayName("Phone home")]
-        [Column(TypeName = "VARCHAR")]
+        [Column(TypeName = "varchar")]
         [StringLength(30, ErrorMessage = "Home phone number cannot have more than 30 digits")]
         [MinLength(6, ErrorMessage = "Home phone number must be at least 6 digits.")]
         public string? PhoneHome { get; set; }
 
         [DisplayName("Mobile phone")]
-        [Column(TypeName = "VARCHAR")]
+        [Column(TypeName = "varchar")]
         [StringLength(30,ErrorMessage = "Mobile phone number cannot have more than 30 digits")]
         [MinLength(6, ErrorMessage = "Mobile phone number must be at least 6 digits.")]
         public string? PhoneMobile { get; set; }
 
         [DisplayName("Email")]
-        [Column(TypeName = "VARCHAR")]
+        [Column(TypeName = "varchar")]
         [StringLength(256, ErrorMessage = "Email address must have at least 6 characters")]
         [MinLength(6, ErrorMessage = "An email address must be at least 6 digits.")]
         public string? Email { get; set; }
@@ -69,30 +64,54 @@ namespace CleanMe.Domain.Entities
         public Address Address { get; set; } = new Address(); // Embedded Address Object
 
         [DisplayName("IRD number")]
-        [Column(TypeName = "VARCHAR")]
+        [Column(TypeName = "varchar")]
         [StringLength(12, ErrorMessage = "IRD number must have between 11 and 12 digits")]
-        [MinLength(11, ErrorMessage = "IRD number must have between 11 and 12 letters")]
+        [MinLength(11, ErrorMessage = "IRD number must have between 11 and 12 digits")]
         public string? IrdNumber { get; set; }
 
-        [DisplayName("Bank account")]
-        [Column(TypeName = "VARCHAR")]
-        [StringLength(20, ErrorMessage = "Bank account must have between 19 and 20 digits")]
+        [DisplayName("Bank account name")]
+        [Column(TypeName = "varchar")]
+        [StringLength(200, ErrorMessage = "Bank account name must have between 3 and 200 letters")]
+        [MinLength(19, ErrorMessage = "Bank account name must have between 3 and 200 letters")]
+        public string? BankAccountName { get; set; }
+
+        [DisplayName("Bank account number")]
+        [Column(TypeName = "varchar")]
+        [StringLength(20, ErrorMessage = "Bank account number must have between 19 and 20 digits")]
         [MinLength(19, ErrorMessage = "Bank account must have between 19 and 20 digits")]
-        public string? BankAccount { get; set; }
+        public string? BankAccountNumber { get; set; }
+
+        [DisplayName("Bank account particulars")]
+        [Column(TypeName = "varchar")]
+        [StringLength(20, ErrorMessage = "Bank account particulars must have between 2 and 20 letters")]
+        [MinLength(2, ErrorMessage = "Bank account particulars must have between 2 and 20 letters")]
+        public string? BankAccountParticulars { get; set; }
+
+        [DisplayName("Bank account code")]
+        [Column(TypeName = "varchar")]
+        [StringLength(20, ErrorMessage = "Bank account code must have between 2 and 20 letters")]
+        [MinLength(2, ErrorMessage = "Bank account name must have between 2 and 20 letters")]
+        public string? BankAccountCode { get; set; }
+
+        [DisplayName("Bank account reference")]
+        [Column(TypeName = "varchar")]
+        [StringLength(20, ErrorMessage = "Bank account name must have between 2 and 20 letters")]
+        [MinLength(2, ErrorMessage = "Bank account name must have between 2 and 20 letters")]
+        public string? BankAccountReference { get; set; }
 
         [DisplayName("Payroll number")]
-        [Column(TypeName = "VARCHAR")]
+        [Column(TypeName = "varchar")]
         [StringLength(10)]
         public string? PayrollId { get; set; }
 
         [DisplayName("Job title")]
-        [Column(TypeName = "VARCHAR")]
+        [Column(TypeName = "varchar")]
         [StringLength(20)]
         public string? JobTitle { get; set; }
 
         [DisplayName("Work role")]
         [Required]
-        [Column(TypeName = "VARCHAR")]
+        [Column(TypeName = "varchar")]
         [StringLength(20)]
         public WorkRole WorkRole { get; set; } // Admin, Contractor, Cleaner
 
@@ -129,16 +148,15 @@ namespace CleanMe.Domain.Entities
         {
             FirstName = string.Empty;
             FamilyName = string.Empty;
-            WorkRole = WorkRole.Cleaner;
+            WorkRole = WorkRole.Employee;
         }
 
         // Constructor to ensure required properties are set
-        public Staff(int staffNo, string firstName, string familyName, string workRole)
+        public Staff(string firstName, string familyName, string workRole)
         {
-            StaffNo = staffNo;
             FirstName = firstName;
             FamilyName = familyName;
-            WorkRole = WorkRole.Cleaner;
+            WorkRole = WorkRole.Employee;
         }
 
         // Navigation property

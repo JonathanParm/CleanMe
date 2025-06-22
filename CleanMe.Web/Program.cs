@@ -85,25 +85,30 @@ builder.Services.AddScoped<IAssetLocationService, AssetLocationService>();
 builder.Services.AddScoped<IAssetLocationRepository, AssetLocationRepository>();
 builder.Services.AddScoped<IAssetService, AssetService>();
 builder.Services.AddScoped<IAssetRepository, AssetRepository>();
-builder.Services.AddScoped<IAssetTypeService, AssetTypeService>();
-builder.Services.AddScoped<IAssetTypeRepository, AssetTypeRepository>();
-builder.Services.AddScoped<IAssetTypeRateService, AssetTypeRateService>();
-builder.Services.AddScoped<IAssetTypeRateRepository, AssetTypeRateRepository>();
+builder.Services.AddScoped<IItemCodeService, ItemCodeService>();
+builder.Services.AddScoped<IItemCodeRepository, ItemCodeRepository>();
+builder.Services.AddScoped<IItemCodeRateService, ItemCodeRateService>();
+builder.Services.AddScoped<IItemCodeRateRepository, ItemCodeRateRepository>();
 builder.Services.AddScoped<ICleanFrequencyService, CleanFrequencyService>();
 builder.Services.AddScoped<ICleanFrequencyRepository, CleanFrequencyRepository>();
 builder.Services.AddScoped<IClientContactService, ClientContactService>();
 builder.Services.AddScoped<IClientContactRepository, ClientContactRepository>();
 builder.Services.AddScoped<IClientService, ClientService>();
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
+builder.Services.AddScoped<ICompanyInfoRepository, CompanyInfoRepository>();
+builder.Services.AddScoped<ICompanyInfoService, CompanyInfoService>();
 builder.Services.AddScoped<IRegionService, RegionService>();
 builder.Services.AddScoped<IRegionRepository, RegionRepository>();
+builder.Services.AddScoped<IReportService, ReportService>();
+builder.Services.AddScoped<ISettingService, SettingService>();
+builder.Services.AddScoped<ISettingRepository, SettingRepository>();
 builder.Services.AddScoped<IStaffService, StaffService>();
 builder.Services.AddScoped<IStaffRepository, StaffRepository>();
-builder.Services.AddScoped<IStockCodeService, StockCodeService>();
-builder.Services.AddScoped<IStockCodeRepository, StockCodeRepository>();
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<ILookupService, LookupService>();
+
+builder.Services.AddScoped<IReportOutputService, ReportOutputService>();
 
 builder.Services.AddControllersWithViews(options =>
 {

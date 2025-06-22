@@ -11,10 +11,10 @@ namespace CleanMe.Domain.Enums
     {
     [Display(Name = "Administrator")]
         Admin,
-    [Display(Name = "Cleaner")]
-        Cleaner,
-    [Display(Name = "Contractor")]
-        Contractor,
+    [Display(Name = "Employee")]
+        Employee,
+    [Display(Name = "Supplier")]
+        Supplier,
     [Display(Name = "Client")]
         Client
     }

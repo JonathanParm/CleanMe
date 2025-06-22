@@ -12,6 +12,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.1.66" />
+    <PackageReference Include="DocX" Version="1.0.0.13" />
+    <PackageReference Include="EPPlus" Version="8.0.2" />
+    <PackageReference Include="QuestPDF" Version="2025.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Helpers\" />
   </ItemGroup>
 

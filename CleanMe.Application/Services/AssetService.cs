@@ -1,4 +1,5 @@
-﻿using CleanMe.Application.Interfaces;
+﻿using CleanMe.Application.DTOs;
+using CleanMe.Application.Interfaces;
 using CleanMe.Application.ViewModels;
 using CleanMe.Domain.Entities;
 using CleanMe.Domain.Interfaces;
@@ -92,13 +93,37 @@ namespace CleanMe.Application.Services
                 ClientName = asset.Client?.Brand,
                 assetLocationId = asset.assetLocationId,
                 AssetLocationName = asset.AssetLocation?.Description,
-                assetTypeId = asset.assetTypeId,
-                AssetTypeName = asset.AssetType?.Name,
+                itemCodeId = asset.itemCodeId,
+                ItemCodeName = asset.ItemCode?.Code,
                 MdReference = asset.MdReference,
                 ClientReference = asset.ClientReference,
                 Position = asset.Position,
                 Access = asset.Access
             };
+        }
+
+
+        public async Task<AssetHierarchyDto?> GetHierarchyIdsByAssetIdAsync(int assetId)
+        {
+            var query = @"
+        SELECT
+            ass.assetId,
+            ass.[Name] AS AssetName,
+            ass.clientId,
+            c.Brand AS Client,
+            ass.assetLocationId,
+            al.[Description] AS AssetLocation,
+            al.areaId,
+            a.[Name] AS AreaName
+        FROM Assets AS ass
+        INNER JOIN Clients AS c ON ass.clientId = c.clientId
+        INNER JOIN AssetLocations AS al ON ass.assetLocationId = al.assetLocationId
+        INNER JOIN Areas AS a ON al.areaId = a.areaId
+        WHERE ass.assetId = @AssetId";
+
+            var parameters = new { AssetId = assetId };
+
+            return await _unitOfWork.DapperRepository.QueryFirstOrDefaultAsync<AssetHierarchyDto?>(query, parameters);
         }
 
         public async Task<int> AddAssetAsync(AssetViewModel model, string addedById)
@@ -115,7 +140,7 @@ namespace CleanMe.Application.Services
                 Access = model.Access,
                 clientId = model.clientId.Value,
                 assetLocationId = model.assetLocationId.Value,
-                assetTypeId = model.assetTypeId.Value,
+                itemCodeId = model.itemCodeId.Value,
                 AddedAt = DateTime.UtcNow,
                 AddedById = addedById,
                 UpdatedAt = DateTime.UtcNow,
@@ -143,11 +168,11 @@ namespace CleanMe.Application.Services
             asset.Access = model.Access;
             asset.clientId = model.clientId.Value;
             asset.assetLocationId = model.assetLocationId.Value;
-            asset.assetTypeId = model.assetTypeId.Value;
+            asset.itemCodeId = model.itemCodeId.Value;
             asset.UpdatedAt = DateTime.UtcNow;
             asset.UpdatedById = updatedById;
 
-           await _unitOfWork.AssetRepository.UpdateAssetAsync(asset);
+            await _unitOfWork.AssetRepository.UpdateAssetAsync(asset);
         }
 
         public async Task<bool> SoftDeleteAssetAsync(int assetId, string updatedById)

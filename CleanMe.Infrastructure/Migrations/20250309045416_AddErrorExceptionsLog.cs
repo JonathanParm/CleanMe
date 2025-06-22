@@ -37,7 +37,7 @@ namespace CleanMe.Infrastructure.Migrations
                     logId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ApplicationUserId = table.Column<string>(type: "NVARCHAR(450)", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2(0)", nullable: false),
                     Message = table.Column<string>(type: "NVARCHAR(1000)", nullable: false),
                     StackTrace = table.Column<string>(type: "NVARCHAR(MAX)", nullable: false),
                     Source = table.Column<string>(type: "NVARCHAR(255)", nullable: false),

@@ -2,7 +2,7 @@
 @model IEnumerable<CleanMe.Application.ViewModels.AssetIndexViewModel>
 
 @{
-    ViewData["Title"] = "Asset List";
+    ViewData["Title"] = "Asset list";
     string sortOrder = ViewBag.SortOrder as string ?? "ASC";
     string sortColumn = ViewBag.SortColumn as string ?? "AssetName";
 }
@@ -46,7 +46,7 @@
                     </th>
                     <th>
                         <a href="#" onclick="sortTable('MdReference')">
-                            MD Reference @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "MdReference"))
+                            MD reference @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "MdReference"))
                         </a>
                     </th>
                     <th>
@@ -56,7 +56,7 @@
                     </th>
                     <th>
                         <a href="#" onclick="sortTable('ClientReference')">
-                            Client Reference @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "ClientReference"))
+                            Client reference @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "ClientReference"))
                         </a>
                     </th>
                     <th>
@@ -65,8 +65,8 @@
                         </a>
                     </th>
                     <th>
-                        <a href="#" onclick="sortTable('AssetType')">
-                            Type @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "AssetType"))
+                        <a href="#" onclick="sortTable('ItemCode')">
+                            Item code @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "ItemCode"))
                         </a>
                     </th>
                     <th>Actions</th>
@@ -74,13 +74,13 @@
 
                 <!-- Filter Row -->
                 <tr>
-                    <td><input type="text" name="assetName" class="form-control" value="@ViewBag.AssetName" placeholder="Search Asset"></td>
-                    <td><input type="text" name="regionName" class="form-control" value="@ViewBag.RegionName" placeholder="Search Region"></td>
-                    <td><input type="text" name="mdReference" class="form-control" value="@ViewBag.MdReference" placeholder="Search MD Ref."></td>
-                    <td><input type="text" name="clientName" class="form-control" value="@ViewBag.ClientName" placeholder="Search Client"></td>
-                    <td><input type="text" name="clientReference" class="form-control" value="@ViewBag.ClientReference" placeholder="Search Client Ref."></td>
-                    <td><input type="text" name="assetLocation" class="form-control" value="@ViewBag.AssetLocation" placeholder="Search Location"></td>
-                    <td><input type="text" name="assetType" class="form-control" value="@ViewBag.AssetType" placeholder="Search Type"></td>
+                    <td><input type="text" name="assetName" class="form-control" value="@ViewBag.AssetName" placeholder="Search asset"></td>
+                    <td><input type="text" name="regionName" class="form-control" value="@ViewBag.RegionName" placeholder="Search region"></td>
+                    <td><input type="text" name="mdReference" class="form-control" value="@ViewBag.MdReference" placeholder="Search MD ref."></td>
+                    <td><input type="text" name="clientName" class="form-control" value="@ViewBag.ClientName" placeholder="Search client"></td>
+                    <td><input type="text" name="clientReference" class="form-control" value="@ViewBag.ClientReference" placeholder="Search client Ref."></td>
+                    <td><input type="text" name="assetLocation" class="form-control" value="@ViewBag.AssetLocation" placeholder="Search location"></td>
+                    <td><input type="text" name="itemCode" class="form-control" value="@ViewBag.ItemCode" placeholder="Search Type"></td>
                     <td>
                         <button type="submit" class="btn btn-success">Filter</button>
                         <a href="@Url.Action("Index", "Asset")" class="btn btn-secondary">Clear</a>
@@ -97,7 +97,7 @@
                         <td>@Asset.ClientName</td>
                         <td>@Asset.ClientReference</td>
                         <td>@Asset.AssetLocation</td>
-                        <td>@Asset.AssetType</td>
+                        <td>@Asset.ItemCode</td>
                         <td>
                             <a asp-action="AddEdit" asp-route-assetId="@Asset.assetId" class="btn btn-warning btn-sm">Edit</a>
                             <a asp-action="Delete" asp-route-assetId="@Asset.assetId" class="btn btn-danger btn-sm">Delete</a>

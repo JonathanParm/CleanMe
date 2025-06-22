@@ -41,12 +41,12 @@ namespace CleanMe.Application.ViewModels
         public bool IsAccessable { get; set; } = true;
 
         [DisplayName("Start on")]
-        [DataType(DataType.Date)]
-        public DateOnly? StartOn { get; set; }
+        [DataType(DataType.DateTime)]
+        public DateTime? StartOn { get; set; }
 
         [DisplayName("Finish on")]
-        [DataType(DataType.Date)]
-        public DateOnly? FinishOn { get; set; }
+        [DataType(DataType.DateTime)]
+        public DateTime? FinishOn { get; set; }
 
         [Column(TypeName = "VARCHAR")]
         [StringLength(2000, MinimumLength = 2, ErrorMessage = "Comment about amendment to schedule must have between 2 and 2000 letters")]
@@ -54,8 +54,8 @@ namespace CleanMe.Application.ViewModels
         public string? Comment { get; set; }
 
         [DisplayName("Invoiced")]
-        [DataType(DataType.Date)]
-        public DateOnly? InvoicedOn { get; set; }
+        [DataType(DataType.DateTime)]
+        public DateTime? InvoicedOn { get; set; }
 
         //public IEnumerable<SelectListItem>? AmendmentTypes { get; set; }
         //public IEnumerable<SelectListItem>? Areas { get; set; }

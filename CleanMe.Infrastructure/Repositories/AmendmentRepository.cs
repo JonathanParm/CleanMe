@@ -25,13 +25,15 @@ namespace CleanMe.Infrastructure.Repositories
 
         public async Task<Amendment?> GetAmendmentByIdAsync(int amendmentId)
         {
+            // use .Include(...) on navigation properties — not scalar foreign keys
             return await _context.Amendments
-                .Include(a => a.clientId)  // eager load
-                .Include(a => a.areaId)  // eager load
-                .Include(a => a.assetLocationId)  // eager load
-                .Include(a => a.assetId)  // eager load
-                .Include(a => a.cleanFrequencyId)  // eager load
-                .Include(a => a.staffId)  // eager load
+                .Include(a => a.Client)
+                .Include(a => a.Area)
+                .Include(a => a.AssetLocation)
+                .Include(a => a.Asset)
+                .Include(a => a.CleanFrequency)
+                .Include(a => a.Staff)
+                .Include(a => a.AmendmentType)
                 .FirstOrDefaultAsync(a => a.amendmentId == amendmentId);
         }
 

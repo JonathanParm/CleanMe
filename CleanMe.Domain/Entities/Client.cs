@@ -20,12 +20,12 @@ namespace CleanMe.Domain.Entities
 
         [Required]
         [DisplayName("Name")]
-        [Column(TypeName = "VARCHAR")]
+        [Column(TypeName = "varchar")]
         [StringLength(100, ErrorMessage = "Client name must have between 3 and 100 letters")]
         public string Name { get; set; }
 
         [DisplayName("Brand")]
-        [Column(TypeName = "VARCHAR")]
+        [Column(TypeName = "varchar")]
         [StringLength(10, MinimumLength = 2, ErrorMessage = "Client brand must have between 2 and 10 letters")]
         public string? Brand { get; set; }
 
@@ -77,6 +77,6 @@ namespace CleanMe.Domain.Entities
         public ICollection<Amendment> Amendments { get; set; } = new List<Amendment>();
 
         // Navigation property
-        public ICollection<AssetTypeRate> AssetTypeRates { get; set; } = new List<AssetTypeRate>();
+        public ICollection<ItemCodeRate> AssetTypeRates { get; set; } = new List<ItemCodeRate>();
     }
 }

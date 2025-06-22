@@ -19,14 +19,18 @@ namespace CleanMe.Domain.Entities
 
         [Required(ErrorMessage = "Must have an amendment type name")]
         [DisplayName("Type")]
-        [Column(TypeName = "VARCHAR")]
+        [Column(TypeName = "varchar")]
         [StringLength(50, MinimumLength = 3, ErrorMessage = "Amendment type Name must have between 3 and 50 letters")]
         public string Name { get; set; }
 
         [DisplayName("Description")]
-        [Column(TypeName = "VARCHAR")]
+        [Column(TypeName = "varchar")]
         [StringLength(1000, MinimumLength = 3, ErrorMessage = "Amendment type Name must have between 3 and 1000 letters")]
         public string Description { get; set; }
+
+        [Required]
+        [Display(Name = "Sort order")]
+        public int SortOrder { get; set; }
 
         [Required]
         [DisplayName("Active")]

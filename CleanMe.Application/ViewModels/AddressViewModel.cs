@@ -43,5 +43,16 @@ namespace CleanMe.Application.ViewModels
         [StringLength(20, ErrorMessage = "A postcode cannot exceed 10 characters.")]
         [MinLength(4, ErrorMessage = "A postcode must be at least 4 characters.")]
         public string Postcode { get; set; } = string.Empty;
+
+        public override string ToString()
+        {
+            return $"{Line1}{(string.IsNullOrWhiteSpace(Line2) ? "" : ", " + Line2)} {(string.IsNullOrWhiteSpace(Suburb) ? "" : ", " + Suburb)}, {TownOrCity}, {Postcode}";
+        }
+
+        // Returns a multi-line formatted address
+        public string ToMultiLine()
+        {
+            return $"{Line1}\n{(string.IsNullOrWhiteSpace(Line2) ? "" : Line2 + "\n")}{(string.IsNullOrWhiteSpace(Suburb) ? "" : Suburb + "\n")}{TownOrCity} {Postcode}";
+        }
     }
 }

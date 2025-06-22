@@ -38,11 +38,7 @@ namespace CleanMe.Domain.Entities
 
         [Required]
         [Display(Name = "Sort order")]
-        public int SequenceOrder { get; set; }
-
-        // temp for initial data load. previous AreaId.
-        [DisplayName("Seq no")]
-        public int SeqNo { get; set; }
+        public int SortOrder { get; set; }
 
         [Required]
         [DisplayName("Active")]

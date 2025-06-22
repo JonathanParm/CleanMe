@@ -18,19 +18,19 @@ namespace CleanMe.Application.ViewModels
         [Display(Name = "Region")]
         public string RegionName { get; set; }
 
-        [Display(Name = "MD Reference")]
+        [Display(Name = "MD reference")]
         public string MdReference { get; set; }
 
-        [Display(Name = "Client Name")]
+        [Display(Name = "Client name")]
         public string ClientName { get; set; }
 
-        [Display(Name = "Client Reference")]
+        [Display(Name = "Client reference")]
         public string ClientReference { get; set; }
 
-        [Display(Name = "Asset Location")]
+        [Display(Name = "Asset location")]
         public string AssetLocation { get; set; }
 
-        [Display(Name = "Asset Type")]
-        public string AssetType { get; set; }
+        [Display(Name = "Item code")]
+        public string ItemCode { get; set; }
     }
 }

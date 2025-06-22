@@ -1,0 +1,36 @@
+﻿@using CleanMe.Application.ViewModels
+@using CleanMe.Domain.Enums
+@using CleanMe.Shared.Helpers
+
+@model CleanMe.Application.ViewModels.SettingViewModel
+
+@{
+    ViewData["Title"] = "Edit System Setting";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form asp-action="Edit" method="post" id="SettingForm" novalidate>
+    @Html.AntiForgeryToken()
+
+    @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+
+    <input asp-for="settingId" type="hidden" />
+
+    <div class="form-group">
+        <label asp-for="ExcelExportPath" class="form-label"></label>
+        <input asp-for="ExcelExportPath" class="form-control" required />
+        <span asp-validation-for="ExcelExportPath" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+    <button type="button"
+            class="btn btn-secondary"
+            onclick="window.location.href='@Url.Action("Index", "Home")'">
+        Home
+    </button>
+
+</form>
+
+@section Scripts {
+}

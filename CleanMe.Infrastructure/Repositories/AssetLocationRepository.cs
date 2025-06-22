@@ -30,10 +30,25 @@ namespace CleanMe.Infrastructure.Repositories
 
         public async Task<IEnumerable<AssetLocation>> GetAllAssetLocationsAsync()
         {
-            return await _context.AssetLocations
-                .Where(c => !c.IsDeleted)
-                .OrderBy(c => c.Description)
-                .ToListAsync();
+            try
+            {
+                // Using Dapper for a raw SQL query
+                using (var connection = new SqlConnection(_context.Database.GetDbConnection().ConnectionString))
+                {
+                    await connection.OpenAsync();
+                    var sql = "SELECT * FROM AssetLocations WHERE IsDeleted = 0 ORDER BY Description";
+                    return await connection.QueryAsync<AssetLocation>(sql);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log the exception (not implemented here)
+                throw new Exception("An error occurred while retrieving asset locations.", ex);
+            }
+            //return await _context.AssetLocations
+            //    .Where(c => !c.IsDeleted)
+            //    .OrderBy(c => c.Description)
+            //    .ToListAsync();
         }
 
         public async Task<AssetLocation?> GetAssetLocationByIdAsync(int assetLocationId)

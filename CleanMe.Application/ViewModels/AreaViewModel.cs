@@ -29,11 +29,7 @@ namespace CleanMe.Application.ViewModels
 
         [Required]
         [Display(Name = "Sort order")]
-        public int SequenceOrder { get; set; }
-
-        [Required]
-        [Display(Name = "Seq no")]
-        public int SeqNo { get; set; }
+        public int SortOrder { get; set; }
 
         [Required]
         [DisplayName("Active")]

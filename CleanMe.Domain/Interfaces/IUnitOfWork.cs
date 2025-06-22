@@ -7,14 +7,15 @@
         IAreaRepository AreaRepository { get; }
         IAssetLocationRepository AssetLocationRepository { get; }
         IAssetRepository AssetRepository { get; }
-        IAssetTypeRepository AssetTypeRepository { get; }
-        IAssetTypeRateRepository AssetTypeRateRepository { get; }
         ICleanFrequencyRepository CleanFrequencyRepository { get; }
         IClientContactRepository ClientContactRepository { get; }
         IClientRepository ClientRepository { get; }
+        ICompanyInfoRepository CompanyInfoRepository { get; }
+        IItemCodeRateRepository ItemCodeRateRepository { get; }
+        IItemCodeRepository ItemCodeRepository { get; }
         IRegionRepository RegionRepository { get; }
+        ISettingRepository SettingRepository { get; }
         IStaffRepository StaffRepository { get; }
-        IStockCodeRepository StockCodeRepository { get; }
 
         IDapperRepository DapperRepository { get; }
 

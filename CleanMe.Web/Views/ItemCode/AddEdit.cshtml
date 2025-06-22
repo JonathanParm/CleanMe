@@ -1,0 +1,151 @@
+﻿@using CleanMe.Application.ViewModels
+@using CleanMe.Domain.Enums
+@using CleanMe.Shared.Helpers
+
+@model CleanMe.Application.ViewModels.ItemCodeViewModel
+
+@{
+    ViewData["Title"] = Model.itemCodeId == 0 ? "Add Item code" : "Edit Item code";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form asp-action="AddEdit" method="post" id="ItemCodeForm" novalidate>
+    @Html.AntiForgeryToken()
+
+    @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+
+    @Html.HiddenFor(m => m.itemCodeId)
+    @* <input asp-for="itemCodeId" type="hidden" /> *@
+
+    <div class="form-group">
+        <label asp-for="Code" class="form-label"></label>
+        <input asp-for="Code" class="form-control" required />
+        <span asp-validation-for="Code" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="ItemName" class="form-label"></label>
+        <input asp-for="ItemName" class="form-control" required />
+        <span asp-validation-for="ItemName" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="ItemDescription" class="form-label"></label>
+        <input asp-for="ItemDescription" class="form-control" required />
+        <span asp-validation-for="ItemDescription" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="PurchasesDescription" class="form-label"></label>
+        <input asp-for="PurchasesDescription" class="form-control" required />
+        <span asp-validation-for="PurchasesDescription" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="PurchasesUnitRate" class="form-label"></label>
+        <input asp-for="PurchasesUnitRate" class="form-control" required />
+        <span asp-validation-for="PurchasesUnitRate" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="PurchasesXeroAccount" class="form-label"></label>
+        <input asp-for="PurchasesXeroAccount" class="form-control" required />
+        <span asp-validation-for="PurchasesXeroAccount" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="SalesDescription" class="form-label"></label>
+        <input asp-for="SalesDescription" class="form-control" required />
+        <span asp-validation-for="SalesDescription" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="SalesUnitRate" class="form-label"></label>
+        <input asp-for="SalesUnitRate" class="form-control" required />
+        <span asp-validation-for="SalesUnitRate" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="SalesXeroAccount" class="form-label"></label>
+        <input asp-for="SalesXeroAccount" class="form-control" required />
+        <span asp-validation-for="SalesXeroAccount" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Is Active</label>
+        <select asp-for="IsActive" class="form-control">
+            <option value="true">Active</option>
+            <option value="false">Inactive</option>
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>
+
+<h3 class="mt-4">Areas</h3>
+@* 
+<!-- Add Asset Rate Button -->
+<div class="text-start mb-3">
+    <button type="button"
+            class="btn btn-sm btn-primary"
+            data-redirect="@Url.Action("AddEdit", "AssetType", new
+            {
+                itemCodeId = Model.itemCodeId,
+                returnUrl = Url.Action("AddEdit", "ItemCode", new { itemCodeId = Model.itemCodeId })
+            })"
+            data-form="ItemCodeForm">
+            ➕ Add Asset Type
+    </button>
+</div>
+
+<!-- Areas Table -->
+<div class="table-responsive">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Asset type</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var assetType in Model.AssetTypesList)
+            {
+                <tr>
+                    <td>@assetType.Name</td>
+                    <td>@(assetType.IsActive ? "Yes" : "No")</td>
+                    <td>
+                        <button type="button"
+                                class="btn btn-sm btn-warning redirect-after-save"
+                                data-redirect="@Url.Action("AddEdit", "AssetType", new
+                            {
+                                assetTypeId = assetType.assetTypeId,
+                                itemCodeId = Model.itemCodeId,
+                                    returnUrl = Url.Action("AddEdit", "ItemCode", new { itemCodeId = Model.itemCodeId })
+                                })"
+                                data-form="ItemCodeForm">
+                                ✏️ Edit
+                        </button>
+
+                        <button type="button"
+                                class="btn btn-sm btn-danger redirect-after-save"
+                                data-redirect="@Url.Action("Delete", "AssetType", new
+                            {
+                                assetTypeId = assetType.assetTypeId,
+                                itemCodeId = Model.itemCodeId,
+                                    returnUrl = Url.Action("AddEdit", "ItemCode", new { itemCodeId = Model.itemCodeId })
+                                })"
+                                data-form="ItemCodeForm">
+                                🗑 Delete
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+ *@
+@section Scripts {
+    <script src="~/js/shared/redirect-on-submit.js"></script>
+}

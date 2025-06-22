@@ -25,9 +25,9 @@ namespace CleanMe.Infrastructure.Migrations
                     Email = table.Column<string>(type: "VARCHAR(256)", maxLength: 256, nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    AddedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    AddedAt = table.Column<DateTime>(type: "datetime2(0)", nullable: false),
                     AddedById = table.Column<string>(type: "NVARCHAR(450)", maxLength: 450, nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2(0)", nullable: false),
                     UpdatedById = table.Column<string>(type: "NVARCHAR(450)", maxLength: 450, nullable: false)
                 },
                 constraints: table =>

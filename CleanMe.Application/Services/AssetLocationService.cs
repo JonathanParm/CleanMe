@@ -95,8 +95,7 @@ namespace CleanMe.Application.Services
                     TownOrCity = al.AddressTownOrCity,
                     Postcode = al.AddressPostcode
                 },
-                SequenceOrder = al.SequenceOrder,
-                SeqNo = al.SeqNo,
+                SortOrder = al.SortOrder,
                 ReportCode = al.ReportCode,
                 AccNo = al.AccNo,
                 IsActive = al.IsActive
@@ -126,8 +125,7 @@ namespace CleanMe.Application.Services
                     TownOrCity = row.AddressTownOrCity,
                     Postcode = row.AddressPostcode
                 },
-                SequenceOrder = row.SequenceOrder,
-                SeqNo = row.SeqNo,
+                SortOrder = row.SortOrder,
                 ReportCode = row.ReportCode,
                 AccNo = row.AccNo,
                 IsActive = row.IsActive
@@ -165,8 +163,7 @@ namespace CleanMe.Application.Services
                     TownOrCity = model.Address.TownOrCity,
                     Postcode = model.Address.Postcode,
                 },
-                SequenceOrder = model.SequenceOrder,
-                SeqNo = model.SeqNo,
+                SortOrder = model.SortOrder,
                 ReportCode = model.ReportCode,
                 AccNo = model.AccNo,
                 IsActive = model.IsActive,
@@ -200,8 +197,7 @@ namespace CleanMe.Application.Services
                 TownOrCity = model.Address.TownOrCity,
                 Postcode = model.Address.Postcode,
             };
-            assetLocation.SequenceOrder = model.SequenceOrder;
-            assetLocation.SeqNo = model.SeqNo;
+            assetLocation.SortOrder = model.SortOrder;
             assetLocation.ReportCode = model.ReportCode;
             assetLocation.AccNo = model.AccNo;
             assetLocation.IsActive = model.IsActive;

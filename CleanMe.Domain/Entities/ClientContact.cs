@@ -52,13 +52,13 @@ namespace CleanMe.Domain.Entities
         public string? JobTitle { get; set; }
 
         [DisplayName("Mobile phone")]
-        [Column(TypeName = "VARCHAR")]
+        [Column(TypeName = "varchar")]
         [StringLength(30, ErrorMessage = "Mobile phone number cannot have more than 30 digits")]
         [MinLength(6, ErrorMessage = "Mobile phone number must be at least 6 digits.")]
         public string? PhoneMobile { get; set; }
 
         [DisplayName("Email")]
-        [Column(TypeName = "VARCHAR")]
+        [Column(TypeName = "varchar")]
         [StringLength(256, ErrorMessage = "Email address must have at least 6 characters")]
         [MinLength(6, ErrorMessage = "An email address must be at least 6 digits.")]
         public string? Email { get; set; }

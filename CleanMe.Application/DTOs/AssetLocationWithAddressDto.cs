@@ -20,8 +20,7 @@ namespace CleanMe.Application.DTOs
         public string? AddressSuburb { get; set; }
         public string AddressTownOrCity { get; set; } = string.Empty;
         public string AddressPostcode { get; set; } = string.Empty;
-        public int SequenceOrder { get; set; } = 0;
-        public int SeqNo { get; set; } = 0;
+        public int SortOrder { get; set; } = 0;
         public string ReportCode { get; set; }
         public int AccNo { get; set; }
         public int areaId { get; set; }

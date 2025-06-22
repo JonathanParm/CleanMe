@@ -12,15 +12,16 @@ namespace CleanMe.Infrastructure.Repositories
         public IAreaRepository AreaRepository { get; }
         public IAssetLocationRepository AssetLocationRepository { get; }
         public IAssetRepository AssetRepository { get; }
-        public IAssetTypeRepository AssetTypeRepository { get; }
-        public IAssetTypeRateRepository AssetTypeRateRepository { get; }
         public ICleanFrequencyRepository CleanFrequencyRepository { get; }
         public IClientContactRepository ClientContactRepository { get; }
         public IClientRepository ClientRepository { get; }
+        public ICompanyInfoRepository CompanyInfoRepository { get; }
         public IDapperRepository DapperRepository { get; }
+        public IItemCodeRateRepository ItemCodeRateRepository { get; }
+        public IItemCodeRepository ItemCodeRepository { get; }
         public IRegionRepository RegionRepository { get; }
+        public ISettingRepository SettingRepository { get; }
         public IStaffRepository StaffRepository { get; }
-        public IStockCodeRepository StockCodeRepository { get; }
 
         public UnitOfWork(
                 ApplicationDbContext context,
@@ -29,15 +30,16 @@ namespace CleanMe.Infrastructure.Repositories
                 IAreaRepository areaRepository,
                 IAssetLocationRepository assetLocationRepository,
                 IAssetRepository assetRepository,
-                IAssetTypeRepository assetTypeRepository,
-                IAssetTypeRateRepository assetTypeRateRepository,
                 ICleanFrequencyRepository cleanFrequencyRepository,
                 IClientContactRepository clientContactRepository,
                 IClientRepository clientRepository,
+                ICompanyInfoRepository companyInfoRepository,
                 IDapperRepository dapperRepository,
+                IItemCodeRateRepository itemCodeRateRepository,
+                IItemCodeRepository itemCodeRepository,
                 IRegionRepository regionRepository,
-                IStaffRepository staffRepository,
-                IStockCodeRepository stockCodeRepository
+                ISettingRepository settingRepository,
+                IStaffRepository staffRepository
             )
         {
             _context = context;
@@ -46,15 +48,16 @@ namespace CleanMe.Infrastructure.Repositories
             AreaRepository = areaRepository;
             AssetLocationRepository = assetLocationRepository;
             AssetRepository = assetRepository;
-            AssetTypeRepository = assetTypeRepository;
-            AssetTypeRateRepository = assetTypeRateRepository;
             CleanFrequencyRepository = cleanFrequencyRepository;
             ClientContactRepository = clientContactRepository;
             ClientRepository = clientRepository;
+            CompanyInfoRepository = companyInfoRepository;
             DapperRepository = dapperRepository;
+            ItemCodeRateRepository = itemCodeRateRepository;
+            ItemCodeRepository = itemCodeRepository;
             RegionRepository = regionRepository;
+            SettingRepository = settingRepository;
             StaffRepository = staffRepository;
-            StockCodeRepository = stockCodeRepository;
         }
 
         public async Task<int> CommitAsync()

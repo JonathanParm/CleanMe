@@ -17,7 +17,7 @@ namespace CleanMe.Domain.Entities
         [Display(Name = "ID")]
         public int amendmentId { get; set; }
 
-        [Column(TypeName = "VARCHAR")]
+        [Column(TypeName = "varchar")]
         [StringLength(100, ErrorMessage = "Source name of amendment cannot exceed 100 characters")]
         [MinLength(2, ErrorMessage = "Source name of amendment must be at least 2 characters.")]
         [Display(Name = "Name of source")]
@@ -83,7 +83,7 @@ namespace CleanMe.Domain.Entities
         [Column(TypeName = "decimal(5, 2)")]
         public decimal? Rate { get; set; }
 
-        [Column(TypeName = "VARCHAR")]
+        [Column(TypeName = "varchar")]
         [StringLength(200, MinimumLength = 2, ErrorMessage = "Description of how to find asset must have between 2 and 200 letters")]
         [Display(Name = "Access to asset")]
         public string? Access { get; set; }
@@ -92,18 +92,18 @@ namespace CleanMe.Domain.Entities
         public bool IsAccessable { get; set; } = true;
 
         [DisplayName("Start on")]
-        public DateOnly? StartOn { get; set; }
+        public DateTime? StartOn { get; set; }
 
         [DisplayName("Finish on")]
-        public DateOnly? FinishOn { get; set; }
+        public DateTime? FinishOn { get; set; }
 
-        [Column(TypeName = "VARCHAR")]
+        [Column(TypeName = "varchar")]
         [StringLength(2000, MinimumLength = 2, ErrorMessage = "Comment about amendment to schedule must have between 2 and 2000 letters")]
         [Display(Name = "Comment about amendment")]
         public string? Comment { get; set; }
 
         [DisplayName("Invoiced")]
-        public DateOnly? InvoicedOn { get; set; }
+        public DateTime? InvoicedOn { get; set; }
 
         [Required]
         [DisplayName("Deleted")]

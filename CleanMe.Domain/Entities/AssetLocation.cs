@@ -20,7 +20,7 @@ namespace CleanMe.Domain.Entities
 
         [Required(ErrorMessage = "Must have an asset location description")]
         [DisplayName("Location")]
-        [Column(TypeName = "VARCHAR")]
+        [Column(TypeName = "varchar")]
         [StringLength(200, MinimumLength = 3, ErrorMessage = "Asset location description must have between 3 and 200 letters")]
         public string Description { get; set; }
 
@@ -28,10 +28,7 @@ namespace CleanMe.Domain.Entities
 
         [Required]
         [Display(Name = "Sort order")]
-        public int SequenceOrder { get; set; }
-
-        [DisplayName("Seq no")]
-        public int SeqNo { get; set; }
+        public int SortOrder { get; set; }
 
         [DisplayName("Report code")]
         [Column(TypeName = "VARCHAR")]

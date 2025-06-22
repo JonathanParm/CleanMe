@@ -1,6 +1,11 @@
-﻿using CleanMe.Domain.Interfaces;
+﻿using CleanMe.Application.ViewModels;
+using CleanMe.Domain.Interfaces;
 using Dapper;
 using System.Data;
+using System.Reflection;
+using System.Web.Mvc;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace CleanMe.Infrastructure.Repositories
 {

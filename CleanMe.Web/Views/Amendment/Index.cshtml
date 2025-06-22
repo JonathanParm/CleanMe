@@ -7,7 +7,7 @@
     string sortColumn = ViewBag.SortColumn as string ?? "SourceName";
 }
 
-<h2>Amendment Type List</h2>
+<h2>Amendment List</h2>
 
 @if (TempData["SuccessMessage"] != null)
 {
@@ -98,10 +98,10 @@
                         <td>@amendment.LocationName</td>
                         <td>@amendment.MdReference</td>
                         <td>@amendment.ClientReference</td>
-                        <td>@amendment.AmendmentSummary</td>
+                        <td>@Html.Raw(@amendment.AmendmentSummary)</td>
                         <td>
-                            <a asp-action="AddEdit" asp-route-amendmentTypeId="@amendment.amendmentId" class="btn btn-warning btn-sm">Edit</a>
-                            <a asp-action="Delete" asp-route-amendmentTypeId="@amendment.amendmentId" class="btn btn-danger btn-sm">Delete</a>
+                            <a asp-action="AddEdit" asp-route-amendmentId="@amendment.amendmentId" class="btn btn-warning btn-sm">Edit</a>
+                            <a asp-action="Delete" asp-route-amendmentId="@amendment.amendmentId" class="btn btn-danger btn-sm">Delete</a>
                         </td>
                     </tr>
                 }

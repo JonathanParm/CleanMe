@@ -33,12 +33,12 @@ namespace CleanMe.Application.ViewModels
         [Display(Name = "Asset Location")]
         public string? AssetLocationName { get; set; }
 
-        [Range(1, int.MaxValue, ErrorMessage = "Asset type is required")]
-        [Display(Name = "Asset Type")]
-        public int? assetTypeId { get; set; }  // nullable int to allow for no selection in the dropdown
+        [Range(1, int.MaxValue, ErrorMessage = "Item code is required")]
+        [Display(Name = "Item code")]
+        public int? itemCodeId { get; set; }  // nullable int to allow for no selection in the dropdown
 
-        [Display(Name = "Asset Type")]
-        public string? AssetTypeName { get; set; }
+        [Display(Name = "Item code")]
+        public string? ItemCodeName { get; set; }
 
         [StringLength(50, MinimumLength = 2, ErrorMessage = "MD reference must have between 2 and 50 letters")]
         [Display(Name = "MD reference")]
@@ -58,6 +58,6 @@ namespace CleanMe.Application.ViewModels
 
         public IEnumerable<SelectListItem> Clients { get; set; } = new List<SelectListItem>();
         public IEnumerable<SelectListItem> AssetLocations { get; set; } = new List<SelectListItem>();
-        public IEnumerable<SelectListItem> AssetTypes { get; set; } = new List<SelectListItem>();
+        public IEnumerable<SelectListItem> ItemCodes { get; set; } = new List<SelectListItem>();
     }
 }

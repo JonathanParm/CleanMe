@@ -32,7 +32,7 @@ namespace CleanMe.Infrastructure.Migrations
 
                     b.Property<string>("Access")
                         .HasMaxLength(200)
-                        .HasColumnType("VARCHAR");
+                        .HasColumnType("varchar");
 
                     b.Property<DateTime>("AddedAt")
                         .HasColumnType("datetime2");
@@ -44,17 +44,17 @@ namespace CleanMe.Infrastructure.Migrations
 
                     b.Property<string>("AmendmentSourceName")
                         .HasMaxLength(100)
-                        .HasColumnType("VARCHAR");
+                        .HasColumnType("varchar");
 
                     b.Property<string>("Comment")
                         .HasMaxLength(2000)
-                        .HasColumnType("VARCHAR");
+                        .HasColumnType("varchar");
 
-                    b.Property<DateOnly?>("FinishOn")
-                        .HasColumnType("date");
+                    b.Property<DateTime?>("FinishOn")
+                        .HasColumnType("datetime2");
 
-                    b.Property<DateOnly?>("Invoiced")
-                        .HasColumnType("date");
+                    b.Property<DateTime?>("InvoicedOn")
+                        .HasColumnType("datetime2");
 
                     b.Property<bool>("IsAccessable")
                         .HasColumnType("bit");
@@ -65,8 +65,8 @@ namespace CleanMe.Infrastructure.Migrations
                     b.Property<decimal?>("Rate")
                         .HasColumnType("decimal(5, 2)");
 
-                    b.Property<DateOnly?>("StartOn")
-                        .HasColumnType("date");
+                    b.Property<DateTime?>("StartOn")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -136,7 +136,7 @@ namespace CleanMe.Infrastructure.Migrations
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(1000)
-                        .HasColumnType("VARCHAR");
+                        .HasColumnType("varchar");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -147,7 +147,10 @@ namespace CleanMe.Infrastructure.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("VARCHAR");
+                        .HasColumnType("varchar");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -192,10 +195,7 @@ namespace CleanMe.Infrastructure.Migrations
                     b.Property<int>("ReportCode")
                         .HasColumnType("int");
 
-                    b.Property<int>("SeqNo")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SequenceOrder")
+                    b.Property<int>("SortOrder")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("UpdatedAt")
@@ -226,7 +226,7 @@ namespace CleanMe.Infrastructure.Migrations
 
                     b.Property<string>("Access")
                         .HasMaxLength(200)
-                        .HasColumnType("VARCHAR");
+                        .HasColumnType("varchar");
 
                     b.Property<DateTime>("AddedAt")
                         .HasColumnType("datetime2");
@@ -238,7 +238,7 @@ namespace CleanMe.Infrastructure.Migrations
 
                     b.Property<string>("ClientReference")
                         .HasMaxLength(50)
-                        .HasColumnType("VARCHAR");
+                        .HasColumnType("varchar");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -246,16 +246,16 @@ namespace CleanMe.Infrastructure.Migrations
                     b.Property<string>("MdReference")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("VARCHAR");
+                        .HasColumnType("varchar");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("VARCHAR");
+                        .HasColumnType("varchar");
 
                     b.Property<string>("Position")
                         .HasMaxLength(50)
-                        .HasColumnType("VARCHAR");
+                        .HasColumnType("varchar");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -268,19 +268,19 @@ namespace CleanMe.Infrastructure.Migrations
                     b.Property<int>("assetLocationId")
                         .HasColumnType("int");
 
-                    b.Property<int>("assetTypeId")
+                    b.Property<int>("clientId")
                         .HasColumnType("int");
 
-                    b.Property<int>("clientId")
+                    b.Property<int>("itemCodeId")
                         .HasColumnType("int");
 
                     b.HasKey("assetId");
 
                     b.HasIndex("assetLocationId");
 
-                    b.HasIndex("assetTypeId");
-
                     b.HasIndex("clientId");
+
+                    b.HasIndex("itemCodeId");
 
                     b.ToTable("Assets");
                 });
@@ -307,7 +307,7 @@ namespace CleanMe.Infrastructure.Migrations
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(200)
-                        .HasColumnType("VARCHAR");
+                        .HasColumnType("varchar");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -320,10 +320,7 @@ namespace CleanMe.Infrastructure.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("VARCHAR");
 
-                    b.Property<int>("SeqNo")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SequenceOrder")
+                    b.Property<int>("SortOrder")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("UpdatedAt")
@@ -342,119 +339,6 @@ namespace CleanMe.Infrastructure.Migrations
                     b.HasIndex("areaId");
 
                     b.ToTable("AssetLocations");
-                });
-
-            modelBuilder.Entity("CleanMe.Domain.Entities.AssetType", b =>
-                {
-                    b.Property<int>("assetTypeId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("assetTypeId"));
-
-                    b.Property<DateTime>("AddedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("AddedById")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("NVARCHAR");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("VARCHAR");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UpdatedById")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("NVARCHAR");
-
-                    b.Property<int>("regionId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("stockCodeId")
-                        .HasColumnType("int");
-
-                    b.HasKey("assetTypeId");
-
-                    b.HasIndex("stockCodeId");
-
-                    b.ToTable("AssetTypes");
-                });
-
-            modelBuilder.Entity("CleanMe.Domain.Entities.AssetTypeRate", b =>
-                {
-                    b.Property<int>("assetTypeRateId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("assetTypeRateId"));
-
-                    b.Property<DateTime>("AddedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("AddedById")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("NVARCHAR");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(100)
-                        .HasColumnType("VARCHAR");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDefault")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("VARCHAR");
-
-                    b.Property<decimal>("Rate")
-                        .HasColumnType("decimal(5, 2)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UpdatedById")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("NVARCHAR");
-
-                    b.Property<int>("assetTypeId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("cleanFrequencyId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("clientId")
-                        .HasColumnType("int");
-
-                    b.HasKey("assetTypeRateId");
-
-                    b.HasIndex("assetTypeId");
-
-                    b.HasIndex("cleanFrequencyId");
-
-                    b.HasIndex("clientId");
-
-                    b.ToTable("AssetTypeRates");
                 });
 
             modelBuilder.Entity("CleanMe.Domain.Entities.CleanFrequency", b =>
@@ -476,12 +360,12 @@ namespace CleanMe.Infrastructure.Migrations
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasMaxLength(2)
-                        .HasColumnType("VARCHAR");
+                        .HasColumnType("varchar");
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(500)
-                        .HasColumnType("VARCHAR");
+                        .HasColumnType("varchar");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -492,9 +376,9 @@ namespace CleanMe.Infrastructure.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("VARCHAR");
+                        .HasColumnType("varchar");
 
-                    b.Property<int>("SequenceOrder")
+                    b.Property<int>("SortOrder")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("UpdatedAt")
@@ -531,7 +415,7 @@ namespace CleanMe.Infrastructure.Migrations
 
                     b.Property<string>("Brand")
                         .HasMaxLength(10)
-                        .HasColumnType("VARCHAR");
+                        .HasColumnType("varchar");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -542,7 +426,7 @@ namespace CleanMe.Infrastructure.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("VARCHAR");
+                        .HasColumnType("varchar");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -579,7 +463,7 @@ namespace CleanMe.Infrastructure.Migrations
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
-                        .HasColumnType("VARCHAR");
+                        .HasColumnType("varchar");
 
                     b.Property<string>("FamilyName")
                         .IsRequired()
@@ -603,7 +487,7 @@ namespace CleanMe.Infrastructure.Migrations
 
                     b.Property<string>("PhoneMobile")
                         .HasMaxLength(30)
-                        .HasColumnType("VARCHAR");
+                        .HasColumnType("varchar");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -621,6 +505,39 @@ namespace CleanMe.Infrastructure.Migrations
                     b.HasIndex("clientId");
 
                     b.ToTable("ClientContacts");
+                });
+
+            modelBuilder.Entity("CleanMe.Domain.Entities.CompanyInfo", b =>
+                {
+                    b.Property<int>("companyInfoId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("VARCHAR");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("VARCHAR");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("VARCHAR");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedById")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("NVARCHAR");
+
+                    b.HasKey("companyInfoId");
+
+                    b.ToTable("CompanyInfo");
                 });
 
             modelBuilder.Entity("CleanMe.Domain.Entities.ErrorExceptionsLog", b =>
@@ -659,6 +576,143 @@ namespace CleanMe.Infrastructure.Migrations
                     b.ToTable("ErrorExceptionsLogs");
                 });
 
+            modelBuilder.Entity("CleanMe.Domain.Entities.ItemCode", b =>
+                {
+                    b.Property<int>("itemCodeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("itemCodeId"));
+
+                    b.Property<DateTime>("AddedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("AddedById")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("NVARCHAR");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("varchar");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ItemDescription")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar");
+
+                    b.Property<string>("ItemName")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar");
+
+                    b.Property<string>("PurchasesDescription")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar");
+
+                    b.Property<decimal>("PurchasesUnitRate")
+                        .HasColumnType("decimal(5, 2)");
+
+                    b.Property<int?>("PurchasesXeroAccount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SalesDescription")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar");
+
+                    b.Property<decimal>("SalesUnitRate")
+                        .HasColumnType("decimal(5, 2)");
+
+                    b.Property<int?>("SalesXeroAccount")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedById")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("NVARCHAR");
+
+                    b.HasKey("itemCodeId");
+
+                    b.ToTable("ItemCodes");
+                });
+
+            modelBuilder.Entity("CleanMe.Domain.Entities.ItemCodeRate", b =>
+                {
+                    b.Property<int>("itemCodeRateId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("itemCodeRateId"));
+
+                    b.Property<DateTime>("AddedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("AddedById")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("NVARCHAR");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDefault")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar");
+
+                    b.Property<decimal>("Rate")
+                        .HasColumnType("decimal(5, 2)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedById")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("NVARCHAR");
+
+                    b.Property<int>("cleanFrequencyId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("clientId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("itemCodeId")
+                        .HasColumnType("int");
+
+                    b.HasKey("itemCodeRateId");
+
+                    b.HasIndex("cleanFrequencyId");
+
+                    b.HasIndex("clientId");
+
+                    b.HasIndex("itemCodeId");
+
+                    b.ToTable("ItemCodeRates");
+                });
+
             modelBuilder.Entity("CleanMe.Domain.Entities.Region", b =>
                 {
                     b.Property<int>("regionId")
@@ -684,14 +738,14 @@ namespace CleanMe.Infrastructure.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("VARCHAR");
+                        .HasColumnType("varchar");
 
                     b.Property<string>("ReportCode")
                         .IsRequired()
                         .HasMaxLength(2)
                         .HasColumnType("CHAR");
 
-                    b.Property<int>("SequenceOrder")
+                    b.Property<int>("SortOrder")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("UpdatedAt")
@@ -705,6 +759,29 @@ namespace CleanMe.Infrastructure.Migrations
                     b.HasKey("regionId");
 
                     b.ToTable("Regions");
+                });
+
+            modelBuilder.Entity("CleanMe.Domain.Entities.Setting", b =>
+                {
+                    b.Property<int>("settingId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ExcelExportPath")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("VARCHAR");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedById")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("NVARCHAR");
+
+                    b.HasKey("settingId");
+
+                    b.ToTable("Settings");
                 });
 
             modelBuilder.Entity("CleanMe.Domain.Entities.Staff", b =>
@@ -727,13 +804,29 @@ namespace CleanMe.Infrastructure.Migrations
                         .HasMaxLength(450)
                         .HasColumnType("NVARCHAR");
 
-                    b.Property<string>("BankAccount")
+                    b.Property<string>("BankAccountCode")
                         .HasMaxLength(20)
-                        .HasColumnType("VARCHAR");
+                        .HasColumnType("varchar");
+
+                    b.Property<string>("BankAccountName")
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar");
+
+                    b.Property<string>("BankAccountNumber")
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar");
+
+                    b.Property<string>("BankAccountParticulars")
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar");
+
+                    b.Property<string>("BankAccountReference")
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
-                        .HasColumnType("VARCHAR");
+                        .HasColumnType("varchar");
 
                     b.Property<string>("FamilyName")
                         .IsRequired()
@@ -747,7 +840,7 @@ namespace CleanMe.Infrastructure.Migrations
 
                     b.Property<string>("IrdNumber")
                         .HasMaxLength(12)
-                        .HasColumnType("VARCHAR");
+                        .HasColumnType("varchar");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -757,22 +850,19 @@ namespace CleanMe.Infrastructure.Migrations
 
                     b.Property<string>("JobTitle")
                         .HasMaxLength(20)
-                        .HasColumnType("VARCHAR");
+                        .HasColumnType("varchar");
 
                     b.Property<string>("PayrollId")
                         .HasMaxLength(10)
-                        .HasColumnType("VARCHAR");
+                        .HasColumnType("varchar");
 
                     b.Property<string>("PhoneHome")
                         .HasMaxLength(30)
-                        .HasColumnType("VARCHAR");
+                        .HasColumnType("varchar");
 
                     b.Property<string>("PhoneMobile")
                         .HasMaxLength(30)
-                        .HasColumnType("VARCHAR");
-
-                    b.Property<int>("StaffNo")
-                        .HasColumnType("int");
+                        .HasColumnType("varchar");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -785,7 +875,7 @@ namespace CleanMe.Infrastructure.Migrations
                     b.Property<string>("WorkRole")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("VARCHAR");
+                        .HasColumnType("varchar");
 
                     b.HasKey("staffId");
 
@@ -794,51 +884,6 @@ namespace CleanMe.Infrastructure.Migrations
                         .HasFilter("[ApplicationUserId] IS NOT NULL");
 
                     b.ToTable("Staff");
-                });
-
-            modelBuilder.Entity("CleanMe.Domain.Entities.StockCode", b =>
-                {
-                    b.Property<int>("stockCodeId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("stockCodeId"));
-
-                    b.Property<DateTime>("AddedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("AddedById")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("NVARCHAR");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("VARCHAR");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("VARCHAR");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UpdatedById")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("NVARCHAR");
-
-                    b.HasKey("stockCodeId");
-
-                    b.ToTable("StockCodes");
                 });
 
             modelBuilder.Entity("CleanMe.Shared.Models.ApplicationUser", b =>
@@ -1111,23 +1156,23 @@ namespace CleanMe.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("CleanMe.Domain.Entities.AssetType", "AssetType")
-                        .WithMany("Assets")
-                        .HasForeignKey("assetTypeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("CleanMe.Domain.Entities.Client", "Client")
                         .WithMany("Assets")
                         .HasForeignKey("clientId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("CleanMe.Domain.Entities.ItemCode", "ItemCode")
+                        .WithMany("Assets")
+                        .HasForeignKey("itemCodeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("AssetLocation");
 
-                    b.Navigation("AssetType");
-
                     b.Navigation("Client");
+
+                    b.Navigation("ItemCode");
                 });
 
             modelBuilder.Entity("CleanMe.Domain.Entities.AssetLocation", b =>
@@ -1183,44 +1228,6 @@ namespace CleanMe.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Area");
-                });
-
-            modelBuilder.Entity("CleanMe.Domain.Entities.AssetType", b =>
-                {
-                    b.HasOne("CleanMe.Domain.Entities.StockCode", "StockCode")
-                        .WithMany("AssetTypes")
-                        .HasForeignKey("stockCodeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("StockCode");
-                });
-
-            modelBuilder.Entity("CleanMe.Domain.Entities.AssetTypeRate", b =>
-                {
-                    b.HasOne("CleanMe.Domain.Entities.AssetType", "AssetType")
-                        .WithMany("AssetTypeRates")
-                        .HasForeignKey("assetTypeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("CleanMe.Domain.Entities.CleanFrequency", "CleanFrequency")
-                        .WithMany("AssetTypeRates")
-                        .HasForeignKey("cleanFrequencyId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("CleanMe.Domain.Entities.Client", "Client")
-                        .WithMany("AssetTypeRates")
-                        .HasForeignKey("clientId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("AssetType");
-
-                    b.Navigation("CleanFrequency");
-
-                    b.Navigation("Client");
                 });
 
             modelBuilder.Entity("CleanMe.Domain.Entities.Client", b =>
@@ -1279,6 +1286,80 @@ namespace CleanMe.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Client");
+                });
+
+            modelBuilder.Entity("CleanMe.Domain.Entities.CompanyInfo", b =>
+                {
+                    b.OwnsOne("CleanMe.Domain.Common.Address", "Address", b1 =>
+                        {
+                            b1.Property<int>("companyInfoId")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("Line1")
+                                .IsRequired()
+                                .HasMaxLength(20)
+                                .HasColumnType("varchar(100)")
+                                .HasColumnName("Address_Line1");
+
+                            b1.Property<string>("Line2")
+                                .HasMaxLength(20)
+                                .HasColumnType("varchar(100)")
+                                .HasColumnName("Address_Line2");
+
+                            b1.Property<string>("Postcode")
+                                .IsRequired()
+                                .HasMaxLength(20)
+                                .HasColumnType("varchar(10)")
+                                .HasColumnName("Address_Postcode");
+
+                            b1.Property<string>("Suburb")
+                                .HasMaxLength(20)
+                                .HasColumnType("varchar(50)")
+                                .HasColumnName("Address_Suburb");
+
+                            b1.Property<string>("TownOrCity")
+                                .IsRequired()
+                                .HasMaxLength(20)
+                                .HasColumnType("varchar(100)")
+                                .HasColumnName("Address_TownOrCity");
+
+                            b1.HasKey("companyInfoId");
+
+                            b1.ToTable("CompanyInfo");
+
+                            b1.WithOwner()
+                                .HasForeignKey("companyInfoId");
+                        });
+
+                    b.Navigation("Address")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("CleanMe.Domain.Entities.ItemCodeRate", b =>
+                {
+                    b.HasOne("CleanMe.Domain.Entities.CleanFrequency", "CleanFrequency")
+                        .WithMany("AssetTypeRates")
+                        .HasForeignKey("cleanFrequencyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("CleanMe.Domain.Entities.Client", "Client")
+                        .WithMany("AssetTypeRates")
+                        .HasForeignKey("clientId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("CleanMe.Domain.Entities.ItemCode", "ItemCode")
+                        .WithMany("ItemCodeRates")
+                        .HasForeignKey("itemCodeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CleanFrequency");
+
+                    b.Navigation("Client");
+
+                    b.Navigation("ItemCode");
                 });
 
             modelBuilder.Entity("CleanMe.Domain.Entities.Staff", b =>
@@ -1407,13 +1488,6 @@ namespace CleanMe.Infrastructure.Migrations
                     b.Navigation("Assets");
                 });
 
-            modelBuilder.Entity("CleanMe.Domain.Entities.AssetType", b =>
-                {
-                    b.Navigation("AssetTypeRates");
-
-                    b.Navigation("Assets");
-                });
-
             modelBuilder.Entity("CleanMe.Domain.Entities.CleanFrequency", b =>
                 {
                     b.Navigation("Amendments");
@@ -1432,6 +1506,13 @@ namespace CleanMe.Infrastructure.Migrations
                     b.Navigation("ClientContacts");
                 });
 
+            modelBuilder.Entity("CleanMe.Domain.Entities.ItemCode", b =>
+                {
+                    b.Navigation("Assets");
+
+                    b.Navigation("ItemCodeRates");
+                });
+
             modelBuilder.Entity("CleanMe.Domain.Entities.Region", b =>
                 {
                     b.Navigation("Areas");
@@ -1440,11 +1521,6 @@ namespace CleanMe.Infrastructure.Migrations
             modelBuilder.Entity("CleanMe.Domain.Entities.Staff", b =>
                 {
                     b.Navigation("Amendments");
-                });
-
-            modelBuilder.Entity("CleanMe.Domain.Entities.StockCode", b =>
-                {
-                    b.Navigation("AssetTypes");
                 });
 #pragma warning restore 612, 618
         }

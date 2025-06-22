@@ -75,14 +75,38 @@ namespace CleanMe.Application.ViewModels
 
         [DisplayName("IRD number")]
         [StringLength(12, ErrorMessage = "IRD number must have between 11 and 12 digits")]
-        [MinLength(11, ErrorMessage = "IRD number must have between 11 and 12 letters")]
+        [MinLength(11, ErrorMessage = "IRD number must have between 11 and 12 digits")]
         public string? IrdNumber { get; set; } = string.Empty;
 
-        [DisplayName("Bank account")]
-        [Column(TypeName = "VARCHAR")]
-        [StringLength(20, ErrorMessage = "Bank account must have between 19 and 20 digits")]
-        [MinLength(19, ErrorMessage = "Bank account must have between 19 and 20 digits")]
-        public string? BankAccount { get; set; } = string.Empty;
+        [DisplayName("Bank account name")]
+        [Column(TypeName = "varchar")]
+        [StringLength(200, ErrorMessage = "Bank account must have between 3 and 200 letters")]
+        [MinLength(3, ErrorMessage = "Bank account must have between 3 and 200 letters")]
+        public string? BankAccountName { get; set; } = string.Empty;
+
+        [DisplayName("Bank account number")]
+        [Column(TypeName = "varchar")]
+        [StringLength(20, ErrorMessage = "Bank account number must have between 19 and 20 digits")]
+        [MinLength(19, ErrorMessage = "Bank account number must have between 19 and 20 digits")]
+        public string? BankAccountNumber { get; set; } = string.Empty;
+
+        [DisplayName("Bank account particulars")]
+        [Column(TypeName = "varchar")]
+        [StringLength(20, ErrorMessage = "Bank account particulars must have between 2 and 20 digits")]
+        [MinLength(2, ErrorMessage = "Bank account particulars must have between 2 and 20 digits")]
+        public string? BankAccountParticulars { get; set; } = string.Empty;
+
+        [DisplayName("Bank account code")]
+        [Column(TypeName = "varchar")]
+        [StringLength(20, ErrorMessage = "Bank account code must have between 2 and 20 digits")]
+        [MinLength(2, ErrorMessage = "Bank account code must have between 2 and 20 digits")]
+        public string? BankAccountCode { get; set; } = string.Empty;
+
+        [DisplayName("Bank account reference")]
+        [Column(TypeName = "varchar")]
+        [StringLength(20, ErrorMessage = "Bank account reference must have between 2 and 20 digits")]
+        [MinLength(19, ErrorMessage = "Bank account reference must have between 2 and 20 digits")]
+        public string? BankAccountReference { get; set; } = string.Empty;
 
         [DisplayName("Payroll number")]
         [StringLength(10)]
@@ -94,7 +118,7 @@ namespace CleanMe.Application.ViewModels
 
         [DisplayName("Work role")]
         [Required]
-        public WorkRole WorkRole { get; set; } // Admin, Contractor, Cleaner
+        public WorkRole WorkRole { get; set; } // Admin, Supplier, Employee, Client
 
         [Required]
         [DisplayName("Active")]

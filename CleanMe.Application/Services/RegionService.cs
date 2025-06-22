@@ -103,7 +103,7 @@ namespace CleanMe.Application.Services
                 IsActive = region.IsActive,
 
                 AreasList = region.Areas
-                    .OrderBy(a => a.SequenceOrder)
+                    .OrderBy(a => a.SortOrder)
                     .Select(a => new AreaIndexViewModel
                     {
                         areaId = a.areaId,

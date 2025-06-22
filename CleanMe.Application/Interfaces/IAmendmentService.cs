@@ -7,9 +7,9 @@ namespace CleanMe.Application.Interfaces
 {
     public interface IAmendmentService
     {
-        Task<IEnumerable<AmendmentViewModel>> FindDuplicateAmendmentAsync(int amendmentTypeId, int? excludeamendmentId);
+        Task<IEnumerable<AmendmentViewModel>> FindDuplicateAmendmentAsync(int amendmentTypeId, int assetId, int? excludeamendmentId);
 
-        Task<int?> GetAmendmentLastInvoicedByIdAsync(int amendmentId, int amendmentTypeId);
+        Task<int?> GetAmendmentLastInvoicedOnByIdAsync(int amendmentId, int amendmentTypeId);
         Task<AmendmentViewModel?> GetAmendmentViewModelByIdAsync(int amendmentId);
         Task<AmendmentViewModel?> GetAmendmentViewModelOnlyByIdAsync(int amendmentId);
         //Task<AmendmentViewModel> PrepareNewAmendmentViewModelAsync(int regionId);

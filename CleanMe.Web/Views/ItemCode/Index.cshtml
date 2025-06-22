@@ -1,0 +1,123 @@
+﻿@using CleanMe.Web.Helpers
+@model IEnumerable<CleanMe.Application.ViewModels.ItemCodeIndexViewModel>
+
+@{
+    ViewData["Title"] = "Item Code List";
+    string sortOrder = ViewBag.SortOrder as string ?? "ASC";
+    string sortColumn = ViewBag.SortColumn as string ?? "Code";
+}
+
+<h2>Item
+Code List</h2>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<!-- Add Button (Top-Right) -->
+<div class="text-end mb-3">
+    <a asp-action="AddEdit" class="btn btn-primary">Add Item Code</a>
+</div>
+
+<!-- Filtering Form -->
+<form method="get" id="filterForm">
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <!-- Column Headers with Sorting -->
+                <tr>
+                    <th>
+                        <a href="#" onclick="sortTable('Code')">
+                            Code @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "Code"))
+                        </a>
+                    </th>
+                    <th>
+                        <a href="#" onclick="sortTable('ItemName')">
+                            Item name @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "ItemName"))
+                        </a>
+                    </th>
+                    <th>
+                        <a href="#" onclick="sortTable('PurchasesUnitRate')">
+                            Purchases unit rate @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "PurchasesUnitRate"))
+                        </a>
+                    </th>
+                    <th>
+                        <a href="#" onclick="sortTable('PurchasesXeroAccount')">
+                            Purchases XERO account @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "PurchasesXeroAccount"))
+                        </a>
+                    </th>
+                    <th>
+                        <a href="#" onclick="sortTable('SalesUnitRate')">
+                            Sales unit rate @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "SalesUnitRate"))
+                        </a>
+                    </th>
+                    <th>
+                        <a href="#" onclick="sortTable('SalesXeroAccount')">
+                            Sales XERO account @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "SalesXeroAccount"))
+                        </a>
+                    </th>
+                    <th>
+                        <a href="#" onclick="sortTable('IsActive')">
+                            Active @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "IsActive"))
+                        </a>
+                    </th>
+                    <th>Actions</th>
+                </tr>
+
+                <!-- Filter Row -->
+                <tr>
+                    <td><input type="text" name="code" class="form-control" value="@ViewBag.Code" placeholder="Search item code"></td>
+                    <td><input type="text" name="itemName" class="form-control" value="@ViewBag.ItemName" placeholder="Search item name"></td>
+                    <td><input type="text" name="purchasesUnitRate" class="form-control" value="@ViewBag.PurchasesUnitRate" placeholder="Search purchases unit rate"></td>
+                    <td><input type="text" name="purchasesXeroAccount" class="form-control" value="@ViewBag.PurchasesXeroAccount" placeholder="Search purchases XERO account"></td>
+                    <td><input type="text" name="salesUnitRate" class="form-control" value="@ViewBag.SalesUnitRate" placeholder="Search sales unit rate"></td>
+                    <td><input type="text" name="salesXeroAccount" class="form-control" value="@ViewBag.SalesXeroAccount" placeholder="Search sales XERO account"></td>
+                    <td>
+                        <select name="isActive" class="form-control">
+                            <option value="">All</option>
+                            <option value="1" selected="@(ViewBag.IsActive == "1" ? "selected" : null)">Active</option>
+                            <option value="0" selected="@(ViewBag.IsActive == "0" ? "selected" : null)">Inactive</option>
+                        </select>
+                    </td>
+                    <td>
+                        <button type="submit" class="btn btn-success">Filter</button>
+                        <a href="@Url.Action("Index", "StockCode")" class="btn btn-secondary">Clear</a>
+                    </td>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var itemCode in Model)
+                {
+                    <tr>
+                        <td>@itemCode.Code</td>
+                        <td>@itemCode.ItemName</td>
+                        <td>@itemCode.ItemDescription</td>
+                        <td>@itemCode.PurchasesUnitRate</td>
+                        <td>@itemCode.PurchasesXeroAccount</td>
+                        <td>@itemCode.SalesUnitRate</td>
+                        <td>@itemCode.SalesXeroAccount</td>
+                        <td>@(itemCode.IsActive ? "Yes" : "No")</td>
+                        <td>
+                            <a asp-action="AddEdit" asp-route-itemCodeId="@itemCode.itemCodeId" class="btn btn-warning btn-sm">Edit</a>
+                            <a asp-action="Delete" asp-route-itemCodeId="@itemCode.itemCodeId" class="btn btn-danger btn-sm">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</form>
+
+<!-- JavaScript for Sorting -->
+@section Scripts {
+    <script src="~/js/shared/index-view-sort-table.js"></script>
+}
