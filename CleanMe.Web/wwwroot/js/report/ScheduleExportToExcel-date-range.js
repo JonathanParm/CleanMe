@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     toggleDateRangeInputs(); // initial load
 
-    debugger;
+    /*debugger;*/
     document.querySelector("form").addEventListener("submit", function () {
         console.log("📨 Form is about to submit");
 
