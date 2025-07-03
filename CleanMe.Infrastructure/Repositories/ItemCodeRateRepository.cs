@@ -20,7 +20,7 @@ namespace CleanMe.Infrastructure.Repositories
     {
         private readonly ApplicationDbContext _context;
 
-        public ItemCodeRateRepository( ApplicationDbContext context)
+        public ItemCodeRateRepository(ApplicationDbContext context)
         {
             _context = context;
         }
@@ -50,14 +50,30 @@ namespace CleanMe.Infrastructure.Repositories
 
         public async Task AddItemCodeRateAsync(ItemCodeRate ItemCodeRate)
         {
-            await _context.ItemCodeRates.AddAsync(ItemCodeRate);
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.ItemCodeRates.AddAsync(ItemCodeRate);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                // Log or debug ex.InnerException
+                throw new Exception("Add item code rate failed", ex);
+            }
         }
 
         public async Task UpdateItemCodeRateAsync(ItemCodeRate ItemCodeRate)
         {
-            _context.ItemCodeRates.Update(ItemCodeRate);
-            await _context.SaveChangesAsync();
+            try
+            {
+                _context.ItemCodeRates.Update(ItemCodeRate);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                // Log or debug ex.InnerException
+                throw new Exception("Update item code rate failed", ex);
+            }
         }
     }
 }

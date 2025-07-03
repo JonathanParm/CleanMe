@@ -1,0 +1,51 @@
+﻿@model CleanMe.Application.ViewModels.ExportClientScheduleToExcelViewModel
+
+<form asp-action="ExportClientScheduleToExcel" method="post">
+    <input type="hidden" asp-for="DateRangeType" id="DateRangeType" />
+  @*   <div class="form-group">
+        <label>Date Range</label>
+        <select id="dateRangeType" asp-for="DateRangeType" class="form-control">
+            <option value="Month">By Month</option>
+            <option value="Week">By Week</option>
+        </select>
+    </div> *@
+
+    <!-- Month selection -->
+    <div id="month-year-wrapper">
+        <div class="form-group">
+            <label>Year</label>
+            <select id="year" asp-for="Year" asp-items="Model.YearList" class="form-control"></select>
+        </div>
+        <div class="form-group">
+            <label>Month</label>
+            <select id="month" asp-for="Month" asp-items="Model.MonthList" class="form-control"></select>
+        </div>
+    </div>
+
+    <!-- Week selection -->
+    <div id="week-range-wrapper" style="display:none;">
+        <div class="form-group">
+            <label>From</label>
+            <input type="date" asp-for="DateFrom" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label>To</label>
+            <input type="date" asp-for="DateTo" class="form-control" />
+        </div>
+    </div>
+
+    <!-- Hidden DateFrom and DateTo for Month mode only -->
+    <input type="hidden" asp-for="DateFrom" id="DateFrom" />
+    <input type="hidden" asp-for="DateTo" id="DateTo" />
+
+    <div class="form-group">
+        <label>Client</label>
+        <select id="clientId" asp-for="ClientId" asp-items="Model.Clients" class="form-control"></select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Export</button>
+</form>
+
+@section Scripts {
+    <script src="~/js/report/exportScheduleToExcel-date-range.js"></script>
+}

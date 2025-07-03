@@ -40,14 +40,30 @@ namespace CleanMe.Infrastructure.Repositories
 
         public async Task AddClientAsync(Client Client)
         {
-            await _context.Clients.AddAsync(Client);
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.Clients.AddAsync(Client);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                // Log or debug ex.InnerException
+                throw new Exception("Add client failed", ex);
+            }
         }
 
         public async Task UpdateClientAsync(Client Client)
         {
-            _context.Clients.Update(Client);
-            await _context.SaveChangesAsync();
+            try
+            {
+                _context.Clients.Update(Client);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                // Log or debug ex.InnerException
+                throw new Exception("Update client failed", ex);
+            }
         }
     }
 }

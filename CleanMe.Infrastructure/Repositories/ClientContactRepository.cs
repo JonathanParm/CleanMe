@@ -34,14 +34,30 @@ namespace CleanMe.Infrastructure.Repositories
 
         public async Task AddClientContactAsync(ClientContact clientContact)
         {
+            try
+            {
             await _context.ClientContacts.AddAsync(clientContact);
             await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                // Log or debug ex.InnerException
+                throw new Exception("Add client contact failed", ex);
+            }
         }
 
         public async Task UpdateClientContactAsync(ClientContact clientContact)
         {
+            try
+            {
             _context.ClientContacts.Update(clientContact);
             await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                // Log or debug ex.InnerException
+                throw new Exception("Update client contact failed", ex);
+            }
         }
 
         public async Task<bool> IsEmailAvailableAsync(string email, int clientContactId)

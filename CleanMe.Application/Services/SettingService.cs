@@ -44,7 +44,10 @@ namespace CleanMe.Application.Services
             if (settings == null)
                 return null;
 
-            var setting = typeof(Settings).GetProperty(settingName);
+            var setting = typeof(Setting)
+                .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                .FirstOrDefault(p => string.Equals(p.Name, settingName, StringComparison.OrdinalIgnoreCase));
+
             if (setting == null)
                 return null;
 

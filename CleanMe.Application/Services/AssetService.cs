@@ -114,12 +114,17 @@ namespace CleanMe.Application.Services
             ass.assetLocationId,
             al.[Description] AS AssetLocation,
             al.areaId,
-            a.[Name] AS AreaName
-        FROM Assets AS ass
-        INNER JOIN Clients AS c ON ass.clientId = c.clientId
-        INNER JOIN AssetLocations AS al ON ass.assetLocationId = al.assetLocationId
-        INNER JOIN Areas AS a ON al.areaId = a.areaId
-        WHERE ass.assetId = @AssetId";
+            a.[Name] AS AreaName,
+			ass.itemCodeId,
+			ic.Code AS ItemName
+        FROM 
+			dbo.Assets AS ass
+            INNER JOIN dbo.Clients AS c ON ass.clientId = c.clientId
+            INNER JOIN dbo.AssetLocations AS al ON ass.assetLocationId = al.assetLocationId
+            INNER JOIN dbo.Areas AS a ON al.areaId = a.areaId
+			INNER JOIN dbo.ItemCodes AS ic ON ass.itemCodeId = ic.itemCodeId
+        WHERE 
+            ass.assetId = @AssetId";
 
             var parameters = new { AssetId = assetId };
 

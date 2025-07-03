@@ -10,6 +10,7 @@ using OfficeOpenXml.Style;
 using System.Data;
 using CleanMe.Application.DTOs;
 using System.Drawing;
+using Microsoft.AspNetCore.Http;
 
 
 namespace CleanMe.Application.Services
@@ -24,7 +25,7 @@ namespace CleanMe.Application.Services
         private readonly ILogger<ReportService> _logger;
 
         public ReportService(
-            ICompanyInfoService companyInfoService, 
+            ICompanyInfoService companyInfoService,
             ISettingService settingService,
             IAreaService areaService,
             IStaffService staffService,
@@ -39,437 +40,348 @@ namespace CleanMe.Application.Services
             _logger = logger;
         }
 
-        public async Task<string> GenerateScheduleExportToExcelAsync(ScheduleExportToExcelViewModel model)
+        public async Task<string> GenerateExportClientScheduleToExcelAsync(ExportClientScheduleToExcelViewModel model)
         {
-            // Adjust date range
-            var firstSunday = model.DateFrom.Value;
-            while (firstSunday.DayOfWeek != DayOfWeek.Sunday)
-                firstSunday = firstSunday.AddDays(1);
-
-            var lastSaturday = model.DateTo.Value;
-            while (lastSaturday.DayOfWeek != DayOfWeek.Saturday)
-                lastSaturday = lastSaturday.AddDays(1);
-
-            // Get output path
-            var exportRoot = await _settingService.GetSettingValueAsync("ExcelExportPath");
-            var folderName = $"{firstSunday:yyyy MMMM}";
-            var fullPath = Path.Combine(exportRoot, folderName);
-            Directory.CreateDirectory(fullPath);
-
-            var weekStart = firstSunday.ToDateTime(TimeOnly.MinValue);
-            var weekEnd = lastSaturday.ToDateTime(TimeOnly.MinValue);
-
-            var area = _areaService.GetAreaViewModelByIdAsync(model.AreaId ?? 0).GetAwaiter().GetResult().Name;
-
-            var baseName = model.DateRangeType == "Month"
-                ? $"Schedule_{firstSunday:yyyy_MM}_Area_Cleaner.xlsx"
-                : $"Schedule_{firstSunday:yyyy}_W{CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(weekStart, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Sunday):D2}_to_W{CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(weekEnd, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Sunday):D2}_Area_Cleaner.xlsx";
-
-            var fileName = Path.Combine(fullPath, baseName);
-            if (File.Exists(fileName))
+            _logger.LogInformation("Generate Export client schedule to Excel Async.");
+            try
             {
-                var suffix = DateTime.Now.ToString("yyyyMMdd_HHmm");
-                fileName = Path.Combine(fullPath, Path.GetFileNameWithoutExtension(baseName) + $"_{suffix}.xlsx");
-            }
 
-            // Fetch data from stored procedure
-            var parameters = new
-            {
-                model.CleanerId,
-                model.ClientId,
-                model.RegionId,
-                model.AreaId,
-                model.AssetLocationId,
-                model.AssetId,
-                DateFrom = firstSunday,
-                DateTo = lastSaturday
-            };
+                // Adjust DateFrom to first Sunday of month, and DateTo to following Saturday last day of month if needed
+                var firstSunday = DateTime.Parse(model.DateFrom.ToString());
+                while (firstSunday.DayOfWeek != DayOfWeek.Sunday)
+                    firstSunday = firstSunday.AddDays(1);
 
-            // Use Dapper to execute the stored procedure and get the data
-            var data = await _unitOfWork.DapperRepository.QueryAsync<ScheduleReportRowDto>(
-                "ScheduledCleaning",
-                parameters,
+                var lastSaturday = DateTime.Parse(model.DateTo.ToString());
+                while (lastSaturday.DayOfWeek != DayOfWeek.Saturday)
+                    lastSaturday = lastSaturday.AddDays(1);
+
+                model.DateFrom = firstSunday;
+                model.DateTo = lastSaturday;
+
+                var companyInfo = await _companyInfoService.GetCompanyInfoViewModelAsync();
+                var clientSchedules = await _unitOfWork.DapperRepository.QueryAsync<ExportClientScheduleToExcelDto>(
+                "ExportClientScheduleToExcel",
+                new
+                {
+                    model.DateFrom,
+                    model.DateTo,
+                    ClientId = model.ClientId ?? 0,
+                },
                 commandType: CommandType.StoredProcedure);
 
-            // Group data by Cleaner
-            var grouped = data.GroupBy(x => x.CleanerName).ToList();
-            var company = await _companyInfoService.GetCompanyInfoViewModelAsync();
+                var outputPath = await _settingService.GetSettingValueAsync("ExcelExportPath");
+                if (string.IsNullOrWhiteSpace(outputPath))
+                    throw new Exception("Excel export path is not configured.");
 
-            using var package = new ExcelPackage();
-            foreach (var group in grouped)
-            {
-                var ws = package.Workbook.Worksheets.Add(group.Key);
+                var totalDays = (lastSaturday - firstSunday).Days;
+                var sundays = Enumerable.Range(0, totalDays + 1)
+                    .Select(d => firstSunday.AddDays(d))
+                    .Where(d => d.DayOfWeek == DayOfWeek.Sunday)
+                    .Select(d => DateOnly.FromDateTime(d))
+                    .ToList();
 
-                // Header
-                ws.Cells["A1:E2"].Merge = true;
-                ws.Cells["A1"].Value = company.Name + Environment.NewLine + company.Phone + Environment.NewLine + company.Email;
-                //ws.Cells["A1"].Style.Border.BorderAround(ExcelBorderStyle.Thin);
-                //ws.Cells["A1"].Style.WrapText = true;
+                var groupedByClient = clientSchedules
+                        .GroupBy(x => new { x.clientId, x.ClientName })
+                        .OrderBy(g => g.Key.ClientName)
+                        .ThenBy(g => g.Key.clientId);
 
-                ws.Cells["F1:H2"].Merge = true;
-                ws.Cells["F1"].Value = company.Address.ToMultiLine();
-                //ws.Cells["F1"].Style.Border.BorderAround(ExcelBorderStyle.Thin);
-                //ws.Cells["F1"].Style.WrapText = true;
-
-                ws.Cells["B1:D2"].Merge = true;
-                ws.Cells["B1"].Value = group.First().CleanerAddress;
-                ws.Cells["B1"].Style.Border.BorderAround(ExcelBorderStyle.Thin);
-                ws.Cells["B1"].Style.WrapText = true;
-
-                ws.Cells["G1:I2"].Merge = true;
-                ws.Cells["G1"].Value = $"Schedule for {firstSunday:MMMM yyyy}";
-
-                // Generate all Sundays between DateFrom and DateTo (inclusive)
-                List<DateTime> sundays = GetSundaysBetween(firstSunday, lastSaturday);
-
-                // Create dynamic headers
-                var headers = new List<string> { "Location", "MD ID", "Bank", "Freq" };
-                headers.AddRange(sundays.Select(d => d.ToString("dd MMM")));
-
-                int rowStart = 6;
-                for (int i = 0; i < headers.Count; i++)
-                    ws.Cells[rowStart, i + 1].Value = headers[i];
-
-                // Data
-                int row = rowStart + 1;
-                foreach (var item in group)
+                foreach (var clientGroup in groupedByClient)
                 {
-                    int col = 1;
-                    ws.Cells[row, col++].Value = item.Date;
-                    ws.Cells[row, col++].Value = item.Location;
-                    ws.Cells[row, col++].Value = item.MdId;
-                    ws.Cells[row, col++].Value = item.Frequency;
+                    var clientName = clientGroup.Key.ClientName;
+                    var monthFolderName = model.DateFrom.ToString();
+                    var parsedDate = DateTime.Parse(monthFolderName);
+                    var folder = Path.Combine(outputPath, parsedDate.ToString("yyyy MM"));
+                    Directory.CreateDirectory(folder);
 
-                    // Dynamically insert one value per Sunday (max 5)
-                    for (int i = 0; i < sundays.Count && i < 5; i++)
+                    var baseFileName = $"Schedule {model.DateFrom:yyyy_MM} {clientName}.xlsx";
+                    var fullPath = Path.Combine(folder, baseFileName);
+                    if (File.Exists(fullPath))
                     {
-                        var value = i switch
-                        {
-                            0 => item.Week1,
-                            1 => item.Week2,
-                            2 => item.Week3,
-                            3 => item.Week4,
-                            4 => item.Week5,
-                            _ => ""
-                        };
-
-                        ws.Cells[row, col++].Value = value;
+                        var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmm");
+                        baseFileName = $"Schedule {model.DateFrom:yyyy-MM} {clientName} {timestamp}.xlsx";
+                        fullPath = Path.Combine(folder, baseFileName);
                     }
 
+                    using var package = new ExcelPackage();
+                    var ws = package.Workbook.Worksheets.Add("Schedule");
+
+                    int row = 1;
+
+                    // Company info: Name, phone, email (left), Address (right)
+                    ws.Cells[row, 1, row, 4].Merge = true;
+                    ws.Cells[row, 1].Value = $"{companyInfo.Name}\nPhone: {companyInfo.Phone}\nEmail: {companyInfo.Email}";
+
+                    ws.Cells[row, 6, row, 8].Merge = true;
+                    ws.Cells[row, 6].Value = companyInfo.Address;
+
+                    row += 4;
+
+                    // Client block left
+                    ws.Cells[row, 1, row + 2, 4].Merge = true;
+                    ws.Cells[row, 1].Value = clientGroup.First().ClientAddress;
+                    ws.Cells[row, 1].Style.Border.BorderAround(ExcelBorderStyle.Thin);
+
+                    // Schedule title right
+                    ws.Cells[row + 1, 6].Value = $"Schedule for {model.DateFrom:MMMM yyyy}";
+                    ws.Cells[row + 1, 6].Style.Font.Bold = true;
+
+                    row += 4;
+
+                    int headerRow = 4;
+                    int sundayRow = headerRow - 1;
+
+                    // Fixed headers
+                    var fixedHeaders = new List<string> { "Freq", "Wk1", "Wk2", "Wk3", "Wk4", "Wk5", "Type", "Client Ref.", "MD ID", "Region", "Area", "Location" };
+
+                    // Sunday headers (only go above Wk1–Wk5, which are the last 5 columns)
+                    var sundayHeaders = sundays.Select(d => d.ToString("d MMM")).ToList();
+
+                    // Write Sunday row (row 3) starting at column 5 (above Wk1–Wk5)
+                    for (int i = 0; i < sundayHeaders.Count; i++)
+                    {
+                        ws.Cells[sundayRow, i + 2].Value = sundayHeaders[i];
+                        ws.Cells[sundayRow, i + 2].Style.Font.Bold = true;
+                    }
+
+                    // Write Column Labels row (row 4)
+                    //var allHeaders = new List<string>(fixedHeaders) { "Wk1", "Wk2", "Wk3", "Wk4", "Wk5" };
+                    //for (int col = 0; col < allHeaders.Count; col++)
+                    //{
+                    //    ws.Cells[headerRow, col + 1].Value = allHeaders[col];
+                    //    ws.Cells[headerRow, col + 1].Style.Font.Bold = true;
+                    //}
+
+                    for (int col = 0; col < fixedHeaders.Count; col++)
+                    {
+                        ws.Cells[headerRow, col + 1].Value = fixedHeaders[col];
+                        ws.Cells[headerRow, col + 1].Style.Font.Bold = true;
+                    }
+
+
+                    //// Freeze panes below headers
+                    //ws.View.FreezePanes(headerRow + 1, 1);
+
+                    // Repeat column labels when printing
+                    ws.PrinterSettings.RepeatRows = ws.Cells[$"{headerRow}:{headerRow}"];
+
                     row++;
+
+                    var groupedByArea = clientGroup.GroupBy(x => x.AreaName);
+                    foreach (var areaGroup in groupedByArea)
+                    {
+                        ws.Cells[row, 1].Value = areaGroup.Key;
+                        ws.Cells[row, 1].Style.Font.Bold = true;
+                        row++;
+
+                        foreach (var item in areaGroup)
+                        {
+                            ws.Cells[row, 1].Value = item.CleanFrequency;
+
+                            var weekValues = new[] { item.Wk1, item.Wk2, item.Wk3, item.Wk4, item.Wk5 };
+                            for (int i = 0; i < sundays.Count; i++)
+                            {
+                                ws.Cells[row, 2 + i].Value = weekValues[i];
+                            }
+
+                            ws.Cells[row, 1].Value = item.ItemCode;
+                            ws.Cells[row, 2].Value = item.ClientReference;
+                            ws.Cells[row, 3].Value = item.MdId;
+                            ws.Cells[row, 4].Value = item.RegionName;
+                            ws.Cells[row, 5].Value = item.AreaName;
+                            ws.Cells[row, 6].Value = item.AssetLocation;
+
+                            row++;
+                        }
+                        row++; // Blank row between areas
+                    }
+
+                    ws.Cells[1, 1, row, fixedHeaders.Count].AutoFitColumns();
+
+                    // Conditional formatting on cleaning frequency
+                    var freqRange = ws.Cells[1, 4, row, 4];
+
+                    var red = freqRange.ConditionalFormatting.AddEqual();
+                    red.Formula = "\"M\"";
+                    red.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    red.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.Red);
+
+                    var green = freqRange.ConditionalFormatting.AddEqual();
+                    green.Formula = "\"Q\"";
+                    green.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    green.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.Green);
+
+                    await package.SaveAsAsync(new FileInfo(fullPath));
+
+                    return fullPath;
                 }
 
-                // Conditional formatting on Frequency (column 4)
-                var range = ws.Cells[$"D{rowStart + 1}:D{row - 1}"];
-                var red = ws.ConditionalFormatting.AddEqual(range);
-                red.Formula = "\"W\"";
-                red.Style.Fill.BackgroundColor.SetColor(Color.Red);
-
-                var green = ws.ConditionalFormatting.AddEqual(range);
-                green.Formula = "\"Q\"";
-                green.Style.Fill.BackgroundColor.SetColor(Color.LightGreen);
-
-                ws.Cells[ws.Dimension.Address].AutoFitColumns();
-                ws.PrinterSettings.RepeatRows = new ExcelAddress($"${rowStart}:${rowStart}");
+                return string.Empty;
             }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error generating 'Generate Export client schedule to Excel Async Async.");
 
-            package.SaveAs(new FileInfo(fileName));
-            return fileName;
+                throw new ApplicationException("Error generating 'Generate Export client schedule to Excel Async", ex);
+            }
         }
 
-        private List<DateTime> GetSundaysBetween(DateOnly from, DateOnly to)
+        public async Task<string> GenerateExportStaffScheduleToExcelAsync(ExportStaffScheduleToExcelViewModel model)
         {
-            var sundays = new List<DateTime>();
-            var date = from.ToDateTime(TimeOnly.MinValue);
-            var end = to.ToDateTime(TimeOnly.MinValue);
-
-            while (date <= end)
+            _logger.LogInformation("Generate Export staff schedule to Excel Async.");
+            try
             {
-                if (date.DayOfWeek == DayOfWeek.Sunday)
-                    sundays.Add(date);
 
-                date = date.AddDays(1);
+                // Adjust DateFrom to first Sunday of month, and DateTo to following Saturday last day of month if needed
+                var firstSunday = DateTime.Parse(model.DateFrom.ToString());
+                while (firstSunday.DayOfWeek != DayOfWeek.Sunday)
+                    firstSunday = firstSunday.AddDays(1);
+
+                var lastSaturday = DateTime.Parse(model.DateTo.ToString());
+                while (lastSaturday.DayOfWeek != DayOfWeek.Saturday)
+                    lastSaturday = lastSaturday.AddDays(1);
+
+                model.DateFrom = firstSunday;
+                model.DateTo = lastSaturday;
+
+                var companyInfo = await _companyInfoService.GetCompanyInfoViewModelAsync();
+                var cleanerSchedules = await _unitOfWork.DapperRepository.QueryAsync<ExportStaffScheduleToExcelDto>(
+                "ExportStaffScheduleToExcel",
+                new
+                {
+                    model.DateFrom,
+                    model.DateTo,
+                    StaffId = model.StaffId ?? 0,
+                    ClientId = model.ClientId ?? 0,
+                    RegionId = model.RegionId ?? 0,
+                    AreaId = model.AreaId ?? 0,
+                    AssetLocationId = model.AssetLocationId ?? 0,
+                    AssetId = model.AssetId ?? 0
+                },
+                commandType: CommandType.StoredProcedure);
+
+                var outputPath = await _settingService.GetSettingValueAsync("ExcelExportPath");
+                if (string.IsNullOrWhiteSpace(outputPath))
+                    throw new Exception("Excel export path is not configured.");
+
+                var totalDays = (lastSaturday - firstSunday).Days;
+                var sundays = Enumerable.Range(0, totalDays + 1)
+                    .Select(d => firstSunday.AddDays(d))
+                    .Where(d => d.DayOfWeek == DayOfWeek.Sunday)
+                    .Select(d => DateOnly.FromDateTime(d))
+                    .ToList();
+
+                var groupedByCleaner = cleanerSchedules
+                        .GroupBy(x => new { x.staffId, x.CleanerName })
+                        .OrderBy(g => g.Key.CleanerName)
+                        .ThenBy(g => g.Key.staffId);
+
+                foreach (var cleanerGroup in groupedByCleaner)
+                {
+                    var cleanerName = cleanerGroup.Key;
+                    var monthFolderName = model.DateFrom.ToString();
+                    var parsedDate = DateTime.Parse(monthFolderName);
+                    var folder = Path.Combine(outputPath, parsedDate.ToString("yyyy MM"));
+                    Directory.CreateDirectory(folder);
+
+                    var baseFileName = $"Schedule {model.DateFrom:yyyy_MM} {cleanerName}.xlsx";
+                    var fullPath = Path.Combine(folder, baseFileName);
+                    if (File.Exists(fullPath))
+                    {
+                        var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmm");
+                        baseFileName = $"Schedule {model.DateFrom:yyyy_MM} {cleanerName} {timestamp}.xlsx";
+                        fullPath = Path.Combine(folder, baseFileName);
+                    }
+
+                    using var package = new ExcelPackage();
+                    var ws = package.Workbook.Worksheets.Add("Schedule");
+
+                    int row = 1;
+
+                    // Company info: Name, phone, email (left), Address (right)
+                    ws.Cells[row, 1, row, 4].Merge = true;
+                    ws.Cells[row, 1].Value = $"{companyInfo.Name}\nPhone: {companyInfo.Phone}\nEmail: {companyInfo.Email}";
+
+                    ws.Cells[row, 6, row, 8].Merge = true;
+                    ws.Cells[row, 6].Value = companyInfo.Address;
+
+                    row += 4;
+
+                    // Cleaner block left
+                    ws.Cells[row, 1, row + 2, 4].Merge = true;
+                    ws.Cells[row, 1].Value = cleanerGroup.First().CleanerAddress;
+                    ws.Cells[row, 1].Style.Border.BorderAround(ExcelBorderStyle.Thin);
+
+                    // Schedule title right
+                    ws.Cells[row + 1, 6].Value = $"Schedule for {model.DateFrom:MMMM yyyy}";
+                    ws.Cells[row + 1, 6].Style.Font.Bold = true;
+
+                    row += 4;
+
+                    var headers = new List<string> { "Location", "MD ID", "Bank", "Freq" };
+                    headers.AddRange(sundays.Select(d => d.ToString("d MMM")));
+
+                    // Column headers
+                    for (int col = 0; col < headers.Count; col++)
+                    {
+                        ws.Cells[row, col + 1].Value = headers[col];
+                        ws.Cells[row, col + 1].Style.Font.Bold = true;
+                    }
+                    ws.PrinterSettings.RepeatRows = ws.Cells[$"{row}:{row}"];
+
+                    row++;
+
+                    var groupedByArea = cleanerGroup.GroupBy(x => x.AreaName);
+                    foreach (var areaGroup in groupedByArea)
+                    {
+                        ws.Cells[row, 1].Value = areaGroup.Key;
+                        ws.Cells[row, 1].Style.Font.Bold = true;
+                        row++;
+
+                        foreach (var item in areaGroup)
+                        {
+                            ws.Cells[row, 1].Value = item.AssetLocation;
+                            ws.Cells[row, 2].Value = item.MdId;
+                            ws.Cells[row, 3].Value = item.BankName;
+                            ws.Cells[row, 4].Value = item.CleanFrequency;
+
+                            var weekValues = new[] { item.Week1, item.Week2, item.Week3, item.Week4, item.Week5 };
+                            for (int i = 0; i < sundays.Count; i++)
+                            {
+                                ws.Cells[row, 5 + i].Value = weekValues[i];
+                            }
+                            row++;
+                        }
+                        row++; // Blank row between areas
+                    }
+
+                    ws.Cells[1, 1, row, headers.Count].AutoFitColumns();
+
+                    // Conditional formatting on cleaning frequency
+                    var freqRange = ws.Cells[1, 4, row, 4];
+
+                    var red = freqRange.ConditionalFormatting.AddEqual();
+                    red.Formula = "\"M\"";
+                    red.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    red.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.Red);
+
+                    var green = freqRange.ConditionalFormatting.AddEqual();
+                    green.Formula = "\"Q\"";
+                    green.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    green.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.Green);
+
+                    await package.SaveAsAsync(new FileInfo(fullPath));
+
+                    return fullPath;
+                }
+
+                return string.Empty;
             }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error generating 'Generate Export staff schedule to Excel Async.");
 
-            return sundays;
+                throw new ApplicationException("Error generating 'Generate Export staff schedule to Excel Async", ex);
+            }
         }
     }
 }
-
-
-//using CleanMe.Application.Helpers.Interfaces;
-//using CleanMe.Application.Services.Interface;
-//using Microsoft.AspNetCore.Mvc;
-//using Syncfusion.XlsIO;
-//using System;
-//using System.Data;
-//using System.IO;
-//using Microsoft.Extensions.Logging;
-//using CleanMe.Application.Services.Models;
-//using CleanMe.Application.Helpers.Utilities;
-//using System.Globalization;
-
-//namespace CleanMe.Application.Services
-//{
-//    public class ReportService : IReportService
-//    {
-//        private readonly IUnitOfWork _unitOfWork;
-//        private readonly ILogger<IReportsService> _logger;
-//        private readonly Dictionary<int, char> _numberToColumn;
-
-//        public ReportService(IUnitOfWork unitOfWork, ILogger<IReportsService> logger)
-//        {
-//            this._unitOfWork = unitOfWork;
-//            this._logger = logger;
-//            _numberToColumn = new Dictionary<int, char>()
-//                        {
-//                            { 1, 'A' },
-//                            { 2, 'B' },
-//                            { 3, 'C' },
-//                            { 4, 'D' },
-//                            { 5, 'E' },
-//                            { 6, 'F' },
-//                            { 7, 'G' },
-//                            { 8, 'H' },
-//                            { 9, 'I' },
-//                            { 10, 'J' },
-//                            { 11, 'K' },
-//                            { 12, 'L' },
-//                            { 13, 'M' },
-//                            { 14, 'N' },
-//                            { 15, 'O' },
-//                            { 16, 'P' },
-//                            { 17, 'Q' },
-//                            { 18, 'R' },
-//                            { 19, 'S' },
-//                            { 20, 'T' },
-//                            { 21, 'U' },
-//                            { 22, 'V' },
-//                            { 23, 'W' },
-//                            { 24, 'X' },
-//                            { 25, 'Y' },
-//                            { 26, 'Z' }
-//                        };
-//        }
-
-//        //public byte[] ExportScheduleToExcel(int StaffId, int Year, int Month)
-//        public IEnumerable<string> ExportScheduleToExcel(ExportScheduleToExcelModel exportModel)
-//        {
-//            List<string> result = new List<string>();
-
-//            try
-//            {
-//                Dictionary<string, string> parameters = new Dictionary<string, string>();
-//                parameters.Add("staffId", exportModel.StaffId.ToString());
-//                parameters.Add("year", exportModel.Year.ToString());
-//                parameters.Add("month", exportModel.Month.ToString());
-//                parameters.Add("areaId", "0");
-
-//                // todo
-//                // dbo.GetStaffAreas
-//                // for each staffArea product report, named staff area.
-
-//                DataTable reportHeader = _unitOfWork.SqlRepository.GetDataTableFromSql("dbo.GetStaffAreas", parameters);
-//                foreach (DataRow row in reportHeader.Rows)
-//                {
-//                    int staffId = Convert.ToInt32(row["staffId"]);
-//                    string staffName = row["StaffName"].ToString();
-//                    string staffAddress = row["StaffAddress"].ToString();
-//                    int areaId = Convert.ToInt32(row["areaId"]);
-//                    string areaCode = row["AreaCode"].ToString();
-//                    string areaName = row["AreaName"].ToString();
-
-//                    staffName = FormatText.ToProperCase(staffName, " ");
-
-//                    parameters["areaId"] = areaId.ToString();
-//                    // update staff id with current row staff id
-//                    parameters["staffId"] = staffId.ToString();
-
-//                    // Produce Excel workbook for each staff for each area
-//                    DataTable reportData = _unitOfWork.SqlRepository.GetDataTableFromSql("dbo.CleaningScheduleForMonth", parameters);
-//                    var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "content", "Schedule.xltx");
-//                    var fileName = string.Format("Schedule_{0}_{1}_{2}_{3}.xlsx", exportModel.Year.ToString(), exportModel.Month.ToString(), staffName, areaName.Replace(@"/", "-"));
-
-//                    string folderName = string.Format("{0} {1}", exportModel.Year.ToString(), CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(exportModel.Month));
-//                    folderName = Path.Combine(Directory.GetCurrentDirectory(), "C:", "_tmp", folderName);
-//                    if (!Directory.Exists(folderName))
-//                    {
-//                        Directory.CreateDirectory(folderName);
-//                    }
-
-//                    string filePath = Path.Combine(Directory.GetCurrentDirectory(), folderName, fileName);
-
-//                    if (File.Exists(filePath))
-//                    {
-//                        File.Delete(filePath);
-//                    }
-
-//                    using (ExcelEngine excelEngine = new ExcelEngine())
-//                    {
-//                        IApplication application = excelEngine.Excel;
-//                        IWorkbook workbook = application.Workbooks.Create(1);
-//                        IWorksheet worksheet = workbook.Worksheets[0];
-
-//                        // Add header
-//                        IRange cellCompany = worksheet.Range["A1"];
-//                        cellCompany.Text = exportModel.CompanyAndContactDetails;
-//                        cellCompany.WrapText = true;
-//                        cellCompany.AutofitRows();
-//                        cellCompany.AutofitColumns();
-
-//                        IRange cellAddress = worksheet.Range["G1"];
-//                        cellAddress.Text = exportModel.Address;
-//                        cellAddress.WrapText = true;
-//                        cellAddress.AutofitRows();
-//                        cellAddress.AutofitColumns();
-
-//                        // Add data
-//                        int firstDataRow = 3;
-//                        worksheet.ImportDataTable(reportData, true, firstDataRow, 1);
-
-//                        if (reportData.Rows.Count == 0)
-//                        {
-//                            string messageCellAddress = string.Format("A{0}", (firstDataRow + 2).ToString());
-//                            worksheet.Range[messageCellAddress].Value = "No scheduled cleaning";
-//                        }
-
-//                        int lastRow = worksheet.UsedRange.LastRow;
-//                        int lastCol = worksheet.UsedRange.LastColumn;
-//                        _numberToColumn.TryGetValue(lastCol, out char lastColumn);
-
-//                        string cellRangeAddress = string.Format("A1:{0}{1}", lastColumn, lastRow.ToString());
-//                        worksheet.Range[cellRangeAddress].AutofitColumns();
-
-//                        // Set footer with client code, area name, and page numbers
-//                        IPageSetup pageSetup = worksheet.PageSetup;
-//                        //pageSetup.LeftFooter = $"Client Code: {clientCode}\nArea: {areaName}";
-//                        pageSetup.CenterFooter = $"Client Code: {areaCode}\nArea: {areaName}";
-//                        pageSetup.RightFooter = "Page &P of &N";
-
-//                        // Format columns
-//                        int column = exportModel.StaffId == 0 ? 2 : 1;
-//                        ApplyConditionalFormatting(worksheet, column, firstDataRow);
-
-//                        // Save the Excel file to a memory stream
-//                        using (FileStream fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
-//                        {
-//                            workbook.SaveAs(fileStream);
-//                        }
-
-//                        result.Add(filePath);
-//                    }
-
-
-
-//                    // Save the Excel file to a memory stream and then write to file
-//                    //using (MemoryStream memoryStream = new MemoryStream())
-//                    //{
-//                    //    workbook.SaveAs(memoryStream);
-//                    //    memoryStream.Position = 0; // Reset the position to the beginning of the stream
-
-//                    //    using (FileStream fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
-//                    //    {
-//                    //        memoryStream.CopyTo(fileStream);
-//                    //    }
-//                    //    //return memoryStream.ToArray();
-//                    //    MemoryStream stream = new MemoryStream();
-//                    //}
-
-//                    //// Save the Excel file to a memory stream
-//                    //using (FileStream fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
-//                    //{
-//                    //    workbook.SaveAs(fileStream);
-//                    //}
-
-//                    ////Save the Excel file to a memory stream
-//                    //using (MemoryStream stream = new MemoryStream())
-//                    //{
-//                    //    workbook.SaveAs(stream);
-//                    //    return stream.ToArray();
-//                    //}
-//                }
-//                return result;
-//            }
-//            catch (Exception ex)
-//            {
-//                // Log the exception (you can use a logging framework here)
-//                _logger.LogError(ex, "Error generating Excel file");
-//                throw new InvalidOperationException("Error generating Excel file", ex);
-//            }
-
-//            return result;
-//        }
-
-//        public IEnumerable<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> GetMonthSelectListItems()
-//        {
-//            var months = new List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>
-//                    {
-//                        new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem { Text = "January", Value = "1" },
-//                        new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem { Text = "February", Value = "2" },
-//                        new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem { Text = "March", Value = "3" },
-//                        new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem { Text = "April", Value = "4" },
-//                        new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem { Text = "May", Value = "5" },
-//                        new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem { Text = "June", Value = "6" },
-//                        new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem { Text = "July", Value = "7" },
-//                        new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem { Text = "August", Value = "8" },
-//                        new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem { Text = "September", Value = "9" },
-//                        new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem { Text = "October", Value = "10" },
-//                        new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem { Text = "November", Value = "11" },
-//                        new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem { Text = "December", Value = "12" }
-//                    };
-
-//            int currentMonth = DateTime.Now.Month;
-//            int nextMonth = currentMonth == 12 ? 1 : currentMonth + 1; // Wrap around to January if the current month is December
-
-//            months.ForEach(m => m.Selected = (m.Value == nextMonth.ToString()));
-//            return months;
-//        }
-
-//        public IEnumerable<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> GetYearSelectListItems()
-//        {
-//            var currentYear = DateTime.Now.Year;
-
-//            var years = new List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>
-//                    {
-//                        new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem { Text = (currentYear - 1).ToString(), Value = (currentYear - 1).ToString() },
-//                        new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem { Text = currentYear.ToString(), Value = currentYear.ToString() },
-//                        new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem { Text = (currentYear + 1).ToString(), Value = (currentYear + 1).ToString() }
-//                    };
-
-//            int currentMonth = DateTime.Now.Month;
-//            int defaultYear = currentMonth == 12 ? currentYear + 1 : currentYear;
-
-//            years.ForEach(y => y.Selected = (y.Value == defaultYear.ToString()));
-
-//            return years;
-//        }
-
-//        private void ApplyConditionalFormatting(IWorksheet worksheet, int column, int firstDataRow)
-//        {
-//            _numberToColumn.TryGetValue(column, out char cellColumn);
-
-//            int firstRow = firstDataRow + 1;
-//            int lastRow = worksheet.UsedRange.LastRow;
-//            // Format column 'MD ID' as text from row 2 to the last row
-//            string cellRangeAddress = string.Format("{0}{1}:{0}{2}", cellColumn, firstRow.ToString(), lastRow);
-//            worksheet.Range[cellRangeAddress].NumberFormat = "@";
-
-//            // Apply conditional formatting to column C from row 2 to the last row
-//            column = column + 2;
-//            _numberToColumn.TryGetValue(column, out cellColumn);
-//            cellRangeAddress = string.Format("{0}{1}:{0}{2 }", cellColumn, firstRow.ToString(), lastRow);
-//            IConditionalFormats conditionalFormats = worksheet.Range[cellRangeAddress].ConditionalFormats;
-//            IConditionalFormat condition1 = conditionalFormats.AddCondition();
-//            condition1.FormatType = ExcelCFType.CellValue;
-//            condition1.Operator = ExcelComparisonOperator.Equal;
-//            condition1.FirstFormula = "\"M\"";
-//            condition1.BackColorRGB = Syncfusion.Drawing.Color.Red;
-
-//            IConditionalFormat condition2 = conditionalFormats.AddCondition();
-//            condition2.FormatType = ExcelCFType.CellValue;
-//            condition2.Operator = ExcelComparisonOperator.Equal;
-//            condition2.FirstFormula = "\"Q\"";
-//            condition2.BackColorRGB = Syncfusion.Drawing.Color.Green;
-//        }
-//    }
-//}

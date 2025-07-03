@@ -223,7 +223,7 @@ namespace CleanMe.Web.Controllers
             {
                 model.Clients = await _lookupService.GetClientSelectListAsync();
                 model.AssetLocations = await _lookupService.GetAssetLocationSelectListAsync(new AssetLocationLookupFilter());
-                model.ItemCodes = await _lookupService.GetItemCodeSelectListAsync();
+                model.ItemCodes = await _lookupService.GetItemCodeSelectListAsync(new ItemCodeLookupFilter());
             }
             else
             {
@@ -240,7 +240,7 @@ namespace CleanMe.Web.Controllers
                 model.ItemCodes = new[]
                 {
                     new SelectListItem { Value = "", Text = "-- Select item code --" }
-                }.Concat(await _lookupService.GetItemCodeSelectListAsync());
+                }.Concat(await _lookupService.GetItemCodeSelectListAsync(new ItemCodeLookupFilter()));
             }
         }
 

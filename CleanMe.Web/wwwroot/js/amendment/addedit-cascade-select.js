@@ -5,9 +5,11 @@
         var clientId = $('#clientId').val();
         var areaId = $('#areaId').val();
         var locationId = $('#assetLocationId').val();
+        var itemCodeId = $('#itemCodeId').val();
 
         $('#areaId').empty();
         $('#assetLocationId').empty();
+        $('#itemCodeId').empty();
         $('#assetId').empty();
 
         if (clientId) {
@@ -29,7 +31,14 @@
                 });
             });
 
-            $.getJSON(`/Amendment/GetAssets?clientId=${clientId}&areaId=${areaId}&assetLocationId=${locationId}`, function (data) {
+            $.getJSON(`/Amendment/GetItemCodes?clientId=${clientId}`, function (data) {
+                $('#itemCodeId').append($('<option>').text('-- Select item code --').attr('value', ''));
+                $.each(data, function (i, item) {
+                    $('#itemCodeId').append($('<option>').text(item.text).attr('value', item.value));
+                });
+            });
+
+            $.getJSON(`/Amendment/GetAssets?clientId=${clientId}&areaId=${areaId}&assetLocationId=${locationId}&itemCodeId=${itemCodeId}`, function (data) {
                 $('#assetId').append($('<option>').text('-- Select asset --').attr('value', ''));
                 $.each(data, function (i, item) {
                     $('#assetId').append($('<option>').text(item.text).attr('value', item.value));

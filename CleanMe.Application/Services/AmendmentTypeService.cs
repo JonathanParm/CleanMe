@@ -81,6 +81,18 @@ namespace CleanMe.Application.Services
                 amendmentTypeId = AmendmentType.amendmentTypeId,
                 Name = AmendmentType.Name,
                 Description = AmendmentType.Description,
+                SortOrder = AmendmentType.SortOrder,
+                HasStaffId = AmendmentType.HasStaffId,
+                HasClientId = AmendmentType.HasClientId,
+                //HasRegionId = AmendmentType.HasRegionId,
+                HasAreaId = AmendmentType.HasAreaId,
+                HasAssetLocationId = AmendmentType.HasAssetLocationId,
+                HasItemCodeId = AmendmentType.HasItemCodeId,
+                HasAssetId = AmendmentType.HasAssetId,
+                HasCleanFrequencyId = AmendmentType.HasCleanFrequencyId,
+                HasRate = AmendmentType.HasRate,
+                //HasAccess = AmendmentType.HasAccess,
+                HasIsAccessable = AmendmentType.HasIsAccessable,
                 IsActive = AmendmentType.IsActive
             };
         }
@@ -123,6 +135,18 @@ namespace CleanMe.Application.Services
             {
                 Name = model.Name,
                 Description = model.Description,
+                SortOrder = model.SortOrder,
+                HasStaffId = model.HasStaffId,
+                HasClientId = model.HasClientId,
+                //HasRegionId = model.HasRegionId,
+                HasAreaId = model.HasAreaId,
+                HasAssetLocationId = model.HasAssetLocationId,
+                HasItemCodeId = model.HasItemCodeId,
+                HasAssetId = model.HasAssetId,
+                HasCleanFrequencyId = model.HasCleanFrequencyId,
+                HasRate = model.HasRate,
+                //HasAccess = model.HasAccess,
+                HasIsAccessable = model.HasIsAccessable,
                 IsActive = model.IsActive,
                 AddedAt = DateTime.UtcNow,
                 AddedById = addedById,
@@ -147,6 +171,18 @@ namespace CleanMe.Application.Services
 
             AmendmentType.Name = model.Name;
             AmendmentType.Description = model.Description;
+            AmendmentType.SortOrder = model.SortOrder;
+            AmendmentType.HasStaffId = model.HasStaffId;
+            AmendmentType.HasClientId = model.HasClientId;
+            //AmendmentType.HasRegionId = model.HasRegionId;
+            AmendmentType.HasAreaId = model.HasAreaId;
+            AmendmentType.HasAssetLocationId = model.HasAssetLocationId;
+            AmendmentType.HasItemCodeId = model.HasItemCodeId;
+            AmendmentType.HasAssetId = model.HasAssetId;
+            AmendmentType.HasCleanFrequencyId = model.HasCleanFrequencyId;
+            AmendmentType.HasRate = model.HasRate;
+            //AmendmentType.HasAccess = model.HasAccess;
+            AmendmentType.HasIsAccessable = model.HasIsAccessable;
             AmendmentType.IsActive = model.IsActive;
             AmendmentType.UpdatedAt = DateTime.UtcNow;
             AmendmentType.UpdatedById = updatedById;

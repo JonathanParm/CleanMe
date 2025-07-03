@@ -47,14 +47,30 @@ namespace CleanMe.Infrastructure.Repositories
 
         public async Task AddItemCodeAsync(ItemCode itemCode)
         {
-            await _context.ItemCodes.AddAsync(itemCode);
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.ItemCodes.AddAsync(itemCode);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                // Log or debug ex.InnerException
+                throw new Exception("Add item code failed", ex);
+            }
         }
 
         public async Task UpdateItemCodeAsync(ItemCode itemCode)
         {
-            _context.ItemCodes.Update(itemCode);
-            await _context.SaveChangesAsync();
+            try
+            {
+                _context.ItemCodes.Update(itemCode);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                // Log or debug ex.InnerException
+                throw new Exception("Update item code failed", ex);
+            }
         }
     }
 }

@@ -17,8 +17,8 @@ namespace CleanMe.Application.Interfaces
         Task<IEnumerable<SelectListItem>> GetCleanFrequencySelectListAsync();
         Task<IEnumerable<SelectListItem>> GetClientContactSelectListAsync(ClientContactLookupFilter filter);
         Task<IEnumerable<SelectListItem>> GetClientSelectListAsync();
-        Task<IEnumerable<SelectListItem>> GetItemCodeRateSelectListAsync();
-        Task<IEnumerable<SelectListItem>> GetItemCodeSelectListAsync();
+        Task<IEnumerable<SelectListItem>> GetItemCodeRateSelectListAsync(ItemCodeRateLookupFilter filter);
+        Task<IEnumerable<SelectListItem>> GetItemCodeSelectListAsync(ItemCodeLookupFilter filter);
         Task<IEnumerable<SelectListItem>> GetRegionSelectListAsync(RegionLookupFilter filter);
         Task<IEnumerable<SelectListItem>> GetStaffSelectListAsync(StaffLookupFilter filter);
 

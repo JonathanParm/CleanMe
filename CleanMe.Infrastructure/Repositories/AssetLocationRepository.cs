@@ -76,14 +76,30 @@ namespace CleanMe.Infrastructure.Repositories
 
         public async Task AddAssetLocationAsync(AssetLocation assetLocation)
         {
-            await _context.AssetLocations.AddAsync(assetLocation);
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.AssetLocations.AddAsync(assetLocation);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                // Log or debug ex.InnerException
+                throw new Exception("Add asset location failed", ex);
+            }
         }
 
         public async Task UpdateAssetLocationAsync(AssetLocation assetLocation)
         {
-            _context.AssetLocations.Update(assetLocation);
-            await _context.SaveChangesAsync();
+            try
+            {
+                _context.AssetLocations.Update(assetLocation);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                // Log or debug ex.InnerException
+                throw new Exception("Update asset location failed", ex);
+            }
         }
     }
 }

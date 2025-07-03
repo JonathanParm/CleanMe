@@ -1,4 +1,5 @@
-﻿using CleanMe.Application.Interfaces;
+﻿using CleanMe.Application.Filters;
+using CleanMe.Application.Interfaces;
 using CleanMe.Application.Services;
 using CleanMe.Application.ViewModels;
 using CleanMe.Domain.Entities;
@@ -222,7 +223,7 @@ namespace CleanMe.Web.Controllers
             if (isEditMode)
             {
                 model.Clients = await _lookupService.GetClientSelectListAsync();
-                model.ItemCodes = await _lookupService.GetItemCodeSelectListAsync();
+                model.ItemCodes = await _lookupService.GetItemCodeSelectListAsync(new ItemCodeLookupFilter());
                 model.CleanFrequencies = await _lookupService.GetCleanFrequencySelectListAsync();
             }
             else
@@ -234,8 +235,8 @@ namespace CleanMe.Web.Controllers
 
                 model.ItemCodes = new[]
                 {
-                        new SelectListItem { Value = "", Text = "-- Select Type --" }
-                    }.Concat(await _lookupService.GetItemCodeSelectListAsync());
+                        new SelectListItem { Value = "", Text = "-- Select Item code --" }
+                    }.Concat(await _lookupService.GetItemCodeSelectListAsync(new ItemCodeLookupFilter()));
 
                 model.CleanFrequencies = new[]
                 {

@@ -56,6 +56,14 @@ namespace CleanMe.Domain.Entities
         public AssetLocation? AssetLocation { get; set; }
 
         // Optional Foreign key property linking to the parent
+        [ForeignKey("ItemCode")]
+        [DisplayName("Item code")]
+        public int? itemCodeId { get; set; }
+        // Navigation property representing the parent
+        [DisplayName("Item code")]
+        public ItemCode? ItemCode { get; set; }
+
+        // Optional Foreign key property linking to the parent
         [ForeignKey("Asset")]
         [DisplayName("Asset")]
         public int? assetId { get; set; }

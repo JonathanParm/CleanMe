@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using CleanMe.Application.DTOs;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,6 +20,7 @@ namespace CleanMe.Application.ViewModels
         public IEnumerable<SelectListItem>? Areas { get; set; }
         public IEnumerable<SelectListItem>? Assets { get; set; }
         public IEnumerable<SelectListItem>? AssetLocations { get; set; }
+        public IEnumerable<SelectListItem>? ItemCodes { get; set; }
         public IEnumerable<SelectListItem>? CleanFrequencies { get; set; }
         public IEnumerable<SelectListItem>? Clients { get; set; }
         public IEnumerable<SelectListItem>? Staff { get; set; }

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using CleanMe.Application.DTOs;
 using CleanMe.Application.ViewModels;
 using CleanMe.Domain.Entities;
 
@@ -12,10 +13,12 @@ namespace CleanMe.Application.Interfaces
         Task<int?> GetAmendmentLastInvoicedOnByIdAsync(int amendmentId, int amendmentTypeId);
         Task<AmendmentViewModel?> GetAmendmentViewModelByIdAsync(int amendmentId);
         Task<AmendmentViewModel?> GetAmendmentViewModelOnlyByIdAsync(int amendmentId);
-        //Task<AmendmentViewModel> PrepareNewAmendmentViewModelAsync(int regionId);
+
         Task<int> AddAmendmentAsync(AmendmentViewModel model, string addedById);
         Task UpdateAmendmentAsync(AmendmentViewModel model, string updatedById);
         Task<bool> SoftDeleteAmendmentAsync(int amendmentId, string updatedById);
+
+        Task<AmendmentTypeHasFieldsDto> GetAmendmentTypeHasFieldsByIdAsync(int amendmentTypeId);
 
         // Retrieves a paginated & filtered Amendment list using Dapper
         Task<IEnumerable<AmendmentIndexViewModel>> GetAmendmentIndexAsync(

@@ -31,14 +31,30 @@ namespace CleanMe.Infrastructure.Repositories
 
         public async Task AddStaffAsync(Staff Staff)
         {
-            await _context.Staff.AddAsync(Staff);
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.Staff.AddAsync(Staff);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                // Log or debug ex.InnerException
+                throw new Exception("Add staff failed", ex);
+            }
         }
 
         public async Task UpdateStaffAsync(Staff Staff)
         {
-            _context.Staff.Update(Staff);
-            await _context.SaveChangesAsync();
+            try
+            {
+                _context.Staff.Update(Staff);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                // Log or debug ex.InnerException
+                throw new Exception("Update staff failed", ex);
+            }
         }
     }
 }

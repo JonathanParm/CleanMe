@@ -22,6 +22,7 @@
     @Html.HiddenFor(m => m.AmendmentLastInvoiced.clientId)
     @Html.HiddenFor(m => m.AmendmentLastInvoiced.areaId)
     @Html.HiddenFor(m => m.AmendmentLastInvoiced.assetLocationId)
+    @Html.HiddenFor(m => m.AmendmentLastInvoiced.itemCodeId)
     @Html.HiddenFor(m => m.AmendmentLastInvoiced.assetId)
     @Html.HiddenFor(m => m.AmendmentLastInvoiced.amendmentTypeId)
     @Html.HiddenFor(m => m.AmendmentLastInvoiced.CleanFrequencyName)
@@ -34,25 +35,29 @@
 
     @if (!Model.IsEdit)
     {
-        <div class="form-group">
+        <div class="form-group" data-field="amendmentTypeId">
+            <label for="AmendmentCurrent.amendmentTypeId">Amendment type</label>
+            <select asp-for="AmendmentCurrent.amendmentTypeId" asp-items="Model.AmendmentTypes" class="form-control" id="amendmentTypeId"></select>
+        </div>
+        <div class="form-group" data-field="clientId">
             <label for="ClientId">Client</label>
             <select asp-for="AmendmentCurrent.clientId" asp-items="Model.Clients" class="form-control" id="clientId"></select>
         </div>
-        <div class="form-group">
+        <div class="form-group" data-field="areaId">
             <label for="AmendmentCurrent.areaId">Area</label>
             <select asp-for="AmendmentCurrent.areaId" asp-items="Model.Areas" class="form-control" id="areaId"></select>
         </div>
-        <div class="form-group">
+        <div class="form-group" data-field="assetLocationId">
             <label for="AmendmentCurrent.assetLocationId">Asset Location</label>
             <select asp-for="AmendmentCurrent.assetLocationId" asp-items="Model.AssetLocations" class="form-control" id="assetLocationId"></select>
         </div>
-        <div class="form-group">
+        <div class="form-group" data-field="itemCodeId">
+            <label for="AmendmentCurrent.itemCodeId">Item code</label>
+            <select asp-for="AmendmentCurrent.itemCodeId" asp-items="Model.ItemCodes" class="form-control" id="itemCodeId"></select>
+        </div>
+        <div class="form-group" data-field="assetId">
             <label for="AmendmentCurrent.assetId">Asset</label>
             <select asp-for="AmendmentCurrent.assetId" asp-items="Model.Assets" class="form-control" id="assetId"></select>
-        </div>
-        <div class="form-group">
-            <label for="AmendmentCurrent.amendmentTypeId">Amendment type</label>
-            <select asp-for="AmendmentCurrent.amendmentTypeId" asp-items="Model.AmendmentTypes" class="form-control" id="amendmentTypeId"></select>
         </div>
     }
     else
@@ -62,28 +67,33 @@
         @Html.HiddenFor(m => m.AmendmentCurrent.clientId)
         @Html.HiddenFor(m => m.AmendmentCurrent.areaId)
         @Html.HiddenFor(m => m.AmendmentCurrent.assetLocationId)
+        @Html.HiddenFor(m => m.AmendmentCurrent.itemCodeId)
         @Html.HiddenFor(m => m.AmendmentCurrent.assetId)
         @Html.HiddenFor(m => m.AmendmentCurrent.amendmentTypeId)
 
         <div class="form-group">
+            <label>Amendment type</label>
+            <p class="form-control-static">@Model.AmendmentCurrent.AmendmentTypeName</p>
+        </div>
+        <div class="form-group" data-field="clientId"">
             <label>Client</label>
             <p class="form-control-static">@Model.AmendmentCurrent.ClientName</p>
         </div>
-        <div class="form-group">
+        <div class="form-group" data-field="areaId"">
             <label>Area</label>
             <p class="form-control-static">@Model.AmendmentCurrent.AreaName</p>
         </div>
-        <div class="form-group">
+        <div class="form-group" data-field="assetLocationId">
             <label>Asset location</label>
             <p class="form-control-static">@Model.AmendmentCurrent.AssetLocationName</p>
         </div>
-        <div class="form-group">
+        <div class="form-group" data-field="itemCodeId">
+            <label>Item code</label>
+            <p class="form-control-static">@Model.AmendmentCurrent.ItemCodeName</p>
+        </div>
+        <div class="form-group" data-field="assetId">
             <label>Asset</label>
             <p class="form-control-static">@Model.AmendmentCurrent.AssetName</p>
-        </div>
-        <div class="form-group">
-            <label>Amendment type</label>
-            <p class="form-control-static">@Model.AmendmentCurrent.AmendmentTypeName</p>
         </div>
     }
 
@@ -97,7 +107,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr>
+            <tr data-field="cleanFrequencyId">
                 <td>Cleaning Frequency</td>
                 <td>@Model.AmendmentLastInvoiced.CleanFrequencyName</td>
                 <td>
@@ -105,7 +115,7 @@
                     <span asp-validation-for="AmendmentCurrent.cleanFrequencyId" class="text-danger"></span>
                 </td>
             </tr>
-            <tr>
+            <tr data-field="staffId">
                 <td>Cleaner</td>
                 <td>@Model.AmendmentLastInvoiced.StaffName</td>
                 <td>
@@ -113,7 +123,7 @@
                     <span asp-validation-for="AmendmentCurrent.staffId" class="text-danger"></span>
                 </td>
             </tr>
-            <tr>
+            <tr data-field="rate">
                 <td>Rate</td>
                 <td>@(Model.AmendmentLastInvoiced.Rate?.ToString("C"))</td>
                 <td>
@@ -121,7 +131,7 @@
                     <span asp-validation-for="AmendmentCurrent.Rate" class="text-danger"></span>
                 </td>
             </tr>
-            <tr>
+            <tr data-field="isAccessable">
                 <td>Is Accessable</td>
                 <td>@(Model.AmendmentLastInvoiced.IsAccessable ? "Yes" : "No")
                 <td>
@@ -164,6 +174,6 @@
 </form>
 
 @section Scripts {
+    <script src="@Url.Content("~/js/amendment/addeddit-amendmenttype-hasfield-visible.js")"></script>
     <script src="@Url.Content("~/js/amendment/addedit-cascade-select.js")"></script>
-   @*  <script src="@Url.Content("~/js/shared/redirect-on-submit.js")"></script> *@
 }

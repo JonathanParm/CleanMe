@@ -12,7 +12,7 @@ namespace CleanMe.Domain.Interfaces
         Task<IEnumerable<Amendment>> GetAllAmendmentsAsync();
         Task<Amendment?> GetAmendmentByIdAsync(int amendmentId);
         Task<Amendment?> GetAmendmentOnlyByIdAsync(int amendmentId);
-        Task AddAmendmentAsync(Amendment Amendment);
-        Task UpdateAmendmentAsync(Amendment Amendment);
+        Task AddAmendmentAsync(Amendment amendment);
+        Task UpdateAmendmentAsync(Amendment amendment);
     }
 }

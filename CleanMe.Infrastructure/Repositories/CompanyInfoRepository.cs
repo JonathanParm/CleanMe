@@ -37,8 +37,16 @@ namespace CleanMe.Infrastructure.Repositories
             if (CompanyInfo.companyInfoId == 0)
                 throw new ArgumentException("Invalid companyInfoId for update.");
 
-            _context.CompanyInfo.Update(CompanyInfo);
-            await _context.SaveChangesAsync();
+            try
+            {
+                _context.CompanyInfo.Update(CompanyInfo);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                // Log or debug ex.InnerException
+                throw new Exception("Update company information failed", ex);
+            }
         }
     }
 }

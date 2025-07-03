@@ -28,17 +28,12 @@ namespace CleanMe.Application.Services
         {
             try
             {
-                var types = await _unitOfWork.AmendmentTypeRepository.GetAllAmendmentTypesAsync();
-                return types.Select(t => new SelectListItem
-                {
-                    Value = t.amendmentTypeId.ToString(),
-                    Text = t.Name
-                });
+                return await GetSelectListAsync("AmendmentTypeLookup", "amendment type");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error retrieving AmendmentType SelectList.");
-                throw new ApplicationException("Error retrieving AmendmentType SelectList", ex);
+                _logger.LogError(ex, "Error retrieving Amendment type SelectList.");
+                throw new ApplicationException("Error retrieving Amendment type SelectList", ex);
             }
             return Enumerable.Empty<SelectListItem>();
         }
@@ -47,14 +42,7 @@ namespace CleanMe.Application.Services
         {
             try
             {
-                return await GetSelectListAsync("AreaLookup", filter);
-
-                //var types = await _unitOfWork.AreaRepository.GetAllAreasAsync();
-                //return types.Select(t => new SelectListItem
-                //{
-                //    Value = t.areaId.ToString(),
-                //    Text = t.Name
-                //});
+                return await GetSelectListAsync("AreaLookup", "area", filter);
             }
             catch (Exception ex)
             {
@@ -68,14 +56,7 @@ namespace CleanMe.Application.Services
         {
             try
             {
-                return await GetSelectListAsync("AssetLocationLookup", filter);
-
-                //var locations = await _unitOfWork.AssetLocationRepository.GetAllAssetLocationsAsync();
-                //return locations.Select(l => new SelectListItem
-                //{
-                //    Value = l.assetLocationId.ToString(),
-                //    Text = l.Description ?? "N/A"
-                //});
+                return await GetSelectListAsync("AssetLocationLookup", "asset location", filter);
             }
             catch (Exception ex)
             {
@@ -89,14 +70,7 @@ namespace CleanMe.Application.Services
         {
             try
             {
-                return await GetSelectListAsync("AssetLookup", filter);
-
-                //var types = await _unitOfWork.AssetRepository.GetAllAssetsAsync();
-                //return types.Select(t => new SelectListItem
-                //{
-                //    Value = t.assetId.ToString(),
-                //    Text = t.Name
-                //});
+                return await GetSelectListAsync("AssetLookup", "asset", filter);
             }
             catch (Exception ex)
             {
@@ -110,12 +84,7 @@ namespace CleanMe.Application.Services
         {
             try
             {
-                var types = await _unitOfWork.CleanFrequencyRepository.GetAllCleanFrequenciesAsync();
-                return types.Select(t => new SelectListItem
-                {
-                    Value = t.cleanFrequencyId.ToString(),
-                    Text = t.Name
-                });
+                return await GetSelectListAsync("CleanFrequencyLookup", "clean frequency");
             }
             catch (Exception ex)
             {
@@ -129,14 +98,7 @@ namespace CleanMe.Application.Services
         {
             try
             {
-                return await GetSelectListAsync("ClientContactLookup", filter);
-
-                //var types = await _unitOfWork.ClientContactRepository.GetAllClientContactsAsync();
-                //return types.Select(t => new SelectListItem
-                //{
-                //    Value = t.clientContactId.ToString(),
-                //    Text = $"{t.FirstName} {t.FamilyName}"
-                //});
+                return await GetSelectListAsync("ClientContactLookup", "client contact", filter);
             }
             catch (Exception ex)
             {
@@ -150,12 +112,7 @@ namespace CleanMe.Application.Services
         {
             try
             {
-                var clients = await _unitOfWork.ClientRepository.GetAllClientsAsync();
-                return clients.Select(c => new SelectListItem
-                {
-                    Value = c.clientId.ToString(),
-                    Text = c.Brand
-                });
+                return await GetSelectListAsync("ClientLookup", "client");
             }
             catch (Exception ex)
             {
@@ -165,16 +122,11 @@ namespace CleanMe.Application.Services
             return Enumerable.Empty<SelectListItem>();
         }
 
-        public async Task<IEnumerable<SelectListItem>> GetItemCodeRateSelectListAsync()
+        public async Task<IEnumerable<SelectListItem>> GetItemCodeRateSelectListAsync(ItemCodeRateLookupFilter filter)
         {
             try
             {
-                var types = await _unitOfWork.ItemCodeRateRepository.GetAllItemCodeRatesAsync();
-                return types.Select(t => new SelectListItem
-                {
-                    Value = t.itemCodeId.ToString(),
-                    Text = t.Name
-                });
+                return await GetSelectListAsync("ItemCodeRateLookup", "item code rate", filter);
             }
             catch (Exception ex)
             {
@@ -184,16 +136,11 @@ namespace CleanMe.Application.Services
             return Enumerable.Empty<SelectListItem>();
         }
 
-        public async Task<IEnumerable<SelectListItem>> GetItemCodeSelectListAsync()
+        public async Task<IEnumerable<SelectListItem>> GetItemCodeSelectListAsync(ItemCodeLookupFilter filter)
         {
             try
             {
-                var types = await _unitOfWork.ItemCodeRepository.GetAllItemCodesAsync();
-                return types.Select(t => new SelectListItem
-                {
-                    Value = t.itemCodeId.ToString(),
-                    Text = t.Code
-                });
+                return await GetSelectListAsync("ItemCodeLookup","item code", filter);
             }
             catch (Exception ex)
             {
@@ -207,14 +154,7 @@ namespace CleanMe.Application.Services
         {
             try
             {
-                return await GetSelectListAsync("RegionLookup", filter);
-
-                //var types = await _unitOfWork.RegionRepository.GetAllRegionsAsync();
-                //return types.Select(t => new SelectListItem
-                //{
-                //    Value = t.regionId.ToString(),
-                //    Text = t.Name
-                //});
+                return await GetSelectListAsync("RegionLookup", "region", filter);
             }
             catch (Exception ex)
             {
@@ -228,14 +168,7 @@ namespace CleanMe.Application.Services
         {
             try
             {
-                return await GetSelectListAsync("StaffLookup", filter);
-
-                //var types = await _unitOfWork.StaffRepository.GetAllStaffAsync();
-                //return types.Select(t => new SelectListItem
-                //{
-                //    Value = t.staffId.ToString(),
-                //    Text = $"{t.FirstName} {t.FamilyName}"
-                //});
+                return await GetSelectListAsync("StaffLookup", "staff", filter);
             }
             catch (Exception ex)
             {
@@ -307,7 +240,7 @@ namespace CleanMe.Application.Services
         //    }
         //}
 
-        private async Task<IEnumerable<SelectListItem>> GetSelectListAsync(string sqlProcedure, object? filter)
+        private async Task<IEnumerable<SelectListItem>> GetSelectListAsync(string sqlProcedure, string caption, object? filter)
         {
             try
             {
@@ -325,19 +258,48 @@ namespace CleanMe.Application.Services
 
                 var items = await _unitOfWork.DapperRepository.QueryAsync<IdNameLookupViewModel>(query + parametersList, parameters);
 
-                return items
+                return new[]
+                {
+                    new SelectListItem { Value = "0", Text = $"-- Select {caption} --" }
+                }.Concat(items
                     .OrderByDescending(al => al.Name)
                     .ThenBy(al => al.Name)
                     .Select(l => new SelectListItem
                     {
                         Value = l.Id.ToString(),
                         Text = l.IsActive ? l.Name : $"{l.Name} (Inactive)"
-                    });
+                    }));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error Get SelectList.");
                 throw new ApplicationException("Error Get SelectList", ex);
+            }
+        }
+
+        private async Task<IEnumerable<SelectListItem>> GetSelectListAsync(string sqlProcedure, string caption)
+        {
+            try
+            {
+                string query = $"Exec {sqlProcedure}";
+                var items = await _unitOfWork.DapperRepository.QueryAsync<IdNameLookupViewModel>(query);
+
+                return new[]
+                {
+                    new SelectListItem { Value = "0", Text = $"-- Select {caption} --" }
+                }.Concat(items
+                    .OrderByDescending(al => al.Name)
+                    .ThenBy(al => al.Name)
+                    .Select(l => new SelectListItem
+                    {
+                        Value = l.Id.ToString(),
+                        Text = l.IsActive ? l.Name : $"{l.Name} (Inactive)"
+                    }));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error Get SelectList (no filter).");
+                throw new ApplicationException("Error Get SelectList (no filter)", ex);
             }
         }
     }

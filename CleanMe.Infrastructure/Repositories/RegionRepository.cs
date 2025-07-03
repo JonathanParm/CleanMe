@@ -37,14 +37,30 @@ namespace CleanMe.Infrastructure.Repositories
 
         public async Task AddRegionAsync(Region region)
         {
-            await _context.Regions.AddAsync(region);
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.Regions.AddAsync(region);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                // Log or debug ex.InnerException
+                throw new Exception("Add region failed", ex);
+            }
         }
 
         public async Task UpdateRegionAsync(Region region)
         {
-            _context.Regions.Update(region);
-            await _context.SaveChangesAsync();
+            try
+            {
+                _context.Regions.Update(region);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                // Log or debug ex.InnerException
+                throw new Exception("Update region failed", ex);
+            }
         }
     }
 }

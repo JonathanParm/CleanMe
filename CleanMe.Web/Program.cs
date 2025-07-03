@@ -1,4 +1,4 @@
-using CleanMe.Application.Services;
+﻿using CleanMe.Application.Services;
 using CleanMe.Domain.Entities;
 using CleanMe.Infrastructure.Data;
 using CleanMe.Infrastructure.Repositories;
@@ -14,6 +14,7 @@ using CleanMe.Infrastructure.Logging;
 using Serilog;
 using Serilog.Extensions.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using OfficeOpenXml;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -108,12 +109,14 @@ builder.Services.AddScoped<IStaffRepository, StaffRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<ILookupService, LookupService>();
 
-builder.Services.AddScoped<IReportOutputService, ReportOutputService>();
+builder.Services.AddScoped<zzIReportOutputService, zzReportOutputService>();
 
 builder.Services.AddControllersWithViews(options =>
 {
     options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
 });
+
+ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
 var app = builder.Build();
 

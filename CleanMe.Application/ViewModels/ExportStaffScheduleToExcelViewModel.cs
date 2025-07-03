@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace CleanMe.Application.ViewModels
 {
-    public class ScheduleExportToExcelViewModel
+    public class ExportStaffScheduleToExcelViewModel
     {
         [Display(Name = "Date Range Type")]
         public string DateRangeType { get; set; } = "Month"; // Default to "Month"
@@ -19,19 +19,17 @@ namespace CleanMe.Application.ViewModels
         [Display(Name = "Month")]
         public int? Month { get; set; }
 
-        [DataType(DataType.Date)]
-        public DateOnly? DateFrom { get; set; }
+        public DateTime? DateFrom { get; set; }
 
-        [DataType(DataType.Date)]
-        public DateOnly? DateTo { get; set; }
+        public DateTime? DateTo { get; set; }
 
         public IEnumerable<SelectListItem>? YearList { get; set; }
         public IEnumerable<SelectListItem>? MonthList { get; set; }
 
-        public int? CleanerId { get; set; }
-        public int? ClientId { get; set; }
+        public int? StaffId { get; set; }
+        public int? ClientId { get; set; } 
         public int? RegionId { get; set; }
-        public int? AreaId { get; set; }
+        public int? AreaId { get; set; } 
         public int? AssetLocationId { get; set; }
         public int? AssetId { get; set; }
 

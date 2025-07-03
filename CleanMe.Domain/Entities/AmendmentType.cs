@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace CleanMe.Domain.Entities
 {
@@ -27,6 +28,36 @@ namespace CleanMe.Domain.Entities
         [Column(TypeName = "varchar")]
         [StringLength(1000, MinimumLength = 3, ErrorMessage = "Amendment type Name must have between 3 and 1000 letters")]
         public string Description { get; set; }
+
+        [Display(Name = "Client")]
+        public bool HasClientId { get; set; } = false;
+
+        [Display(Name = "Area")]
+        public bool HasAreaId { get; set; } = false;
+
+        [Display(Name = "Asset location")]
+        public bool HasAssetLocationId { get; set; } = false;
+
+        [Display(Name = "Item type")]
+        public bool HasItemCodeId { get; set; } = false;
+
+        [Display(Name = "Asset")]
+        public bool HasAssetId { get; set; } = false;
+
+        [Display(Name = "Clean frequency")]
+        public bool HasCleanFrequencyId { get; set; } = false;
+
+        [Display(Name = "Staff")]
+        public bool HasStaffId { get; set; } = false;
+
+        [Display(Name = "Rate")]
+        public bool HasRate { get; set; } = false;
+
+        [Display(Name = "Access")]
+        public bool HasAccess { get; set; } = false;
+
+        [Display(Name = "Is accessible")]
+        public bool HasIsAccessable { get; set; } = false;
 
         [Required]
         [Display(Name = "Sort order")]

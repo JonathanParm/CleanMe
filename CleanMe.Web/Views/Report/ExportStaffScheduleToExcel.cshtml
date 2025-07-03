@@ -1,6 +1,6 @@
-﻿@model CleanMe.Application.ViewModels.ScheduleExportToExcelViewModel
+﻿@model CleanMe.Application.ViewModels.ExportStaffScheduleToExcelViewModel
 
-<form asp-action="ScheduleExportToExcel" method="post">
+<form asp-action="ExportStaffScheduleToExcel" method="post">
     <input type="hidden" asp-for="DateRangeType" id="DateRangeType" />
   @*   <div class="form-group">
         <label>Date Range</label>
@@ -40,7 +40,7 @@
 
     <div class="form-group">
         <label>Cleaner</label>
-        <select id="cleanerId" asp-for="CleanerId" asp-items="Model.Cleaners" class="form-control"></select>
+        <select id="cleanerId" asp-for="StaffId" asp-items="Model.Cleaners" class="form-control"></select>
     </div>
     <div class="form-group">
         <label>Client</label>
@@ -67,6 +67,6 @@
 </form>
 
 @section Scripts {
-    <script src="~/js/report/scheduleExportToExcel-date-range.js"></script>
-    <script src="~/js/report/scheduleExportToExcel-cascade-select.js"></script>
+    <script src="~/js/report/exportScheduleToExcel-date-range.js"></script>
+    <script src="~/js/report/exportStaffScheduleToExcel-cascade-select.js"></script>
 }

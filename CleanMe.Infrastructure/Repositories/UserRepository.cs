@@ -31,14 +31,30 @@ namespace CleanMe.Infrastructure.Repositories
 
         public async Task<bool> AddUserAsync(ApplicationUser user)
         {
-            await _context.Users.AddAsync(user);
-            return await _context.SaveChangesAsync() > 0;
+            try
+            {
+                await _context.Users.AddAsync(user);
+                return await _context.SaveChangesAsync() > 0;
+            }
+            catch (DbUpdateException ex)
+            {
+                // Log or debug ex.InnerException
+                throw new Exception("Add user failed", ex);
+            }
         }
 
         public async Task<bool> UpdateUserAsync(ApplicationUser user)
         {
-            _context.Users.Update(user);
-            return await _context.SaveChangesAsync() > 0;
+            try
+            {
+                _context.Users.Update(user);
+                return await _context.SaveChangesAsync() > 0;
+            }
+            catch (DbUpdateException ex)
+            {
+                // Log or debug ex.InnerException
+                throw new Exception("Update user failed", ex);
+            }
         }
 
         public async Task<bool> DeleteUserAsync(string id)
@@ -46,8 +62,16 @@ namespace CleanMe.Infrastructure.Repositories
             var user = await GetByUserIdAsync(id);
             if (user == null) return false;
 
-            _context.Users.Remove(user);
-            return await _context.SaveChangesAsync() > 0;
+            try
+            {
+                _context.Users.Remove(user);
+                return await _context.SaveChangesAsync() > 0;
+            }
+            catch (DbUpdateException ex)
+            {
+                // Log or debug ex.InnerException
+                throw new Exception("Delete user failed", ex);
+            }
         }
     }
 }

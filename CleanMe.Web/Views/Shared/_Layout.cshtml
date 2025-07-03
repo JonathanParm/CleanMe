@@ -54,10 +54,6 @@
                     @if (User.Identity.IsAuthenticated)
                     {
                         <!-- Admin & Other Users -->
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Reports" asp-action="Index">Reports</a>
-                        </li>
-
                         @if (isAdmin)
                         {
                             <!-- Report Dropdown -->
@@ -66,7 +62,8 @@
                                     Reports
                                 </a>
                                 <ul class="dropdown-menu" aria-labelledby="setupDropdown">
-                                    <li><a class="dropdown-item" asp-controller="Report" asp-action="ScheduleExportToExcel"></a>Schedule</li>
+                                    <li><a class="dropdown-item" asp-controller="Report" asp-action="ExportStaffScheduleToExcel">Staff cleaning schedule</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Report" asp-action="ExportClientScheduleToExcel">Client cleaning schedule</a></li>
                                 </ul>
                             </li>
 
@@ -77,7 +74,7 @@
                                 </a>
                                 <ul class="dropdown-menu" aria-labelledby="setupDropdown">
                                     <li><a class="dropdown-item" asp-controller="Amendment" asp-action="Index">Cleaning amendment</a></li>
-                                    <li><a class="dropdown-item" asp-controller="Report" asp-action="ScheduleExportToExcel">Amendment report</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Report" asp-action="ExportStaffScheduleToExcel">Staff cleaning schedule</a></li>
                                 </ul>
                             </li>
 
@@ -93,7 +90,7 @@
                                     <li><a class="dropdown-item" asp-controller="Asset" asp-action="Index">Asset</a></li>
                                     <li><a class="dropdown-item" asp-controller="CleanFrequency" asp-action="Index">Cleaning frequency</a></li>
                                     <li><a class="dropdown-item" asp-controller="ItemCode" asp-action="Index">Item code</a></li>
-                                    <li><a class="dropdown-item" asp-controller="ItemCodeRate" asp-action="Index">Item code rates</a></li>
+@*                                     <li><a class="dropdown-item" asp-controller="ItemCodeRate" asp-action="Index">Item code rates</a></li> *@
                                     <li><a class="dropdown-item" asp-controller="AmendmentType" asp-action="Index">Amendment type</a></li>
                                     <li><a class="dropdown-item" asp-controller="Staff" asp-action="Index">Staff</a></li>
                                     <li><a class="dropdown-item" asp-controller="Client" asp-action="Index">Client</a></li>

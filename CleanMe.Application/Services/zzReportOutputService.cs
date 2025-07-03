@@ -11,7 +11,7 @@ using CleanMe.Application.Interfaces;
 
 namespace CleanMe.Application.Services
 {
-    public class ReportOutputService : IReportOutputService
+    public class zzReportOutputService : zzIReportOutputService
     {
         public async Task<byte[]> GenerateExcelAsync<T>(List<T> data, string title)
         {

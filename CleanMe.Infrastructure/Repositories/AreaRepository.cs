@@ -20,7 +20,7 @@ namespace CleanMe.Infrastructure.Repositories
     {
         private readonly ApplicationDbContext _context;
 
-        public AreaRepository( ApplicationDbContext context)
+        public AreaRepository(ApplicationDbContext context)
         {
             _context = context;
         }
@@ -50,14 +50,30 @@ namespace CleanMe.Infrastructure.Repositories
 
         public async Task AddAreaAsync(Area Area)
         {
-            await _context.Areas.AddAsync(Area);
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.Areas.AddAsync(Area);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                // Log or debug ex.InnerException
+                throw new Exception("Add area failed", ex);
+            }
         }
 
         public async Task UpdateAreaAsync(Area Area)
         {
-            _context.Areas.Update(Area);
-            await _context.SaveChangesAsync();
+            try
+            {
+                _context.Areas.Update(Area);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                // Log or debug ex.InnerException
+                throw new Exception("Update area failed", ex);
+            }
         }
     }
 }

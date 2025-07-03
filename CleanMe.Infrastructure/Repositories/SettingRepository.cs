@@ -37,8 +37,16 @@ namespace CleanMe.Infrastructure.Repositories
             if (Setting.settingId == 0)
                 throw new ArgumentException("Invalid settingId for update.");
 
-            _context.Settings.Update(Setting);
-            await _context.SaveChangesAsync();
+            try
+            {
+                _context.Settings.Update(Setting);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                // Log or debug ex.InnerException
+                throw new Exception("Update setting failed", ex);
+            }
         }
     }
 }

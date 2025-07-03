@@ -5,6 +5,7 @@ using CleanMe.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Xml.Linq;
+using CleanMe.Application.DTOs;
 
 namespace CleanMe.Application.Services
 {
@@ -119,6 +120,8 @@ namespace CleanMe.Application.Services
                 return null; // No match found
             }
 
+            //var amendmentType = await _unitOfWork.AmendmentTypeRepository.GetAmendmentTypeByIdAsync(amendment.amendmentTypeId.Value);
+
             // Convert `Amendment` entity to `AmendmentViewModel`
             return new AmendmentViewModel
             {
@@ -136,6 +139,8 @@ namespace CleanMe.Application.Services
                 AmendmentTypeName = amendment.AmendmentType?.Name,
                 cleanFrequencyId = amendment.cleanFrequencyId,
                 CleanFrequencyName = amendment.CleanFrequency?.Name,
+                itemCodeId = amendment.itemCodeId,
+                ItemCodeName = amendment.ItemCode?.Code,
                 staffId = amendment.staffId,
                 StaffName = amendment.Staff?.Fullname,
                 Rate = amendment.Rate,
@@ -144,7 +149,7 @@ namespace CleanMe.Application.Services
                 StartOn = amendment.StartOn,
                 FinishOn = amendment.FinishOn,
                 Comment = amendment.Comment,
-                InvoicedOn = amendment.InvoicedOn
+                InvoicedOn = amendment.InvoicedOn,
             };
         }
 
@@ -171,6 +176,31 @@ namespace CleanMe.Application.Services
             };
         }
 
+        public async Task<AmendmentTypeHasFieldsDto> GetAmendmentTypeHasFieldsByIdAsync(int amendmentTypeId)
+        {
+            var amendmentType = await _unitOfWork.AmendmentTypeRepository.GetAmendmentTypeByIdAsync(amendmentTypeId);
+            if (amendmentType == null)
+            {
+                _logger.LogWarning($"AmendmentType with ID {amendmentTypeId} not found.");
+                throw new Exception("AmendmentType not found.");
+            }
+            // Map the fields to the DTO
+            return new AmendmentTypeHasFieldsDto
+            {
+                HasStaffId = amendmentType.HasStaffId,
+                HasClientId = amendmentType.HasClientId,
+                //HasRegionId = amendmentType.HasRegionId,
+                HasAreaId = amendmentType.HasAreaId,
+                HasAssetLocationId = amendmentType.HasAssetLocationId,
+                HasItemCodeId = amendmentType.HasItemCodeId,
+                HasAssetId = amendmentType.HasAssetId,
+                HasCleanFrequencyId = amendmentType.HasCleanFrequencyId,
+                HasRate = amendmentType.HasRate,
+                //HasAccess = amendmentType.HasAccess,
+                HasIsAccessable = amendmentType.HasIsAccessable
+            };
+        }
+
         //public async Task<AmendmentViewModel> PrepareNewAmendmentViewModelAsync(int regionId)
         //{
         //    var region = await _unitOfWork.RegionRepository.GetRegionByIdAsync(regionId);
@@ -192,53 +222,65 @@ namespace CleanMe.Application.Services
         {
             _logger.LogInformation($"Adding new Amendment: {model.AssetName}");
 
-            int? clientId;
-            int? areaId;
-            int? assetLocationId;
-
-            if (model.assetId.HasValue)
+            try
             {
-                var assetHierarchy = await _assetService.GetHierarchyIdsByAssetIdAsync(model.assetId.Value);
+                int? clientId;
+                int? areaId;
+                int? assetLocationId;
+                int? itemCodeId;
 
-                if (assetHierarchy == null)
-                    throw new Exception("Asset not found or missing hierarchy data.");
+                if (model.assetId.HasValue && model.assetId != 0)
+                {
+                    var assetHierarchy = await _assetService.GetHierarchyIdsByAssetIdAsync(model.assetId.Value);
 
-                clientId = assetHierarchy.ClientId;
-                areaId = assetHierarchy.AreaId;
-                assetLocationId = assetHierarchy.AssetLocationId;
+                    if (assetHierarchy == null)
+                        throw new Exception("Asset not found or missing hierarchy data.");
+
+                    clientId = assetHierarchy.clientId;
+                    areaId = assetHierarchy.areaId;
+                    assetLocationId = assetHierarchy.assetLocationId;
+                    itemCodeId = assetHierarchy.itemCodeId;
+                }
+                else
+                {
+                    clientId = model.clientId;
+                    areaId = model.areaId;
+                    assetLocationId = model.assetLocationId;
+                    itemCodeId = model.itemCodeId;
+                }
+
+                var amendment = new Amendment
+                {
+                    amendmentTypeId = model.amendmentTypeId,
+                    clientId = clientId == 0 ? null : clientId,
+                    areaId = areaId == 0 ? null : areaId,
+                    assetLocationId = assetLocationId == 0 ? null : assetLocationId,
+                    assetId = model.assetId == 0 ? null : model.assetId,
+                    cleanFrequencyId = model.cleanFrequencyId == 0 ? null : model.cleanFrequencyId,
+                    itemCodeId = itemCodeId == 0 ? null : itemCodeId,
+                    staffId = model.staffId == 0 ? null : model.staffId,
+                    Rate = model.Rate,
+                    Access = model.Access,
+                    IsAccessable = model.IsAccessable,
+                    StartOn = model.StartOn,
+                    FinishOn = model.FinishOn,
+                    Comment = model.Comment,
+                    InvoicedOn = model.InvoicedOn,
+                    AddedAt = DateTime.UtcNow,
+                    AddedById = addedById,
+                    UpdatedAt = DateTime.UtcNow,
+                    UpdatedById = addedById
+                };
+
+                await _unitOfWork.AmendmentRepository.AddAmendmentAsync(amendment);
+
+                return amendment.amendmentId;
             }
-            else
+            catch (Exception ex)
             {
-                clientId = model.clientId;
-                areaId = model.areaId;
-                assetLocationId = model.assetLocationId;
+                _logger.LogError(ex, "Error adding Amendment.");
+                throw new ApplicationException("Error adding Amendment", ex);
             }
-
-            var Amendment = new Amendment
-            {
-                amendmentTypeId = model.amendmentTypeId,
-                clientId = clientId,
-                areaId = areaId,
-                assetLocationId = assetLocationId,
-                assetId = model.assetId,
-                cleanFrequencyId = model.cleanFrequencyId,
-                staffId = model.staffId,
-                Rate = model.Rate,
-                Access = model.Access,
-                IsAccessable = model.IsAccessable,
-                StartOn = model.StartOn,
-                FinishOn = model.FinishOn,
-                Comment = model.Comment,
-                InvoicedOn = model.InvoicedOn,
-                AddedAt = DateTime.UtcNow,
-                AddedById = addedById,
-                UpdatedAt = DateTime.UtcNow,
-                UpdatedById = addedById
-            };
-
-            await _unitOfWork.AmendmentRepository.AddAmendmentAsync(Amendment);
-
-            return Amendment.amendmentId;
         }
 
         // Updates an existing Amendment (EF Core)
@@ -254,6 +296,7 @@ namespace CleanMe.Application.Services
             int? clientId;
             int? areaId;
             int? assetLocationId;
+            int? itemCodeId;
 
             if (model.assetId.HasValue)
             {
@@ -262,15 +305,17 @@ namespace CleanMe.Application.Services
                 if (assetHierarchy == null)
                     throw new Exception("Asset not found or missing hierarchy data.");
 
-                clientId = assetHierarchy.ClientId;
-                areaId = assetHierarchy.AreaId;
-                assetLocationId = assetHierarchy.AssetLocationId;
+                clientId = assetHierarchy.clientId;
+                areaId = assetHierarchy.areaId;
+                assetLocationId = assetHierarchy.assetLocationId;
+                itemCodeId = assetHierarchy.itemCodeId;
             }
             else
             {
                 clientId = model.clientId;
                 areaId = model.areaId;
                 assetLocationId = model.assetLocationId;
+                itemCodeId = model.itemCodeId;
             }
 
             amendment.amendmentTypeId = model.amendmentTypeId;
@@ -279,6 +324,7 @@ namespace CleanMe.Application.Services
             amendment.assetLocationId = assetLocationId;
             amendment.assetId = model.assetId;
             amendment.cleanFrequencyId = model.cleanFrequencyId;
+            amendment.itemCodeId = itemCodeId;
             amendment.staffId = model.staffId;
             amendment.Rate = model.Rate;
             amendment.Access = model.Access;

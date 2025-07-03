@@ -99,6 +99,7 @@ namespace CleanMe.Web.Controllers
                 if (modelCurrent.amendmentTypeId.HasValue)
                 {
                     var amendmentTypeId = modelCurrent.amendmentTypeId.Value;
+
                     var amendmentLastInvoicedId = await _amendmentService.GetAmendmentLastInvoicedOnByIdAsync(amendmentId.Value, amendmentTypeId);
                     if (amendmentLastInvoicedId.HasValue)
                     {
@@ -137,23 +138,24 @@ namespace CleanMe.Web.Controllers
                 }
 
                 // Check for duplicate Amendment (excluding current record)
-                var duplicateAmendment = await _amendmentService.FindDuplicateAmendmentAsync(
-                        model.AmendmentCurrent.amendmentTypeId.Value,
-                        model.AmendmentCurrent.assetId.Value,
-                        model.AmendmentCurrent.amendmentId
-                    );
-                if (duplicateAmendment.Any())
-                {
-                    //TempData["WarningMessage"] = "An Amendment Type with the same name or code already exists.";
-                    //TempData["MatchingStaffIds"] = duplicateAmendment.Select(s => s.amendmentId).ToArray();
-                    ModelState.AddModelError("Name", "An Amendment for this amendment type already exists.");
-                    await PopulateSelectListsAsync(model, model.amendmentId > 0);
+                // TODO: Implement FindDuplicateAmendmentAsync in IAmendmentService to handle each amendment type visible controls.
+                //var duplicateAmendment = await _amendmentService.FindDuplicateAmendmentAsync(
+                //        model.AmendmentCurrent.amendmentTypeId.Value,
+                //        model.AmendmentCurrent.assetId.Value,
+                //        model.AmendmentCurrent.amendmentId
+                //    );
+                //if (duplicateAmendment.Any())
+                //{
+                //    //TempData["WarningMessage"] = "An Amendment Type with the same name or code already exists.";
+                //    //TempData["MatchingStaffIds"] = duplicateAmendment.Select(s => s.amendmentId).ToArray();
+                //    ModelState.AddModelError("Name", "An Amendment for this amendment type already exists.");
+                //    await PopulateSelectListsAsync(model, model.amendmentId > 0);
 
-                    return View(model);
-                }
+                //    return View(model);
+                //}
 
                 // Add new Amendment
-                if (model.amendmentId == 0)
+                if (model.amendmentId == null || model.amendmentId == 0)
                 {
                     int newamendmentId = await _amendmentService.AddAmendmentAsync(model.AmendmentCurrent, GetCurrentUserId());
                 }
@@ -234,58 +236,32 @@ namespace CleanMe.Web.Controllers
 
         private async Task PopulateSelectListsAsync(AmendmentAddEditViewModel model, bool isEditMode)
         {
-            if (isEditMode)
-            {
+            //if (isEditMode)
+            //{
                 model.AmendmentTypes = await _lookupService.GetAmendmentTypeSelectListAsync();
                 model.Areas = await _lookupService.GetAreaSelectListAsync(new AreaLookupFilter());
                 model.AssetLocations = await _lookupService.GetAssetLocationSelectListAsync(new AssetLocationLookupFilter());
                 model.Assets = await _lookupService.GetAssetSelectListAsync(new AssetLookupFilter());
                 model.CleanFrequencies = await _lookupService.GetCleanFrequencySelectListAsync();
                 model.Clients = await _lookupService.GetClientSelectListAsync();
+                model.ItemCodes = await _lookupService.GetItemCodeSelectListAsync(new ItemCodeLookupFilter());
                 model.Staff = await _lookupService.GetStaffSelectListAsync(new StaffLookupFilter());
-            }
-            else
-            {
-                model.AmendmentTypes = new[]
-                {
-                    new SelectListItem { Value = "", Text = "-- Select amendment type --" }
-                }.Concat(await _lookupService.GetAmendmentTypeSelectListAsync());
-
-                model.Areas = new[]
-                {
-                    new SelectListItem { Value = "", Text = "-- Select area --" }
-                }.Concat(await _lookupService.GetAreaSelectListAsync(new AreaLookupFilter()));
-
-                model.AssetLocations = new[]
-                {
-                    new SelectListItem { Value = "", Text = "-- Select location --" }
-                }.Concat(await _lookupService.GetAssetLocationSelectListAsync(new AssetLocationLookupFilter()));
-
-                model.Assets = new[]
-                {
-                    new SelectListItem { Value = "", Text = "-- Select asset --" }
-                }.Concat(await _lookupService.GetAssetSelectListAsync(new AssetLookupFilter()));
-
-                model.CleanFrequencies = new[]
-                {
-                    new SelectListItem { Value = "", Text = "-- Select clean frequency --" }
-                }.Concat(await _lookupService.GetCleanFrequencySelectListAsync());
-
-                model.Clients = new[]
-                {
-                    new SelectListItem { Value = "", Text = "-- Select client --" }
-                }.Concat(await _lookupService.GetClientSelectListAsync());
-
-
-                model.Staff = new[]
-                {
-                    new SelectListItem { Value = "", Text = "-- Select staff --" }
-                }.Concat(await _lookupService.GetStaffSelectListAsync(new StaffLookupFilter()));
-            }
+            //}
+            //else
+            //{
+            //    model.AmendmentTypes = await _lookupService.GetAmendmentTypeSelectListAsync();
+            //    model.Areas = await _lookupService.GetAreaSelectListAsync(new AreaLookupFilter()));
+            //    model.AssetLocations = await _lookupService.GetAssetLocationSelectListAsync(new AssetLocationLookupFilter());
+            //    model.Assets = await _lookupService.GetAssetSelectListAsync(new AssetLookupFilter());
+            //    model.CleanFrequencies = await _lookupService.GetCleanFrequencySelectListAsync();
+            //    model.Clients = await _lookupService.GetClientSelectListAsync();
+            //    model.ItemCodes = await _lookupService.GetItemCodeSelectListAsync(new ItemCodeLookupFilter());
+            //    model.Staff = await _lookupService.GetStaffSelectListAsync(new StaffLookupFilter());
+            //}
         }
 
         [HttpGet]
-        public async Task<JsonResult> GetAreas(int clientId)
+        public async Task<JsonResult> GetAreas(int? clientId = 0)
         {
             var areaLookupFilter = new AreaLookupFilter
             {
@@ -299,7 +275,7 @@ namespace CleanMe.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<JsonResult> GetAssetLocations(int clientId, int? areaId = 0)
+        public async Task<JsonResult> GetAssetLocations(int? clientId = 0, int? areaId = 0)
         {
             var assetLocationLookupFilter = new AssetLocationLookupFilter
             {
@@ -314,7 +290,19 @@ namespace CleanMe.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<JsonResult> GetAssets(int clientId, int? areaId = 0, int? assetLocationId = 0)
+        public async Task<JsonResult> GetItemCodes(int? clientId = 0)
+        {
+            var itemCodeLookupFilter = new ItemCodeLookupFilter
+            {
+                ClientId = clientId
+            };
+
+            var itemCodes = await _lookupService.GetItemCodeSelectListAsync(itemCodeLookupFilter);
+            return Json(itemCodes);
+        }
+
+        [HttpGet]
+        public async Task<JsonResult> GetAssets(int? clientId = 0, int? areaId = 0, int? assetLocationId = 0, int? itemCodeId = 0)
         {
             var assetLookupFilter = new AssetLookupFilter
             {
@@ -322,11 +310,18 @@ namespace CleanMe.Web.Controllers
                 ClientId = clientId,
                 RegionId = 0,
                 AreaId = areaId,
-                AssetLocationId = assetLocationId
+                AssetLocationId = assetLocationId,
+                ItemCodeId = itemCodeId
             };
 
             var assets = await _lookupService.GetAssetSelectListAsync(assetLookupFilter);
             return Json(assets);
+        }
+
+        [HttpGet]
+        public async Task<JsonResult> GetAmendmentTypeFields(int amendmentTypeId)
+        {
+            return Json(await _amendmentService.GetAmendmentTypeHasFieldsByIdAsync(amendmentTypeId));
         }
     }
 }

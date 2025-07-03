@@ -13,5 +13,6 @@ namespace CleanMe.Application.Filters
         public int? RegionId { get; set; } = 0;
         public int? AreaId { get; set; } = 0;
         public int? AssetLocationId { get; set; } = 0;
+        public int? ItemCodeId { get; set; } = 0;
     }
 }

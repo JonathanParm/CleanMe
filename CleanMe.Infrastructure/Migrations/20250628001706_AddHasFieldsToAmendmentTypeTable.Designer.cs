@@ -4,6 +4,7 @@ using CleanMe.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CleanMe.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250628001706_AddHasFieldsToAmendmentTypeTable")]
+    partial class AddHasFieldsToAmendmentTypeTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -95,9 +98,6 @@ namespace CleanMe.Infrastructure.Migrations
                     b.Property<int?>("clientId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("itemCodeId")
-                        .HasColumnType("int");
-
                     b.Property<int?>("staffId")
                         .HasColumnType("int");
 
@@ -114,8 +114,6 @@ namespace CleanMe.Infrastructure.Migrations
                     b.HasIndex("cleanFrequencyId");
 
                     b.HasIndex("clientId");
-
-                    b.HasIndex("itemCodeId");
 
                     b.HasIndex("staffId");
 
@@ -168,6 +166,9 @@ namespace CleanMe.Infrastructure.Migrations
                         .HasColumnType("bit");
 
                     b.Property<bool>("HasRate")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("HasRegionId")
                         .HasColumnType("bit");
 
                     b.Property<bool>("HasStaffId")
@@ -1152,10 +1153,6 @@ namespace CleanMe.Infrastructure.Migrations
                         .HasForeignKey("clientId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("CleanMe.Domain.Entities.ItemCode", "ItemCode")
-                        .WithMany()
-                        .HasForeignKey("itemCodeId");
-
                     b.HasOne("CleanMe.Domain.Entities.Staff", "Staff")
                         .WithMany("Amendments")
                         .HasForeignKey("staffId")
@@ -1172,8 +1169,6 @@ namespace CleanMe.Infrastructure.Migrations
                     b.Navigation("CleanFrequency");
 
                     b.Navigation("Client");
-
-                    b.Navigation("ItemCode");
 
                     b.Navigation("Staff");
                 });

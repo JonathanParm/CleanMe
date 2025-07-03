@@ -11,7 +11,9 @@ namespace CleanMe.Application.Interfaces
 {
     public interface IReportService
     {
-        Task<string> GenerateScheduleExportToExcelAsync(ScheduleExportToExcelViewModel model);
+        Task<string> GenerateExportStaffScheduleToExcelAsync(ExportStaffScheduleToExcelViewModel model);
+
+        Task<string> GenerateExportClientScheduleToExcelAsync(ExportClientScheduleToExcelViewModel model);
 
         //IEnumerable<string> ExportScheduleToExcel(ExportScheduleToExcelDto exportModel);
         //string ExportScheduleToExcel(ExportScheduleToExcelModel exportModel);

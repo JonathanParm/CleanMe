@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using CleanMe.Application.DTOs;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -14,28 +15,30 @@ namespace CleanMe.Application.ViewModels
         [Display(Name = "Name of source")]
         public string? AmendmentSourceName { get; set; }
 
-        public int? amendmentTypeId { get; set; }
-        public int? areaId { get; set; }
-        public int? assetId { get; set; }
-        public int? assetLocationId { get; set; }
-        public int? cleanFrequencyId { get; set; }
-        public int? clientId { get; set; }
-        public int? staffId { get; set; }
+        public int? amendmentTypeId { get; set; } = null;
+        public int? areaId { get; set; } = null;
+        public int? assetId { get; set; } = null;
+        public int? assetLocationId { get; set; } = null;
+        public int? cleanFrequencyId { get; set; } = null;
+        public int? clientId { get; set; } = null;
+        public int? itemCodeId { get; set; } = null;
+        public int? staffId { get; set; } = null;
 
-        public string? AmendmentTypeName { get; set; }
-        public string? AreaName { get; set; }
-        public string? AssetName { get; set; }
-        public string? AssetLocationName { get; set; }
-        public string? CleanFrequencyName { get; set; }
-        public string? ClientName { get; set; }
-        public string? StaffName { get; set; }
+        public string? AmendmentTypeName { get; set; } = null;
+        public string? AreaName { get; set; } = null;
+        public string? AssetName { get; set; } = null;
+        public string? AssetLocationName { get; set; } = null;
+        public string? CleanFrequencyName { get; set; } = null;
+        public string? ClientName { get; set; } = null;
+        public string? ItemCodeName { get; set; } = null;
+        public string? StaffName { get; set; } = null;
 
         [DisplayName("Rate")]
         [Column(TypeName = "decimal(5, 2)")]
-        public decimal? Rate { get; set; }
+        public decimal? Rate { get; set; } = null;
 
         [Display(Name = "Access to asset")]
-        public string? Access { get; set; }
+        public string? Access { get; set; } = null;
 
         [Display(Name = "Is Accessable")]
         public bool IsAccessable { get; set; } = true;
@@ -56,14 +59,6 @@ namespace CleanMe.Application.ViewModels
         [DisplayName("Invoiced")]
         [DataType(DataType.DateTime)]
         public DateTime? InvoicedOn { get; set; }
-
-        //public IEnumerable<SelectListItem>? AmendmentTypes { get; set; }
-        //public IEnumerable<SelectListItem>? Areas { get; set; }
-        //public IEnumerable<SelectListItem>? Assets { get; set; }
-        //public IEnumerable<SelectListItem>? AssetLocations { get; set; }
-        //public IEnumerable<SelectListItem>? CleanFrequencies { get; set; }
-        //public IEnumerable<SelectListItem>? Clients { get; set; }
-        //public IEnumerable<SelectListItem>? Staff { get; set; }
 
         public string? AmendmentSummary
         {

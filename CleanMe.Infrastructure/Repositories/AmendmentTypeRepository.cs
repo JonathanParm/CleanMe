@@ -9,7 +9,7 @@ namespace CleanMe.Infrastructure.Repositories
     {
         private readonly ApplicationDbContext _context;
 
-        public AmendmentTypeRepository( ApplicationDbContext context)
+        public AmendmentTypeRepository(ApplicationDbContext context)
         {
             _context = context;
         }
@@ -36,14 +36,30 @@ namespace CleanMe.Infrastructure.Repositories
 
         public async Task AddAmendmentTypeAsync(AmendmentType AmendmentType)
         {
-            await _context.AmendmentTypes.AddAsync(AmendmentType);
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.AmendmentTypes.AddAsync(AmendmentType);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                // Log or debug ex.InnerException
+                throw new Exception("Add amendment type failed", ex);
+            }
         }
 
         public async Task UpdateAmendmentTypeAsync(AmendmentType AmendmentType)
         {
-            _context.AmendmentTypes.Update(AmendmentType);
-            await _context.SaveChangesAsync();
+            try
+            {
+                _context.AmendmentTypes.Update(AmendmentType);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                // Log or debug ex.InnerException
+                throw new Exception("Update amendment type failed", ex);
+            }
         }
     }
 }

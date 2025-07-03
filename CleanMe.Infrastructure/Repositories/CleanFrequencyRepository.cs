@@ -44,14 +44,30 @@ namespace CleanMe.Infrastructure.Repositories
 
         public async Task AddCleanFrequencyAsync(CleanFrequency cleanFrequency)
         {
+            try
+            {
             await _context.CleanFrequencies.AddAsync(cleanFrequency);
             await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                // Log or debug ex.InnerException
+                throw new Exception("Add clean frequency failed", ex);
+            }
         }
 
         public async Task UpdateCleanFrequencyAsync(CleanFrequency cleanFrequency)
         {
+            try
+            {
             _context.CleanFrequencies.Update(cleanFrequency);
             await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                // Log or debug ex.InnerException
+                throw new Exception("Update clean frequency failed", ex);
+            }
         }
     }
 }

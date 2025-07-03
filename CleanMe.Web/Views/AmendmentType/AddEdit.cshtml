@@ -30,8 +30,94 @@
         <span asp-validation-for="Description" class="text-danger"></span>
     </div>
 
+    <div class="form-group">
+        <label asp-for="SortOrder" class="form-label"></label>
+        <input asp-for="SortOrder" class="form-control" required />
+        <span asp-validation-for="SortOrder" class="text-danger"></span>
+    </div>
+
     <div class="mb-3">
-        <label class="form-label">Is Active</label>
+        <label asp-for="HasClientId" class="form-label"></label>
+        <select asp-for="HasClientId" class="form-control">
+            <option value="true">Yes</option>
+            <option value="false">No</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="HasAreaId" class="form-label"></label>
+        <select asp-for="HasAreaId" class="form-control">
+            <option value="true">Yes</option>
+            <option value="false">No</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="HasAssetLocationId" class="form-label"></label>
+        <select asp-for="HasAssetLocationId" class="form-control">
+            <option value="true">Yes</option>
+            <option value="false">No</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+       <label asp-for="HasItemCodeId" class="form-label"></label>
+        <select asp-for="HasItemCodeId" class="form-control">
+            <option value="true">Yes</option>
+            <option value="false">No</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="HasAssetId" class="form-label"></label>
+        <select asp-for="HasAssetId" class="form-control">
+            <option value="true">Yes</option>
+            <option value="false">No</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="HasCleanFrequencyId" class="form-label"></label>
+        <select asp-for="HasCleanFrequencyId" class="form-control">
+            <option value="true">Yes</option>
+            <option value="false">No</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="HasStaffId" class="form-label"></label>
+        <select asp-for="HasStaffId" class="form-control">
+            <option value="true">Yes</option>
+            <option value="false">No</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="HasRate" class="form-label"></label>
+        <select asp-for="HasRate" class="form-control">
+            <option value="true">Yes</option>
+            <option value="false">No</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="HasAccess" class="form-label"></label>
+        <select asp-for="HasAccess" class="form-control">
+            <option value="true">Yes</option>
+            <option value="false">No</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="HasIsAccessable" class="form-label"></label>
+        <select asp-for="HasIsAccessable" class="form-control">
+            <option value="true">Yes</option>
+            <option value="false">No</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="IsActive" class="form-label"></label>
         <select asp-for="IsActive" class="form-control">
             <option value="true">Active</option>
             <option value="false">Inactive</option>

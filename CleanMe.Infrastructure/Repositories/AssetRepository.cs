@@ -40,14 +40,30 @@ namespace CleanMe.Infrastructure.Repositories
 
         public async Task AddAssetAsync(Asset Asset)
         {
-            await _context.Assets.AddAsync(Asset);
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.Assets.AddAsync(Asset);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                // Log or debug ex.InnerException
+                throw new Exception("Add asset failed", ex);
+            }
         }
 
         public async Task UpdateAssetAsync(Asset Asset)
         {
-            _context.Assets.Update(Asset);
-            await _context.SaveChangesAsync();
+            try
+            {
+                _context.Assets.Update(Asset);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                // Log or debug ex.InnerException
+                throw new Exception("Update asset failed", ex);
+            }
         }
     }
 }

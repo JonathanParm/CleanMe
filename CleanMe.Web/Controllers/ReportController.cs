@@ -23,17 +23,17 @@ namespace CleanMe.Web.Controllers
             _lookupService = lookupService;
         }
 
-        public async Task<IActionResult> ScheduleExportToExcel()
+        public async Task<IActionResult> ExportStaffScheduleToExcel()
         {
-            var model = new ScheduleExportToExcelViewModel();
+            var model = new ExportStaffScheduleToExcelViewModel();
 
-            await PopulateSelectListsAsync(model);
+            await PopulateStaffSelectListsAsync(model);
 
             return View(model);
         }
 
         [HttpPost]
-        public async Task<IActionResult> ScheduleExportToExcel(ScheduleExportToExcelViewModel model)
+        public async Task<IActionResult> ExportStaffScheduleToExcel(ExportStaffScheduleToExcelViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -48,11 +48,47 @@ namespace CleanMe.Web.Controllers
                     }
                 }
                 // If the model state is invalid, repopulate the select lists and return the view with the model
-                await PopulateSelectListsAsync(model);
+                await PopulateStaffSelectListsAsync(model);
                 return View(model);
             }
 
-            var filePath = await _reportService.GenerateScheduleExportToExcelAsync(model);
+            var filePath = await _reportService.GenerateExportStaffScheduleToExcelAsync(model);
+            var fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
+            var fileName = Path.GetFileName(filePath);
+
+            return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+        }
+
+        public async Task<IActionResult> ExportClientScheduleToExcel()
+        {
+            var model = new ExportClientScheduleToExcelViewModel();
+
+            await PopulateClientSelectListsAsync(model);
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ExportClientScheduleToExcel(ExportClientScheduleToExcelViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                foreach (var key in ModelState.Keys)
+                {
+                    var state = ModelState[key];
+                    if (state.Errors.Count > 0)
+                    {
+                        Console.WriteLine($"{key} has errors:");
+                        foreach (var error in state.Errors)
+                            Console.WriteLine($"  {error.ErrorMessage}");
+                    }
+                }
+                // If the model state is invalid, repopulate the select lists and return the view with the model
+                await PopulateClientSelectListsAsync(model);
+                return View(model);
+            }
+
+            var filePath = await _reportService.GenerateExportClientScheduleToExcelAsync(model);
             var fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
             var fileName = Path.GetFileName(filePath);
 
@@ -60,7 +96,7 @@ namespace CleanMe.Web.Controllers
         }
 
         [HttpGet]
-        private async Task PopulateSelectListsAsync(ScheduleExportToExcelViewModel model)
+        private async Task PopulateStaffSelectListsAsync(ExportStaffScheduleToExcelViewModel model)
         {
             // the default date range is the next month
             var now = DateTime.Now;
@@ -114,6 +150,37 @@ namespace CleanMe.Web.Controllers
             {
                 new SelectListItem { Value = "", Text = "All assets" }
             }.Concat(await _lookupService.GetAssetSelectListAsync(new AssetLookupFilter()));
+        }
+
+        private async Task PopulateClientSelectListsAsync(ExportClientScheduleToExcelViewModel model)
+        {
+            // the default date range is the next month
+            var now = DateTime.Now;
+            var isDecember = now.Month == 12;
+
+            var selectedMonth = isDecember ? 1 : now.Month + 1;
+            var selectedYear = isDecember ? now.Year + 1 : now.Year;
+
+            model.DateRangeType = "Month";
+            model.Year = selectedYear;
+            model.Month = selectedMonth;
+            model.YearList = new List<SelectListItem>
+            {
+                new SelectListItem { Text = (now.Year - 1).ToString(), Value = (now.Year - 1).ToString() },
+                new SelectListItem { Text = now.Year.ToString(), Value = now.Year.ToString() },
+                new SelectListItem { Text = (now.Year + 1).ToString(), Value = (now.Year + 1).ToString() },
+            };
+            model.MonthList = Enumerable.Range(1, 12)
+                .Select(i => new SelectListItem
+                {
+                    Text = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(i),
+                    Value = i.ToString()
+                });
+
+            model.Clients = new[]
+            {
+                new SelectListItem { Value = "", Text = "All clients" }
+            }.Concat(await _lookupService.GetClientSelectListAsync());
         }
 
         // AJAX lookups

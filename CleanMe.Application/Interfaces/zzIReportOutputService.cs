@@ -2,7 +2,7 @@
 
 namespace CleanMe.Application.Interfaces
 {
-    public interface IReportOutputService
+    public interface zzIReportOutputService
     {
         Task<byte[]> GenerateExcelAsync<T>(List<T> data, string title);
         Task<byte[]> GenerateWordAsync<T>(List<T> data, string title);
