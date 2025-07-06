@@ -22,7 +22,7 @@ namespace CleanMe.Application.ViewModels
         [Display(Name = "Code")]
         public string Code { get; set; }
 
-        [DisplayName("Sort order")]
+        [Display(Name = "Sort order")]
         public int SequenceOrder { get; set; }
 
         [Display(Name = "Active")]

@@ -1,5 +1,5 @@
 ﻿function toggleAmendmentFields(flags) {
-    /*debugger;*/
+    debugger;
 
     $('[data-field=clientId]').toggle(flags.hasClientId);
     $('[data-field=areaId]').toggle(flags.hasAreaId);
@@ -12,7 +12,7 @@
     $('[data-field=isAccessable]').toggle(flags.hasIsAccessable);
 }
 
-$('#amendmentTypeId').change(function () {
+$('#AmendmentCurrent_amendmentTypeId').change(function () {
     /*debugger;*/
 
     var amendmentTypeId = $(this).val();
@@ -41,7 +41,7 @@ $(document).ready(function () {
     console.log("Amendment type fields handliong script loaded.");
     /*debugger;*/
 
-    var existingAmendmentTypeId = $('#amendmentTypeId').val();
+    var existingAmendmentTypeId = $('#AmendmentCurrent_amendmentTypeId').val();
     if (existingAmendmentTypeId) {
         $.getJSON('/Amendment/GetItemCodeHasFields', { amendmentTypeId: existingAmendmentTypeId }, function (flags) {
             toggleAmendmentFields(flags);

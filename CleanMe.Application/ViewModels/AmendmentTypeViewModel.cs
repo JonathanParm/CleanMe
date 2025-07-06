@@ -53,7 +53,7 @@ namespace CleanMe.Application.ViewModels
         public bool HasIsAccessable { get; set; } = false;
 
         [Required]
-        [DisplayName("Active")]
+        [Display(Name = "Active")]
         public bool IsActive { get; set; } = true;
 
         public List<AmendmentIndexViewModel> AmendmentsList { get; set; } = new();

@@ -44,24 +44,27 @@
         <input asp-for="PhoneMobile" class="form-control" />
     </div>
 
-    <div class="form-group">
+    @Html.LabeledTextBoxFor(model => model.Email)
+@*     <div class="form-group">
         <label asp-for="Email" class="form-label"></label>
         <input type="email" id="emailInput" name="Email" class="form-control" asp-for="Email" required />
         <span id="emailStatus" class="text-danger"></span>
-    </div>
+    </div> *@
 
-    <div class="form-group">
+    @Html.LabeledTextBoxFor(model => model.JobTitle)
+@*     <div class="form-group">
         <label asp-for="JobTitle" class="form-label"></label>
         <input asp-for="JobTitle" class="form-control" />
-    </div>
+    </div> *@
 
-    <div class="mb-3">
+    @Html.YesNoButtonsFor(model => model.IsActive)
+@*     <div class="mb-3">
         <label class="form-label">Is Active</label>
         <select asp-for="IsActive" class="form-control">
             <option value="true">Active</option>
             <option value="false">Inactive</option>
         </select>
-    </div>
+    </div> *@
 
     <!-- User Login Section -->
     <div class="mb-3">

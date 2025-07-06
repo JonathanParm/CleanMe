@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>aspnet-CleanMe.Web-f71f1036-0597-481a-8b07-b1cc1d86f0fa</UserSecretsId>
+	<OutputType>WinExe</OutputType>
   </PropertyGroup>
 
   <ItemGroup>

@@ -19,19 +19,19 @@ namespace CleanMe.Application.ViewModels
         [Display(Name = "Item name")]
         public string ItemName { get; set; }
 
-        [DisplayName("Item description")]
+        [Display(Name = "Item description")]
         public string ItemDescription { get; set; }
 
-        [DisplayName("Purchases unit rate")]
+        [Display(Name = "Purchases unit rate")]
         public decimal PurchasesUnitRate { get; set; }
 
-        [DisplayName("Purchases XERO account")]
+        [Display(Name = "Purchases XERO account")]
         public int? PurchasesXeroAccount { get; set; }
 
-        [DisplayName("Sales unit rate")]
+        [Display(Name = "Sales unit rate")]
         public decimal SalesUnitRate { get; set; }
 
-        [DisplayName("Sales XERO account")]
+        [Display(Name = "Sales XERO account")]
         public int? SalesXeroAccount { get; set; }
 
         [Display(Name = "Active")]

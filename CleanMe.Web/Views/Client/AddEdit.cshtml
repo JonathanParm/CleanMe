@@ -18,35 +18,17 @@
     @Html.HiddenFor(m => m.clientId)
     @* <input asp-for="clientId" type="hidden" /> *@
 
-    <div class="form-group">
-        <label asp-for="Name" class="form-label"></label>
-        <input asp-for="Name" class="form-control" required />
-        <span asp-validation-for="Name" class="text-danger"></span>
-    </div>
+    @Html.LabeledTextBoxFor(model => model.Name)
 
-    <div class="form-group">
-        <label asp-for="Brand" class="form-label"></label>
-        <input asp-for="Brand" class="form-control" required />
-        <span asp-validation-for="Brand" class="text-danger"></span>
-    </div>
+    @Html.LabeledTextBoxFor(model => model.Brand)
 
-    <div class="form-group">
-        <label asp-for="AccNo" class="form-label"></label>
-        <input asp-for="AccNo" class="form-control" required />
-        <span asp-validation-for="AccNo" class="text-danger"></span>
-    </div>
+    @Html.LabeledTextBoxFor(model => model.AccNo)
 
     <!-- Address Partial View -->
     <h3>Address</h3>
-    @Html.EditorFor(model => model.Address, "_AddressPartialView")
+    @Html.Partial("_AddressPartial", Model.Address)
 
-    <div class="mb-3">
-        <label class="form-label">Is Active</label>
-        <select asp-for="IsActive" class="form-control">
-            <option value="true">Active</option>
-            <option value="false">Inactive</option>
-        </select>
-    </div>
+    @Html.YesNoButtonsFor(model => model.IsActive)
 
     <button type="submit" class="btn btn-primary">Save</button>
     <a asp-action="Index" class="btn btn-secondary">Cancel</a>

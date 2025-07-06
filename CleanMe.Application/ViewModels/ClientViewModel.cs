@@ -15,7 +15,7 @@ namespace CleanMe.Application.ViewModels
 
         [Required]
         [StringLength(100, MinimumLength = 2, ErrorMessage = "Client name must have between 2 and 100 letters")]
-        [Display(Name = "Client name")]
+        [Display(Name = "Client")]
         public string Name { get; set; }
 
         [Required]
@@ -23,13 +23,13 @@ namespace CleanMe.Application.ViewModels
         [Display(Name = "Brand")]
         public string Brand { get; set; }
 
-        [DisplayName("DR Accs")]
+        [Display(Name = "DR Accs")]
         public int AccNo { get; set; }
 
         public AddressViewModel Address { get; set; } = new(); // Embedded Address Object
 
         [Required]
-        [DisplayName("Active")]
+        [Display(Name = "Active")]
         public bool IsActive { get; set; } = true;
 
         public List<ClientContactIndexViewModel> ContactsList { get; set; } = new();

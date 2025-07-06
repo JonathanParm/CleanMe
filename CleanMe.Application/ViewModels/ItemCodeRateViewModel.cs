@@ -14,7 +14,7 @@ namespace CleanMe.Application.ViewModels
         [Display(Name = "Rate name")]
         public string Name { get; set; }
 
-        [DisplayName("Description")]
+        [Display(Name = "Description")]
         [Column(TypeName = "VARCHAR")]
         [StringLength(100, MinimumLength = 2, ErrorMessage = "Item code rate description must have between 2 and 100 letters")]
         public string? Description { get; set; }
@@ -32,16 +32,16 @@ namespace CleanMe.Application.ViewModels
         public int? clientId { get; set; }
 
         [Required]
-        [DisplayName("Rate")]
+        [Display(Name = "Rate")]
         [Column(TypeName = "decimal(5, 2)")]
         public decimal Rate { get; set; }
 
         [Required]
-        [DisplayName("Default rate")]
+        [Display(Name = "Default rate")]
         public bool IsDefault { get; set; } = false;
 
         [Required]
-        [DisplayName("Active")]
+        [Display(Name = "Active")]
         public bool IsActive { get; set; } = true;
 
         [Display(Name = "Item code")]

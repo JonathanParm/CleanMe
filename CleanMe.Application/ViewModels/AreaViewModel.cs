@@ -32,7 +32,7 @@ namespace CleanMe.Application.ViewModels
         public int SortOrder { get; set; }
 
         [Required]
-        [DisplayName("Active")]
+        [Display(Name = "Active")]
         public bool IsActive { get; set; } = true;
 
         public string? RegionName { get; set; }

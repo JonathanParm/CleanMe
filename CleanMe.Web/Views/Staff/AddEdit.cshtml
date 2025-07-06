@@ -57,7 +57,8 @@
 
     <!-- Address Partial View -->
     <h3>Address</h3>
-    @Html.EditorFor(model => model.Address, "_AddressPartialView")
+    @* @Html.EditorFor(model => model.Address, "_AddressPartialView") *@
+    @Html.Partial("_AddressPartial", Model.Address)
 
     <div class="form-group">
         <label asp-for="IrdNumber" class="form-label"></label>

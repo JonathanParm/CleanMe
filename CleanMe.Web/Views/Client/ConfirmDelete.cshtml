@@ -22,7 +22,8 @@
 
 <!-- Address Partial View -->
 <h3>Address</h3>
-@Html.EditorFor(model => model.Address, "_AddressPartialReadOnlyView")
+@* @Html.EditorFor(model => model.Address, "_AddressPartialReadOnlyView") *@
+@Html.Partial("_AddressPartialReadOnly", Model.Address)
 
 <div class="mb-3">
     <label class="form-label">Acc No</label>

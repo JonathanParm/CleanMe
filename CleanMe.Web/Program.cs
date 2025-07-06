@@ -163,4 +163,10 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 app.MapRazorPages();
 
+System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+{
+    FileName = "http://localhost:5000",
+    UseShellExecute = true
+});
+
 app.Run();

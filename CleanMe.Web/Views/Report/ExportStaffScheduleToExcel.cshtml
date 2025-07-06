@@ -1,5 +1,21 @@
 ﻿@model CleanMe.Application.ViewModels.ExportStaffScheduleToExcelViewModel
 
+@if (TempData["ReportSuccessMessage"] != null)
+{
+    <div class="alert alert-success d-flex justify-content-between align-items-center">
+        <span>@TempData["ReportSuccessMessage"]</span>
+        @if (TempData["ReportOutputFolder"] != null)
+        {
+            <form asp-action="OpenFolder" method="post" class="mb-0">
+                <input type="hidden" name="folderPath" value="@TempData["ReportOutputFolder"]" />
+                <input type="hidden" name="returnRedirect" value="ExportStaffScheduleToExcel" />
+                <button type="submit" class="btn btn-sm btn-primary ms-3">Open Folder</button>
+            </form>
+        }
+    </div>
+}
+
+
 <form asp-action="ExportStaffScheduleToExcel" method="post">
     <input type="hidden" asp-for="DateRangeType" id="DateRangeType" />
   @*   <div class="form-group">

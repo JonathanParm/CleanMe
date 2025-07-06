@@ -14,7 +14,7 @@ namespace CleanMe.Application.ViewModels
         public int assetLocationId { get; set; }
 
         [Required(ErrorMessage = "Must have an asset location description")]
-        [DisplayName("Location")]
+        [Display(Name = "Location")]
         [Column(TypeName = "varchar")]
         [StringLength(200, MinimumLength = 3, ErrorMessage = "Asset location description must have between 3 and 200 letters")]
         public string Description { get; set; }
@@ -35,11 +35,11 @@ namespace CleanMe.Application.ViewModels
         [StringLength(20, MinimumLength = 2, ErrorMessage = "Asset location report code must have between 2 and 20 letters")]
         public string ReportCode { get; set; }
 
-        [DisplayName("ACC no")]
+        [Display(Name = "ACC no")]
         public int AccNo { get; set; }
 
         [Required]
-        [DisplayName("Active")]
+        [Display(Name = "Active")]
         public bool IsActive { get; set; } = true;
 
         public string? AreaName { get; set; }

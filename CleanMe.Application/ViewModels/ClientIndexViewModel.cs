@@ -19,7 +19,7 @@ namespace CleanMe.Application.ViewModels
         [Display(Name = "Brand")]
         public string Brand { get; set; }
 
-        [DisplayName("DR Accs")]
+        [Display(Name = "DR Accs")]
         public int AccNo { get; set; }
 
         [Display(Name = "Active")]

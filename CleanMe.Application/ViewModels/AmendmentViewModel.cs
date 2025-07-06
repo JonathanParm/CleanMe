@@ -15,13 +15,28 @@ namespace CleanMe.Application.ViewModels
         [Display(Name = "Name of source")]
         public string? AmendmentSourceName { get; set; }
 
+        [Display(Name = "Type")]
         public int? amendmentTypeId { get; set; } = null;
+
+        [Display(Name = "Area")]
         public int? areaId { get; set; } = null;
+
+        [Display(Name = "Asset")]
         public int? assetId { get; set; } = null;
+
+        [Display(Name = "Location")]
         public int? assetLocationId { get; set; } = null;
+
+        [Display(Name = "Frequency")]
         public int? cleanFrequencyId { get; set; } = null;
+
+        [Display(Name = "Client")]
         public int? clientId { get; set; } = null;
+
+        [Display(Name = "Item code")]
         public int? itemCodeId { get; set; } = null;
+
+        [Display(Name = "Staff")]
         public int? staffId { get; set; } = null;
 
         public string? AmendmentTypeName { get; set; } = null;
@@ -33,7 +48,7 @@ namespace CleanMe.Application.ViewModels
         public string? ItemCodeName { get; set; } = null;
         public string? StaffName { get; set; } = null;
 
-        [DisplayName("Rate")]
+        [Display(Name = "Rate")]
         [Column(TypeName = "decimal(5, 2)")]
         public decimal? Rate { get; set; } = null;
 
@@ -43,20 +58,20 @@ namespace CleanMe.Application.ViewModels
         [Display(Name = "Is Accessable")]
         public bool IsAccessable { get; set; } = true;
 
-        [DisplayName("Start on")]
+        [Display(Name = "Start on")]
         [DataType(DataType.DateTime)]
         public DateTime? StartOn { get; set; }
 
-        [DisplayName("Finish on")]
+        [Display(Name = "Finish on")]
         [DataType(DataType.DateTime)]
         public DateTime? FinishOn { get; set; }
 
         [Column(TypeName = "VARCHAR")]
         [StringLength(2000, MinimumLength = 2, ErrorMessage = "Comment about amendment to schedule must have between 2 and 2000 letters")]
-        [Display(Name = "Comment about amendment")]
+        [Display(Name = "Comment")]
         public string? Comment { get; set; }
 
-        [DisplayName("Invoiced")]
+        [Display(Name = "Invoiced")]
         [DataType(DataType.DateTime)]
         public DateTime? InvoicedOn { get; set; }
 

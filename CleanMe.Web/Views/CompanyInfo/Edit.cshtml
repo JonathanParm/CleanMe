@@ -17,25 +17,29 @@
 
     <input asp-for="companyInfoId" type="hidden" />
 
-    <div class="form-group">
+    @Html.LabeledTextBoxFor(model => model.Name)
+@*     <div class="form-group">
         <label asp-for="Name" class="form-label"></label>
         <input asp-for="Name" class="form-control" required />
         <span asp-validation-for="Name" class="text-danger"></span>
-    </div>
+    </div> *@
 
-    <div class="form-group">
+    @Html.LabeledTextBoxFor(model => model.Phone)
+@*     <div class="form-group">
         <label asp-for="Phone" class="form-label"></label>
         <input asp-for="Phone" class="form-control" />
-    </div>
+    </div> *@
 
-    <div class="form-group">
+    @Html.LabeledTextBoxFor(model => model.Email)
+@*     <div class="form-group">
         <label asp-for="Email" class="form-label"></label>
         <input asp-for="Email" class="form-control" />
-    </div>
+    </div> *@
 
     <!-- Address Partial View -->
     <h3>Address</h3>
-    @Html.EditorFor(model => model.Address, "_AddressPartialView")
+    @* @Html.EditorFor(model => model.Address, "_AddressPartialView") *@
+    @Html.Partial("_AddressPartial", Model.Address)
 
     <button type="submit" class="btn btn-primary">Save</button>
     <button type="button"

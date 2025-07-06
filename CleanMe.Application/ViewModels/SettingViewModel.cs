@@ -12,7 +12,7 @@ namespace CleanMe.Application.ViewModels
         public int settingId { get; set; }
 
         [Required(ErrorMessage = "Must have Export Excel folder path")]
-        [DisplayName("Export to Excel folder")]
+        [Display(Name = "Export to Excel folder")]
         [StringLength(1000, MinimumLength = 3, ErrorMessage = "Export to Excel folder path must have between 3 and 100 letters")]
         public string ExcelExportPath { get; set; }
     }

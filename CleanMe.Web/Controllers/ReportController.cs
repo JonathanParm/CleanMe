@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using CleanMe.Application.Filters;
 using System.Globalization;
+using System.Diagnostics;
 
 namespace CleanMe.Web.Controllers
 {
@@ -52,9 +53,12 @@ namespace CleanMe.Web.Controllers
                 return View(model);
             }
 
-            var filePath = await _reportService.GenerateExportStaffScheduleToExcelAsync(model);
-            var fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
-            var fileName = Path.GetFileName(filePath);
+            var (filePath, fileName) = await _reportService.GenerateExportStaffScheduleToExcelAsync(model);
+            var fileBytes = await System.IO.File.ReadAllBytesAsync(Path.Combine(filePath, fileName));
+
+            TempData["ReportSuccessMessage"] = "Excel report generated successfully.";
+            TempData["ReportOutputFolder"] = filePath; // e.g. @"C:\CleanMeReports\Monthly"
+
 
             return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
@@ -88,12 +92,31 @@ namespace CleanMe.Web.Controllers
                 return View(model);
             }
 
-            var filePath = await _reportService.GenerateExportClientScheduleToExcelAsync(model);
-            var fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
-            var fileName = Path.GetFileName(filePath);
+            var (filePath, fileName) = await _reportService.GenerateExportClientScheduleToExcelAsync(model);
+            var fileBytes = await System.IO.File.ReadAllBytesAsync(Path.Combine(filePath, fileName));
+
+            TempData["ReportSuccessMessage"] = "Excel report generated successfully.";
+            TempData["ReportOutputFolder"] = filePath; // e.g. @"C:\CleanMeReports\Monthly"
 
             return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
+
+        [HttpPost]
+        public IActionResult OpenFolder(string folderPath, string returnRedirect)
+        {
+            if (!string.IsNullOrEmpty(folderPath) && Directory.Exists(folderPath))
+            {
+                var psi = new ProcessStartInfo
+                {
+                    FileName = folderPath,
+                    UseShellExecute = true
+                };
+                Process.Start(psi);
+            }
+
+            return RedirectToAction(returnRedirect);
+        }
+
 
         [HttpGet]
         private async Task PopulateStaffSelectListsAsync(ExportStaffScheduleToExcelViewModel model)

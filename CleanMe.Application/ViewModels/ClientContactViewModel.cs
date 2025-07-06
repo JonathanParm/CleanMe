@@ -13,36 +13,36 @@ namespace CleanMe.Application.ViewModels
 
         public int clientId { get; set; }
 
-        [DisplayName("First name")]
+        [Display(Name = "First name")]
         [Required]
         [StringLength(50, ErrorMessage = "First name cannot exceed 50 characters.")]
         [MinLength(2, ErrorMessage = "First name must be at least 2 characters.")]
         public string FirstName { get; set; } = string.Empty;
 
-        [DisplayName("Family name")]
+        [Display(Name = "Family name")]
         [Required]
         [StringLength(50, ErrorMessage = "Family/last name cannot exceed 50 characters.")]
         [MinLength(2, ErrorMessage = "Family/last name must be at least 2 characters.")]
         public string FamilyName { get; set; } = string.Empty;
 
-        [DisplayName("Mobile phone")]
+        [Display(Name = "Mobile phone")]
         [StringLength(30, MinimumLength = 6, ErrorMessage = "Mobile phone number cannot have more than 30 digits")]
         [MinLength(6, ErrorMessage = "Mobile phone number must be at least 6 digits.")]
         public string? PhoneMobile { get; set; } = string.Empty;
 
-        [DisplayName("Email")]
+        [Display(Name = "Email")]
         [StringLength(256, ErrorMessage = "Email address cannot have more than 256 digits")]
         [MinLength(6, ErrorMessage = "An email address must be at least 6 digits.")]
         [Remote(action: "IsEmailAvailable", controller: "ClientContact", AdditionalFields = "clientContactId", ErrorMessage = "Email is already in use.")]
         [EmailAddress]
         public string? Email { get; set; }
 
-        [DisplayName("Job title")]
+        [Display(Name = "Job title")]
         [StringLength(20)]
         public string? JobTitle { get; set; } = string.Empty;
 
         [Required]
-        [DisplayName("Active")]
+        [Display(Name = "Active")]
         public bool IsActive { get; set; } = true;
 
         public string? ApplicationUserId { get; set; }

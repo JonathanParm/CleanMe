@@ -26,7 +26,7 @@ namespace CleanMe.Application.ViewModels
         [Display(Name = "Client")]
         public string ClientName { get; set; }
 
-        [DisplayName("Rate")]
+        [Display(Name = "Rate")]
         [Column(TypeName = "decimal(5, 2)")]
         public decimal Rate { get; set; }
 

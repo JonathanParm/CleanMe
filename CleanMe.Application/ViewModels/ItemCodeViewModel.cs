@@ -9,41 +9,41 @@ namespace CleanMe.Application.ViewModels
         public int itemCodeId { get; set; }
 
         [Required(ErrorMessage = "Must have an item code")]
-        [DisplayName("Code")]
+        [Display(Name = "Code")]
         public string Code { get; set; }
 
         [Required(ErrorMessage = "Must have an item name")]
-        [DisplayName("Name")]
+        [Display(Name = "Name")]
         public string ItemName { get; set; }
 
         [Required(ErrorMessage = "Item must have an item description")]
-        [DisplayName("Item description")]
+        [Display(Name = "Item description")]
         public string ItemDescription { get; set; }
 
         [Required(ErrorMessage = "Item must have a purchase description")]
-        [DisplayName("Purchase description")]
+        [Display(Name = "Purchase description")]
         public string PurchasesDescription { get; set; }
 
         [Required(ErrorMessage = "Item must have a sales description")]
-        [DisplayName("Sales description")]
+        [Display(Name = "Sales description")]
         public string SalesDescription { get; set; }
 
         [Required]
-        [DisplayName("Purchases unit rate")]
+        [Display(Name = "Purchases unit rate")]
         public decimal PurchasesUnitRate { get; set; }
 
         [Required]
-        [DisplayName("Sales unit rate")]
+        [Display(Name = "Sales unit rate")]
         public decimal SalesUnitRate { get; set; }
 
-        [DisplayName("Purchases XERO account")]
+        [Display(Name = "Purchases XERO account")]
         public int? PurchasesXeroAccount { get; set; }
 
-        [DisplayName("Sales XERO account")]
+        [Display(Name = "Sales XERO account")]
         public int? SalesXeroAccount { get; set; }
 
         [Required]
-        [DisplayName("Active")]
+        [Display(Name = "Active")]
         public bool IsActive { get; set; } = true;
 
         //public List<ItemCodeRateIndexViewModel> ItemCodeRatesList { get; set; } = new();

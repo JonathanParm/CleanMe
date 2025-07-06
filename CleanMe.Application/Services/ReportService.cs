@@ -40,7 +40,7 @@ namespace CleanMe.Application.Services
             _logger = logger;
         }
 
-        public async Task<string> GenerateExportClientScheduleToExcelAsync(ExportClientScheduleToExcelViewModel model)
+        public async Task<(string FolderPath, string FileName)> GenerateExportClientScheduleToExcelAsync(ExportClientScheduleToExcelViewModel model)
         {
             _logger.LogInformation("Generate Export client schedule to Excel Async.");
             try
@@ -93,12 +93,12 @@ namespace CleanMe.Application.Services
                     var folder = Path.Combine(outputPath, parsedDate.ToString("yyyy MM"));
                     Directory.CreateDirectory(folder);
 
-                    var baseFileName = $"Schedule {model.DateFrom:yyyy_MM} {clientName}.xlsx";
+                    var baseFileName = $"Schedule {model.DateFrom:yyyy MM} {clientName}.xlsx";
                     var fullPath = Path.Combine(folder, baseFileName);
                     if (File.Exists(fullPath))
                     {
-                        var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmm");
-                        baseFileName = $"Schedule {model.DateFrom:yyyy-MM} {clientName} {timestamp}.xlsx";
+                        var timestamp = DateTime.Now.ToString("yyyyMMdd HHmm");
+                        baseFileName = $"Schedule {model.DateFrom:yyyy MM} {clientName} {timestamp}.xlsx";
                         fullPath = Path.Combine(folder, baseFileName);
                     }
 
@@ -125,9 +125,9 @@ namespace CleanMe.Application.Services
                     ws.Cells[row + 1, 6].Value = $"Schedule for {model.DateFrom:MMMM yyyy}";
                     ws.Cells[row + 1, 6].Style.Font.Bold = true;
 
-                    row += 4;
+                    row += 6;
 
-                    int headerRow = 4;
+                    int headerRow = row;
                     int sundayRow = headerRow - 1;
 
                     // Fixed headers
@@ -142,14 +142,6 @@ namespace CleanMe.Application.Services
                         ws.Cells[sundayRow, i + 2].Value = sundayHeaders[i];
                         ws.Cells[sundayRow, i + 2].Style.Font.Bold = true;
                     }
-
-                    // Write Column Labels row (row 4)
-                    //var allHeaders = new List<string>(fixedHeaders) { "Wk1", "Wk2", "Wk3", "Wk4", "Wk5" };
-                    //for (int col = 0; col < allHeaders.Count; col++)
-                    //{
-                    //    ws.Cells[headerRow, col + 1].Value = allHeaders[col];
-                    //    ws.Cells[headerRow, col + 1].Style.Font.Bold = true;
-                    //}
 
                     for (int col = 0; col < fixedHeaders.Count; col++)
                     {
@@ -175,20 +167,33 @@ namespace CleanMe.Application.Services
 
                         foreach (var item in areaGroup)
                         {
+
                             ws.Cells[row, 1].Value = item.CleanFrequency;
+                            ws.Cells[row, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
 
-                            var weekValues = new[] { item.Wk1, item.Wk2, item.Wk3, item.Wk4, item.Wk5 };
-                            for (int i = 0; i < sundays.Count; i++)
-                            {
-                                ws.Cells[row, 2 + i].Value = weekValues[i];
-                            }
+                            //col = 2;
+                            //var weekValues = new[] { item.Wk1, item.Wk2, item.Wk3, item.Wk4, item.Wk5 };
+                            //for (int i = 0; i < sundays.Count; i++)
+                            //{
+                            //    ws.Cells[row, col + i].Value = weekValues[i];
+                            //}
+                            ws.Cells[row, 2].Value = item.Wk1;
+                            ws.Cells[row, 2].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+                            ws.Cells[row, 3].Value = item.Wk2;
+                            ws.Cells[row, 3].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+                            ws.Cells[row, 4].Value = item.Wk3;
+                            ws.Cells[row, 4].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+                            ws.Cells[row, 5].Value = item.Wk4;
+                            ws.Cells[row, 5].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+                            ws.Cells[row, 6].Value = item.Wk5;
+                            ws.Cells[row, 6].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
 
-                            ws.Cells[row, 1].Value = item.ItemCode;
-                            ws.Cells[row, 2].Value = item.ClientReference;
-                            ws.Cells[row, 3].Value = item.MdId;
-                            ws.Cells[row, 4].Value = item.RegionName;
-                            ws.Cells[row, 5].Value = item.AreaName;
-                            ws.Cells[row, 6].Value = item.AssetLocation;
+                            ws.Cells[row, 7].Value = item.ItemCode;
+                            ws.Cells[row, 8].Value = item.ClientReference;
+                            ws.Cells[row, 9].Value = item.MdId;
+                            ws.Cells[row, 10].Value = item.RegionName;
+                            ws.Cells[row, 11].Value = item.AreaName;
+                            ws.Cells[row, 12].Value = item.AssetLocation;
 
                             row++;
                         }
@@ -212,10 +217,10 @@ namespace CleanMe.Application.Services
 
                     await package.SaveAsAsync(new FileInfo(fullPath));
 
-                    return fullPath;
+                    return (folder, baseFileName);
                 }
 
-                return string.Empty;
+                return (string.Empty, string.Empty);
             }
             catch (Exception ex)
             {
@@ -225,7 +230,7 @@ namespace CleanMe.Application.Services
             }
         }
 
-        public async Task<string> GenerateExportStaffScheduleToExcelAsync(ExportStaffScheduleToExcelViewModel model)
+        public async Task<(string FolderPath, string FileName)> GenerateExportStaffScheduleToExcelAsync(ExportStaffScheduleToExcelViewModel model)
         {
             _logger.LogInformation("Generate Export staff schedule to Excel Async.");
             try
@@ -277,17 +282,17 @@ namespace CleanMe.Application.Services
 
                 foreach (var cleanerGroup in groupedByCleaner)
                 {
-                    var cleanerName = cleanerGroup.Key;
+                    var cleanerName = cleanerGroup.Key.CleanerName;
                     var monthFolderName = model.DateFrom.ToString();
                     var parsedDate = DateTime.Parse(monthFolderName);
                     var folder = Path.Combine(outputPath, parsedDate.ToString("yyyy MM"));
                     Directory.CreateDirectory(folder);
 
-                    var baseFileName = $"Schedule {model.DateFrom:yyyy_MM} {cleanerName}.xlsx";
+                    var baseFileName = $"Schedule {model.DateFrom:yyyy MM} {cleanerName}.xlsx";
                     var fullPath = Path.Combine(folder, baseFileName);
                     if (File.Exists(fullPath))
                     {
-                        var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmm");
+                        var timestamp = DateTime.Now.ToString("yyyyMMdd HHmm");
                         baseFileName = $"Schedule {model.DateFrom:yyyy_MM} {cleanerName} {timestamp}.xlsx";
                         fullPath = Path.Combine(folder, baseFileName);
                     }
@@ -371,10 +376,10 @@ namespace CleanMe.Application.Services
 
                     await package.SaveAsAsync(new FileInfo(fullPath));
 
-                    return fullPath;
+                    return (folder, baseFileName);
                 }
 
-                return string.Empty;
+                return (string.Empty, string.Empty);
             }
             catch (Exception ex)
             {

@@ -36,28 +36,22 @@
     @if (!Model.IsEdit)
     {
         <div class="form-group" data-field="amendmentTypeId">
-            <label for="AmendmentCurrent.amendmentTypeId">Amendment type</label>
-            <select asp-for="AmendmentCurrent.amendmentTypeId" asp-items="Model.AmendmentTypes" class="form-control" id="amendmentTypeId"></select>
+            @Html.LabeledDropDownFor(model => Model.AmendmentCurrent.amendmentTypeId, Model.AmendmentTypes)
         </div>
         <div class="form-group" data-field="clientId">
-            <label for="ClientId">Client</label>
-            <select asp-for="AmendmentCurrent.clientId" asp-items="Model.Clients" class="form-control" id="clientId"></select>
+            @Html.LabeledDropDownFor(model => Model.AmendmentCurrent.clientId, Model.Clients)
         </div>
         <div class="form-group" data-field="areaId">
-            <label for="AmendmentCurrent.areaId">Area</label>
-            <select asp-for="AmendmentCurrent.areaId" asp-items="Model.Areas" class="form-control" id="areaId"></select>
+            @Html.LabeledDropDownFor(model => Model.AmendmentCurrent.areaId, Model.Areas)
         </div>
         <div class="form-group" data-field="assetLocationId">
-            <label for="AmendmentCurrent.assetLocationId">Asset Location</label>
-            <select asp-for="AmendmentCurrent.assetLocationId" asp-items="Model.AssetLocations" class="form-control" id="assetLocationId"></select>
+            @Html.LabeledDropDownFor(model => Model.AmendmentCurrent.assetLocationId, Model.AssetLocations)
         </div>
         <div class="form-group" data-field="itemCodeId">
-            <label for="AmendmentCurrent.itemCodeId">Item code</label>
-            <select asp-for="AmendmentCurrent.itemCodeId" asp-items="Model.ItemCodes" class="form-control" id="itemCodeId"></select>
+            @Html.LabeledDropDownFor(model => Model.AmendmentCurrent.itemCodeId, Model.ItemCodes)
         </div>
         <div class="form-group" data-field="assetId">
-            <label for="AmendmentCurrent.assetId">Asset</label>
-            <select asp-for="AmendmentCurrent.assetId" asp-items="Model.Assets" class="form-control" id="assetId"></select>
+            @Html.LabeledDropDownFor(model => Model.AmendmentCurrent.assetId, Model.Assets)
         </div>
     }
     else
@@ -75,11 +69,11 @@
             <label>Amendment type</label>
             <p class="form-control-static">@Model.AmendmentCurrent.AmendmentTypeName</p>
         </div>
-        <div class="form-group" data-field="clientId"">
+        <div class="form-group" data-field="clientId" ">
             <label>Client</label>
             <p class="form-control-static">@Model.AmendmentCurrent.ClientName</p>
         </div>
-        <div class="form-group" data-field="areaId"">
+        <div class="form-group" data-field="areaId" ">
             <label>Area</label>
             <p class="form-control-static">@Model.AmendmentCurrent.AreaName</p>
         </div>
@@ -111,59 +105,49 @@
                 <td>Cleaning Frequency</td>
                 <td>@Model.AmendmentLastInvoiced.CleanFrequencyName</td>
                 <td>
-                    <select asp-for="AmendmentCurrent.cleanFrequencyId" asp-items="Model.CleanFrequencies" class="form-control" id="cleanFrequencyId"></select>
-                    <span asp-validation-for="AmendmentCurrent.cleanFrequencyId" class="text-danger"></span>
+                    @Html.LabeledDropDownFor(model => model.AmendmentCurrent.cleanFrequencyId, Model.CleanFrequencies)
                 </td>
             </tr>
             <tr data-field="staffId">
                 <td>Cleaner</td>
                 <td>@Model.AmendmentLastInvoiced.StaffName</td>
                 <td>
-                    <select asp-for="AmendmentCurrent.staffId" asp-items="Model.Staff" class="form-control" id="staffId"></select>
-                    <span asp-validation-for="AmendmentCurrent.staffId" class="text-danger"></span>
+                    @Html.LabeledDropDownFor(model => model.AmendmentCurrent.staffId, Model.Staff)
                 </td>
             </tr>
             <tr data-field="rate">
                 <td>Rate</td>
                 <td>@(Model.AmendmentLastInvoiced.Rate?.ToString("C"))</td>
                 <td>
-                    <input asp-for="AmendmentCurrent.Rate" class="form-control" />
-                    <span asp-validation-for="AmendmentCurrent.Rate" class="text-danger"></span>
+                    @Html.LabeledTextBoxFor(model => model.AmendmentCurrent.Rate)
                 </td>
             </tr>
             <tr data-field="isAccessable">
                 <td>Is Accessable</td>
-                <td>@(Model.AmendmentLastInvoiced.IsAccessable ? "Yes" : "No")
+                <td>@(Model.AmendmentLastInvoiced.IsAccessable ? "Yes" : "No")</td>
                 <td>
-                    <select asp-for="AmendmentLastInvoiced.IsAccessable" class="form-control">
-                        <option value="true">Yes</option>
-                        <option value="false">No</option>
-                    </select>
-                    <span asp-validation-for="AmendmentLastInvoiced.IsAccessable" class="text-danger"></span>
+                    @Html.YesNoButtonsFor(model => model.AmendmentCurrent.IsAccessable)
                 </td>
             </tr>
             <tr>
                 <td>Start Date</td>
                 <td>@(Model.AmendmentLastInvoiced.StartOn?.ToString("d MMM yyyy") ?? "")</td>
                 <td>
-                    <input asp-for="AmendmentCurrent.StartOn" type="date" class="form-control" />
-                    <span asp-validation-for="AmendmentCurrent.StartOn" class="text-danger"></span>
+                    @Html.LabeledTextBoxFor(model => model.AmendmentCurrent.StartOn)
                 </td>
             </tr>
             <tr>
                 <td>Finish Date</td>
                 <td>@(Model.AmendmentLastInvoiced.FinishOn?.ToString("d MMM yyyy") ?? "")</td>
                 <td>
-                    <input asp-for="AmendmentCurrent.FinishOn" type="date" class="form-control" />
-                    <span asp-validation-for="AmendmentCurrent.FinishOn" class="text-danger"></span>
+                    @Html.LabeledTextBoxFor(model => model.AmendmentCurrent.FinishOn)
                 </td>
             </tr>
             <tr>
                 <td>Comment</td>
                 <td>@(Model.AmendmentLastInvoiced.Comment)</td>
                 <td>
-                    <textarea asp-for="AmendmentCurrent.Comment" class="form-control" rows="4"></textarea>
-                    <span asp-validation-for="AmendmentCurrent.FinishOn" class="text-danger"></span>
+                    @Html.LabeledTextAreaFor(model => model.AmendmentCurrent.Comment)
                 </td>
             </tr>
         </tbody>
