@@ -2,17 +2,17 @@
 @using CleanMe.Domain.Enums
 @using CleanMe.Shared.Helpers
 
-@model CleanMe.Application.ViewModels.AreaViewModel
+@model CleanMe.Application.ViewModels.AreaWithAssetLocationsViewModel
 
 @{
-    ViewData["Title"] = Model.areaId == 0 ? "Add Area" : "Edit Area";
+    ViewData["Title"] = Model.Area.areaId == 0 ? "Add Area" : "Edit Area";
 }
 
 <h2>@ViewData["Title"]</h2>
 
 <div class="form-group">
     <label class="form-label">Region</label>
-    <div class="form-control-plaintext">@Model.RegionName</div>
+    <div class="form-control-plaintext">@Model.Area.Region.RegionName</div>
 </div>
 
 <form asp-action="AddEdit" method="post" id="AreaForm" novalidate>
@@ -20,17 +20,17 @@
 
     @Html.ValidationSummary(false, "", new { @class = "text-danger" })
 
-    <input asp-for="areaId" type="hidden" />
-    <input asp-for="regionId" type="hidden" />
+    <input asp-for="Area.areaId" type="hidden" />
+    <input asp-for="Area.regionId" type="hidden" />
     <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
 
-    @Html.LabeledTextBoxFor(model => model.Name)
+    @Html.LabeledTextBoxFor(model => model.Area.AreaName)
 
-    @Html.LabeledTextBoxFor(model => model.ReportCode)
+    @Html.LabeledTextBoxFor(model => model.Area.ReportCode)
 
-    @Html.LabeledTextBoxFor(model => model.SortOrder)
+    @Html.LabeledTextBoxFor(model => model.Area.SortOrder)
 
-    @Html.YesNoButtonsFor(model => model.IsActive)
+    @Html.YesNoButtonsFor(model => model.Area.IsActive)
 
     <button type="submit" class="btn btn-primary">Save</button>
     <a href="@ViewBag.ReturnUrl" class="btn btn-secondary">Cancel</a>
@@ -44,8 +44,8 @@
             class="btn btn-sm btn-primary"
             data-redirect="@Url.Action("AddEdit", "AssetLocation", new
         {
-            areaId = Model.areaId,
-            returnUrl = Url.Action("AddEdit", "Area", new { areaId = Model.areaId })
+                areaId = Model.Area.areaId,
+                returnUrl = Url.Action("AddEdit", "Area", new { areaId = Model.Area.areaId })
         })"
             data-form="AreaForm">
         ➕ Add Asset Location
@@ -64,7 +64,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var assetLocation in Model.AssetLocationsList)
+            @foreach (var assetLocation in Model.AssetLocations)
             {
                 <tr>
                     <td>@assetLocation.Description</td>
@@ -77,8 +77,8 @@
                                 data-redirect="@Url.Action("AddEdit", "AssetLocation", new
                             {
                                 assetLocationId = assetLocation.assetLocationId,
-                                areaId = Model.areaId,
-                                returnUrl = Url.Action("AddEdit", "Area", new { areaId = Model.areaId })
+                                areaId = Model.Area.areaId,
+                                    returnUrl = Url.Action("AddEdit", "Area", new { areaId = Model.Area.areaId })
                             })"
                                 data-form="AreaForm">
                             ✏️ Edit
@@ -89,8 +89,8 @@
                                 data-redirect="@Url.Action("Delete", "AssetLocation", new
                             {
                                 assetLocationId = assetLocation.assetLocationId,
-                                areaId = Model.areaId,
-                                returnUrl = Url.Action("AddEdit", "Area", new { areaId = Model.areaId })
+                                areaId = Model.Area.areaId,
+                                returnUrl = Url.Action("AddEdit", "Area", new { areaId = Model.Area.areaId })
                             })"
                                 data-form="AreaForm">
                             🗑 Delete
@@ -100,6 +100,20 @@
             }
         </tbody>
     </table>
+    @await Html.PartialAsync(
+    "_PagerFooter",
+        new CleanMe.Application.Helpers.Paging.PagerModel
+        {
+            PageNumber = Model.PageNumber,
+            PageSize = Model.PageSize,
+            TotalCount = Model.TotalCount,
+            RouteValues = new Microsoft.AspNetCore.Routing.RouteValueDictionary
+            {
+                ["areaId"] = Model.Area.areaId
+            }
+        },
+        viewData: null
+        )
 </div>
 
 

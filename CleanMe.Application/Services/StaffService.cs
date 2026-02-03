@@ -1,18 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using CleanMe.Application.DTOs;
+using CleanMe.Application.Helpers.Paging;
 using CleanMe.Application.Interfaces;
 using CleanMe.Application.ViewModels;
-using CleanMe.Domain.Interfaces;
-using CleanMe.Domain.Entities;
-using CleanMe.Domain.Enums;
-using Microsoft.Extensions.Logging;
-using System.Reflection;
-using Microsoft.AspNetCore.Http.HttpResults;
 using CleanMe.Domain.Common;
-using CleanMe.Application.DTOs;
-using System.Collections;
+using CleanMe.Domain.Entities;
+using CleanMe.Domain.Interfaces;
+using Microsoft.Extensions.Logging;
 using System.Data;
 
 namespace CleanMe.Application.Services
@@ -35,15 +28,15 @@ namespace CleanMe.Application.Services
 
         // Retrieve a list of staff members using Dapper (Optimized for performance)
         public async Task<IEnumerable<StaffIndexViewModel>> GetStaffIndexAsync(
-            string? staffNo, string? fullName, string? workRole, string? contactDetail, string? isActive,
+            string? staffId, string? fullName, string? workRole, string? contactDetail, string? isActive,
             string sortColumn, string sortOrder, int pageNumber, int pageSize)
         {
             _logger.LogInformation("Fetching staff list using Dapper.");
-            var query = "EXEC dbo.StaffGetIndexView @StaffNo, @FullName, @WorkRole, @ContactDetail, @IsActive, @SortColumn, @SortOrder, @PageNumber, @PageSize";
+            var query = "EXEC dbo.StaffGetIndexView @StaffId, @FullName, @WorkRole, @ContactDetail, @IsActive, @SortColumn, @SortOrder, @PageNumber, @PageSize";
 
             var parameters = new
             {
-                StaffNo = staffNo,
+                StaffId = staffId,
                 FullName = fullName,
                 WorkRole = workRole,
                 ContactDetail = contactDetail,
@@ -55,6 +48,62 @@ namespace CleanMe.Application.Services
             };
 
             return await _unitOfWork.DapperRepository.QueryAsync<StaffIndexViewModel>(query, parameters);
+        }
+        public async Task<PagedResult<StaffIndexViewModel>> GetPagedIndexAsync(
+            int pageNumber,
+            int pageSize,
+            string sortColumn,
+            string sortOrder,
+            string? staffId,
+            string? fullName,
+            string? workRole,
+            string? contactDetail,
+            string? isActive)
+        {
+            // Defensive normalisation (helps prevent bad sort inputs)
+            pageNumber = pageNumber < 1 ? 1 : pageNumber;
+            pageSize = pageSize < 1 ? 20 : pageSize;
+
+            sortOrder = (sortOrder?.ToUpperInvariant() == "DESC") ? "DESC" : "ASC";
+            sortColumn = string.IsNullOrWhiteSpace(sortColumn) ? "staffId" : sortColumn;
+
+            var parameters = new
+            {
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                SortColumn = sortColumn,
+                SortOrder = sortOrder,
+                staffId = staffId,
+                FullName = fullName,
+                WorkRole = workRole,
+                ContactDetail = contactDetail, 
+                IsActive = isActive
+            };
+
+            const string proc = "dbo.StaffGetIndexView";
+
+            var rows = (await _unitOfWork.DapperRepository
+                .QueryAsync<StaffIndexRowDTO>(proc, parameters, CommandType.StoredProcedure))
+                .ToList();
+
+            var totalCount = rows.FirstOrDefault()?.TotalCount ?? 0;
+
+            var items = rows.Select(r => new StaffIndexViewModel
+            {
+                staffId = r.staffId,
+                FullName = r.FullName,
+                WorkRole = r.WorkRole,
+                ContactDetail = r.ContactDetail,
+                IsActive = r.IsActive
+            }).ToList();
+
+            return new PagedResult<StaffIndexViewModel>
+            {
+                Items = items,
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalCount = totalCount
+            };
         }
 
         public async Task<IEnumerable<StaffViewModel>> FindDuplicateStaffAsync(string firstName, string familyName, int? staffNo, int? staffId = null)

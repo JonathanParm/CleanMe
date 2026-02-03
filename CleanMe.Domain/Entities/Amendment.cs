@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CleanMe.Domain.Entities
 {
@@ -25,50 +19,50 @@ namespace CleanMe.Domain.Entities
 
         // Optional Foreign key property linking to the parent
         [ForeignKey("AmendmentType")]
-        [DisplayName("Amendment type")]
+        [Display(Name = "Amendment type")]
         public int? amendmentTypeId { get; set; }
         // Navigation property representing the parent
-        [DisplayName("AmendmentType")]
+        [Display(Name = "AmendmentType")]
         public AmendmentType? AmendmentType { get; set; }
 
         // Optional Foreign key property linking to the parent
         [ForeignKey("Client")]
-        [DisplayName("Client")]
+        [Display(Name = "Client")]
         public int? clientId { get; set; }
         // Navigation property representing the parent
-        [DisplayName("Client")]
+        [Display(Name = "Client")]
         public Client? Client { get; set; }
 
         // Optional Foreign key property linking to the parent
         [ForeignKey("Area")]
-        [DisplayName("Area")]
+        [Display(Name = "Area")]
         public int? areaId { get; set; }
         // Navigation property representing the parent
-        [DisplayName("Area")]
+        [Display(Name = "Area")]
         public Area? Area { get; set; }
 
         // Optional Foreign key property linking to the parent
         [ForeignKey("AssetLocation")]
-        [DisplayName("Asset location")]
+        [Display(Name = "Asset location")]
         public int? assetLocationId { get; set; }
         // Navigation property representing the parent
-        [DisplayName("Asset location")]
+        [Display(Name = "Asset location")]
         public AssetLocation? AssetLocation { get; set; }
 
         // Optional Foreign key property linking to the parent
         [ForeignKey("ItemCode")]
-        [DisplayName("Item code")]
+        [Display(Name = "Item code")]
         public int? itemCodeId { get; set; }
         // Navigation property representing the parent
-        [DisplayName("Item code")]
+        [Display(Name = "Item code")]
         public ItemCode? ItemCode { get; set; }
 
         // Optional Foreign key property linking to the parent
         [ForeignKey("Asset")]
-        [DisplayName("Asset")]
+        [Display(Name = "Asset")]
         public int? assetId { get; set; }
         // Navigation property representing the parent
-        [DisplayName("Asset")]
+        [Display(Name = "Asset")]
         public Asset? Asset { get; set; }
 
         // Optional Foreign key property linking to the parent
@@ -76,18 +70,18 @@ namespace CleanMe.Domain.Entities
         [Display(Name = "Staff Number")]
         public int? staffId { get; set; }
         // Navigation property representing the parent
-        [DisplayName("Staff")]
+        [Display(Name = "Staff")]
         public Staff? Staff { get; set; }
 
         // Foreign key property linking to the parent
         [ForeignKey("Frequency")]
-        [DisplayName("Clean frequency")]
+        [Display(Name = "Clean frequency")]
         public int? cleanFrequencyId { get; set; }
         // Navigation property representing the parent
-        [DisplayName("Clean frequency")]
+        [Display(Name = "Clean frequency")]
         public CleanFrequency? CleanFrequency { get; set; }
 
-        [DisplayName("Rate")]
+        [Display(Name = "Rate")]
         [Column(TypeName = "decimal(5, 2)")]
         public decimal? Rate { get; set; }
 
@@ -99,10 +93,13 @@ namespace CleanMe.Domain.Entities
         [Display(Name = "Is Accessable")]
         public bool IsAccessable { get; set; } = true;
 
-        [DisplayName("Start on")]
+        [Display(Name = "Is default")]
+        public bool IsDefault { get; set; } = false;
+
+        [Display(Name = "Start on")]
         public DateTime? StartOn { get; set; }
 
-        [DisplayName("Finish on")]
+        [Display(Name = "Finish on")]
         public DateTime? FinishOn { get; set; }
 
         [Column(TypeName = "varchar")]
@@ -110,29 +107,29 @@ namespace CleanMe.Domain.Entities
         [Display(Name = "Comment about amendment")]
         public string? Comment { get; set; }
 
-        [DisplayName("Invoiced")]
+        [Display(Name = "Invoiced")]
         public DateTime? InvoicedOn { get; set; }
 
         [Required]
-        [DisplayName("Deleted")]
+        [Display(Name = "Deleted")]
         public bool IsDeleted { get; set; } = false;
 
         [Required]
-        [DisplayName("Added at")]
+        [Display(Name = "Added at")]
         public DateTime AddedAt { get; set; }
 
         [Required]
-        [DisplayName("Created by")]
+        [Display(Name = "Created by")]
         [Column(TypeName = "NVARCHAR")]
         [StringLength(450)]
         public string AddedById { get; set; }
 
         [Required]
-        [DisplayName("Updated at")]
+        [Display(Name = "Updated at")]
         public DateTime UpdatedAt { get; set; }
 
         [Required]
-        [DisplayName("Updated by")]
+        [Display(Name = "Updated by")]
         [Column(TypeName = "NVARCHAR")]
         [StringLength(450)]
         public string UpdatedById { get; set; }

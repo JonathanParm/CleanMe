@@ -35,15 +35,16 @@ namespace CleanMe.Web.Controllers
             _errorLoggingService = errorLoggingService;
         }
         public async Task<IActionResult> Index(
-            string? assetName, string? regionName, string? mdReference, string? clientName, string? clientReference,
+            string? assetName, string? regionName, string? areaName, string? mdReference, string? clientName, string? clientReference,
             string? assetLocation, string? assetType,
             string sortColumn = "AssetName", string sortOrder = "ASC",
-            int pageNumber = 1, int pageSize = 20)
+            int pageNumber = 1, int pageSize = 5)
         {
             ViewBag.SortColumn = sortColumn;
             ViewBag.SortOrder = sortOrder;
             ViewBag.AssetName = assetName;
             ViewBag.RegionName = regionName;
+            ViewBag.AreaName = areaName;
             ViewBag.MdReference = mdReference;
             ViewBag.ClientName = clientName;
             ViewBag.ClientReference = clientReference;
@@ -52,10 +53,24 @@ namespace CleanMe.Web.Controllers
 
             try
             {
-                var AssetList = await _assetService.GetAssetIndexAsync(
-                    assetName, regionName, mdReference, clientName, clientReference,
-                    assetLocation, assetType,
-                    sortColumn, sortOrder, pageNumber, pageSize);
+                //var AssetList = await _assetService.GetAssetIndexAsync(
+                //    assetName, regionName, mdReference, clientName, clientReference,
+                //    assetLocation, assetType,
+                //    sortColumn, sortOrder, pageNumber, pageSize);
+
+                var AssetList = await _assetService.GetPagedIndexAsync(
+                    pageNumber,
+                    pageSize,
+                    sortColumn,
+                    sortOrder,
+                    assetName,
+                    regionName,
+                    areaName,
+                    mdReference,
+                    clientName,
+                    clientReference,
+                    assetLocation,
+                    assetType);
 
                 return View(AssetList);
             }
@@ -123,7 +138,7 @@ namespace CleanMe.Web.Controllers
                 }
 
                 // Check for duplicate Asset (excluding current record)
-                var duplicateAsset = await _assetService.FindDuplicateAssetAsync(model.Name, model.assetId);
+                var duplicateAsset = await _assetService.FindDuplicateAssetAsync(model.AssetName, model.assetId);
                 if (duplicateAsset.Any())
                 {
                     //TempData["WarningMessage"] = "A Asset with the same name or code already exists.";
@@ -138,7 +153,7 @@ namespace CleanMe.Web.Controllers
                 if (model.assetId == 0)
                 {
                     int newassetId = await _assetService.AddAssetAsync(model, GetCurrentUserId());
-                    TempData["SuccessMessage"] = $"Asset {model.Name} added successfully!";
+                    TempData["SuccessMessage"] = $"Asset {model.AssetName} added successfully!";
                 }
                 else // Update Existing Asset
                 {
@@ -154,7 +169,7 @@ namespace CleanMe.Web.Controllers
 
                     Console.WriteLine("DEBUG: Updating existing Asset.");
                     await _assetService.UpdateAssetAsync(model, GetCurrentUserId());
-                    TempData["SuccessMessage"] = $"Asset {model.Name} updated successfully!";
+                    TempData["SuccessMessage"] = $"Asset {model.AssetName} updated successfully!";
                 }
 
                 Console.WriteLine("DEBUG: Asset saved successfully");

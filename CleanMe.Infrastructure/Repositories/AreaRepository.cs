@@ -1,18 +1,7 @@
-﻿using CleanMe.Application.Interfaces;
-using CleanMe.Application.ViewModels;
-using CleanMe.Domain.Entities;
-using CleanMe.Domain.Enums;
+﻿using CleanMe.Domain.Entities;
 using CleanMe.Domain.Interfaces;
 using CleanMe.Infrastructure.Data;
-using Dapper;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CleanMe.Infrastructure.Repositories
 {
@@ -29,23 +18,44 @@ namespace CleanMe.Infrastructure.Repositories
         {
             return await _context.Areas
                 .Where(c => !c.IsDeleted)
-                .OrderBy(c => c.Name)
+                .OrderBy(c => c.AreaName)
                 .ToListAsync();
         }
 
         public async Task<Area?> GetAreaByIdAsync(int areaId)
         {
             return await _context.Areas
+                .AsNoTracking()
                 .Include(a => a.Region)  // eager load Region
                 .FirstOrDefaultAsync(a => a.areaId == areaId);
         }
 
-        public async Task<Area?> GetAreaWithAssetLocationsByIdAsync(int areaId)
+        //public async Task<Area?> GetAreaWithAssetLocationsByIdAsync(int areaId)
+        //{
+        //    return await _context.Areas
+        //        .Include(a => a.Region) // parent region
+        //        .Include(a => a.AssetLocations.Where(al => !al.IsDeleted))
+        //        .FirstOrDefaultAsync(a => a.areaId == areaId);
+        //}
+        public async Task<int> GetAreaAssetLocationsCountAsync(int areaId)
         {
-            return await _context.Areas
-                .Include(a => a.Region) // parent region
-                .Include(a => a.AssetLocations.Where(al => !al.IsDeleted))
-                .FirstOrDefaultAsync(a => a.areaId == areaId);
+            return await _context.AssetLocations
+                .AsNoTracking()
+                .Where(a => a.areaId == areaId && !a.IsDeleted)
+                .CountAsync();
+        }
+        public async Task<List<AssetLocation>> GetAreaAssetLocationsPagedAsync(
+            int areaId,
+            int pageNumber,
+            int pageSize)
+        {
+            return await _context.AssetLocations
+                .AsNoTracking()
+                .Where(a => a.areaId == areaId && !a.IsDeleted)
+                .OrderBy(a => a.Description)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
         }
 
         public async Task AddAreaAsync(Area Area)

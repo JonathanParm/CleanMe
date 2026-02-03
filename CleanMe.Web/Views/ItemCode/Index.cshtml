@@ -31,7 +31,7 @@ Code List</h2>
 <!-- Filtering Form -->
 <form method="get" id="filterForm">
     <div class="table-responsive">
-        <table class="table">
+        <table class="table table-striped w-100 table-fixed">
             <thead>
                 <!-- Column Headers with Sorting -->
                 <tr>
@@ -98,15 +98,15 @@ Code List</h2>
                 @foreach (var itemCode in Model)
                 {
                     <tr>
-                        <td>@itemCode.Code</td>
-                        <td>@itemCode.ItemName</td>
-                        <td>@itemCode.ItemDescription</td>
-                        <td>@itemCode.PurchasesUnitRate</td>
-                        <td>@itemCode.PurchasesXeroAccount</td>
-                        <td>@itemCode.SalesUnitRate</td>
-                        <td>@itemCode.SalesXeroAccount</td>
-                        <td>@(itemCode.IsActive ? "Yes" : "No")</td>
-                        <td>
+                        <td class="ps-4">@itemCode.Code</td>
+                        <td class="ps-4">@itemCode.ItemName</td>
+                        <td class="ps-4">@itemCode.ItemDescription</td>
+                        <td class="ps-4">@itemCode.PurchasesUnitRate</td>
+                        <td class="ps-4">@itemCode.PurchasesXeroAccount</td>
+                        <td class="ps-4">@itemCode.SalesUnitRate</td>
+                        <td class="ps-4">@itemCode.SalesXeroAccount</td>
+                        <td class="ps-4">@(itemCode.IsActive ? "Yes" : "No")</td>
+                        <td class="ps-4">
                             <a asp-action="AddEdit" asp-route-itemCodeId="@itemCode.itemCodeId" class="btn btn-warning btn-sm">Edit</a>
                             <a asp-action="Delete" asp-route-itemCodeId="@itemCode.itemCodeId" class="btn btn-danger btn-sm">Delete</a>
                         </td>

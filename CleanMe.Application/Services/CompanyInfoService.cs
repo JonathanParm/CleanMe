@@ -1,15 +1,7 @@
-﻿using CleanMe.Application.Services;
-using CleanMe.Application.ViewModels;
+﻿using CleanMe.Application.ViewModels;
 using CleanMe.Domain.Common;
-using CleanMe.Domain.Entities;
 using CleanMe.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CleanMe.Application.Services
 {

@@ -1,7 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using CleanMe.Application.Helpers.Paging;
 using CleanMe.Application.ViewModels;
-using CleanMe.Domain.Entities;
 
 namespace CleanMe.Application.Interfaces
 {
@@ -16,5 +14,15 @@ namespace CleanMe.Application.Interfaces
         Task<int> AddCleanFrequencyAsync(CleanFrequencyViewModel model, string addedById);
         Task UpdateCleanFrequencyAsync(CleanFrequencyViewModel model, string updatedById);
         Task<bool> SoftDeleteCleanFrequencyAsync(int cleanFrequencyId, string updatedById);
+        Task<PagedResult<CleanFrequencyIndexViewModel>> GetPagedIndexAsync(
+            int pageNumber,
+            int pageSize,
+            string sortColumn,
+            string sortOrder,
+            string? cleanFrequencyName,
+            string? description,
+            string? code,
+            string? isActive
+        );
     }
 }

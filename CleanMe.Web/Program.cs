@@ -1,5 +1,4 @@
 ﻿using CleanMe.Application.Services;
-using CleanMe.Domain.Entities;
 using CleanMe.Infrastructure.Data;
 using CleanMe.Infrastructure.Repositories;
 using CleanMe.Shared.Models;
@@ -12,7 +11,6 @@ using CleanMe.Application.Interfaces;
 using CleanMe.Web.Middlewares;
 using CleanMe.Infrastructure.Logging;
 using Serilog;
-using Serilog.Extensions.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using OfficeOpenXml;
 

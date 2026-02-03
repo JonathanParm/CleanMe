@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CleanMe.Domain.Entities
 {
@@ -27,7 +21,7 @@ namespace CleanMe.Domain.Entities
         [Column(TypeName = "varchar")]
         [StringLength(50, MinimumLength = 2, ErrorMessage = "Asset name must have between 2 and 50 letters")]
         [Display(Name = "Asset name")]
-        public string Name { get; set; }
+        public string AssetName { get; set; }
 
         [Column(TypeName = "varchar")]
         [StringLength(50, MinimumLength = 2, ErrorMessage = "Client reference must have between 2 and 50 letters")]
@@ -45,52 +39,52 @@ namespace CleanMe.Domain.Entities
         public string? Access { get; set; }
 
         [ForeignKey("Client")]
-        [DisplayName("Client")]
+        [Display(Name = "Client")]
         public int clientId { get; set; }
 
         // Navigation property
-        [DisplayName("Client")]
+        [Display(Name = "Client")]
         [ForeignKey(nameof(clientId))]
         public Client? Client { get; set; }
 
         [ForeignKey("AssetLocation")]
-        [DisplayName("Asset Location")]
+        [Display(Name = "Asset Location")]
         public int assetLocationId { get; set; }
 
         // Navigation property
-        [DisplayName("Asset Location")]
+        [Display(Name = "Asset Location")]
         [ForeignKey(nameof(assetLocationId))]
         public AssetLocation? AssetLocation { get; set; }
 
         [ForeignKey("ItemCode")]
-        [DisplayName("Item code")]
+        [Display(Name = "Item code")]
         public int itemCodeId { get; set; }
 
         // Navigation property
-        [DisplayName("Item code")]
+        [Display(Name = "Item code")]
         [ForeignKey(nameof(itemCodeId))]
         public ItemCode? ItemCode { get; set; }
 
         [Required]
-        [DisplayName("Deleted")]
+        [Display(Name = "Deleted")]
         public bool IsDeleted { get; set; } = false;
 
         [Required]
-        [DisplayName("Added at")]
+        [Display(Name = "Added at")]
         public DateTime AddedAt { get; set; }
 
         [Required]
-        [DisplayName("Added by")]
+        [Display(Name = "Added by")]
         [Column(TypeName = "NVARCHAR")]
         [StringLength(450)]
         public string AddedById { get; set; }
 
         [Required]
-        [DisplayName("Updated at")]
+        [Display(Name = "Updated at")]
         public DateTime UpdatedAt { get; set; }
 
         [Required]
-        [DisplayName("Updated by")]
+        [Display(Name = "Updated by")]
         [Column(TypeName = "NVARCHAR")]
         [StringLength(450)]
         public string UpdatedById { get; set; }

@@ -1,0 +1,90 @@
+﻿@model CleanMe.Application.Helpers.Paging.PagerModel
+@using Microsoft.AspNetCore.Routing
+
+@{
+    var totalPages = Model.TotalPages;
+    if (totalPages <= 0) { return; }
+
+    var currentPage = Model.PageNumber < 1 ? 1 : (Model.PageNumber > totalPages ? totalPages : Model.PageNumber);
+
+    var action = string.IsNullOrWhiteSpace(Model.Action) ? null : Model.Action;
+    var controller = string.IsNullOrWhiteSpace(Model.Controller) ? null : Model.Controller;
+
+    RouteValueDictionary BuildRoute(int page, int? pageSize = null)
+    {
+        var rv = new RouteValueDictionary(Model.RouteValues ?? new RouteValueDictionary());
+        rv["pageNumber"] = page;
+        rv["pageSize"] = pageSize ?? Model.PageSize;
+        return rv;
+    }
+
+    // dropdown options (Index style)
+    var sizeOptions = new[] { 5, 10, 20 };
+    var safePageSize = sizeOptions.Contains(Model.PageSize) ? Model.PageSize : 20;
+}
+
+<div class="d-flex justify-content-between align-items-center mt-3">
+
+    <!-- Left: page size dropdown -->
+    <div class="d-flex align-items-center gap-2">
+        <span class="text-muted small">Page size</span>
+
+        <select class="form-select form-select-sm"
+                style="width: 90px"
+                onchange="location.href=this.value;">
+            @foreach (var s in sizeOptions)
+            {
+                var url = Url.Action(action, controller, BuildRoute(1, s)); // reset to page 1
+                                                                            <option value="@url" selected="@(s == safePageSize ? "selected" : null)">@s</option>
+            }
+        </select>
+    </div>
+
+    <!-- Middle: page text -->
+    <div class="text-muted small">
+        Page @currentPage of @totalPages (@Model.TotalCount records)
+    </div>
+
+    <!-- Right: << >> -->
+    <nav aria-label="Pagination">
+        <ul class="pagination mb-0">
+
+            <!-- First -->
+            <li class="page-item @(currentPage <= 1 ? "disabled" : "")">
+                <a class="page-link"
+                   href="@(currentPage <= 1 ? "#" : Url.Action(action, controller, BuildRoute(1)))"
+                   aria-disabled="@(currentPage <= 1 ? "true" : "false")">
+                    &laquo;
+                </a>
+            </li>
+
+            <!-- Prev -->
+            <li class="page-item @(currentPage <= 1 ? "disabled" : "")">
+                <a class="page-link"
+                   href="@(currentPage <= 1 ? "#" : Url.Action(action, controller, BuildRoute(currentPage - 1)))"
+                   aria-disabled="@(currentPage <= 1 ? "true" : "false")">
+                    &lsaquo;
+                </a>
+            </li>
+
+            <!-- Next -->
+            <li class="page-item @(currentPage >= totalPages ? "disabled" : "")">
+                <a class="page-link"
+                   href="@(currentPage >= totalPages ? "#" : Url.Action(action, controller, BuildRoute(currentPage + 1)))"
+                   aria-disabled="@(currentPage >= totalPages ? "true" : "false")">
+                    &rsaquo;
+                </a>
+            </li>
+
+            <!-- Last -->
+            <li class="page-item @(currentPage >= totalPages ? "disabled" : "")">
+                <a class="page-link"
+                   href="@(currentPage >= totalPages ? "#" : Url.Action(action, controller, BuildRoute(totalPages)))"
+                   aria-disabled="@(currentPage >= totalPages ? "true" : "false")">
+                    &raquo;
+                </a>
+            </li>
+
+        </ul>
+    </nav>
+</div>

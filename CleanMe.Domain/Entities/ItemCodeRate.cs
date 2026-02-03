@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CleanMe.Domain.Entities
 {
@@ -18,76 +12,76 @@ namespace CleanMe.Domain.Entities
         public int itemCodeRateId { get; set; }
 
         [Required]
-        [DisplayName("Name")]
+        [Display(Name = "Name")]
         [Column(TypeName = "varchar")]
         [StringLength(100, MinimumLength = 3, ErrorMessage = "Item code rate name must have between 3 and 100 letters")]
         public string Name { get; set; }
 
-        [DisplayName("Description")]
+        [Display(Name = "Description")]
         [Column(TypeName = "varchar")]
         [StringLength(100, MinimumLength = 2, ErrorMessage = "Item code rate description must have between 2 and 100 letters")]
         public string? Description { get; set; }
 
         [ForeignKey("ItemCode")]
-        [DisplayName("Item code")]
+        [Display(Name = "Item code")]
         public int itemCodeId { get; set; }
 
         // Navigation property
-        [DisplayName("Item code")]
+        [Display(Name = "Item code")]
         [ForeignKey(nameof(itemCodeId))]
         public ItemCode? ItemCode { get; set; }
 
         [ForeignKey("Frequency")]
-        [DisplayName("Clean Frequency")]
+        [Display(Name = "Clean Frequency")]
         public int cleanFrequencyId { get; set; }
 
         // Navigation property
-        [DisplayName("Clean Frequency")]
+        [Display(Name = "Clean Frequency")]
         [ForeignKey(nameof(cleanFrequencyId))]
         public CleanFrequency? CleanFrequency { get; set; }
 
         [ForeignKey("Client")]
-        [DisplayName("Client")]
+        [Display(Name = "Client")]
         public int clientId { get; set; }
 
         // Navigation property
-        [DisplayName("Client")]
+        [Display(Name = "Client")]
         [ForeignKey(nameof(clientId))]
         public Client? Client { get; set; }
 
         [Required]
-        [DisplayName("Rate")]
+        [Display(Name = "Rate")]
         [Column(TypeName = "decimal(5, 2)")]
         public decimal Rate { get; set; }
 
         [Required]
-        [DisplayName("Default rate")]
+        [Display(Name = "Default rate")]
         public bool IsDefault { get; set; } = false;
 
         [Required]
-        [DisplayName("Active")]
+        [Display(Name = "Active")]
         public bool IsActive { get; set; } = true;
 
         [Required]
-        [DisplayName("Deleted")]
+        [Display(Name = "Deleted")]
         public bool IsDeleted { get; set; } = false;
 
         [Required]
-        [DisplayName("Added at")]
+        [Display(Name = "Added at")]
         public DateTime AddedAt { get; set; }
 
         [Required]
-        [DisplayName("Created by")]
+        [Display(Name = "Created by")]
         [Column(TypeName = "NVARCHAR")]
         [StringLength(450)]
         public string AddedById { get; set; }
 
         [Required]
-        [DisplayName("Updated at")]
+        [Display(Name = "Updated at")]
         public DateTime UpdatedAt { get; set; }
 
         [Required]
-        [DisplayName("Updated by")]
+        [Display(Name = "Updated by")]
         [Column(TypeName = "NVARCHAR")]
         [StringLength(450)]
         public string UpdatedById { get; set; }

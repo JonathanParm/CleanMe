@@ -2,7 +2,6 @@
 using CleanMe.Domain.Interfaces;
 using CleanMe.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 
 namespace CleanMe.Infrastructure.Repositories
 {
@@ -19,21 +18,50 @@ namespace CleanMe.Infrastructure.Repositories
         {
             return await _context.Regions
                 .Where(c => !c.IsDeleted)
-                .OrderBy(c => c.Name)
+                .OrderBy(c => c.RegionName)
                 .ToListAsync();
         }
 
+        //public async Task<Region?> GetRegionByIdAsync(int regionId)
+        //{
+        //    return await _context.Regions.FindAsync(regionId);
+        //}
+
+        //public async Task<Region?> GetRegionWithAreasByIdAsync(int regionId, int pageNumber, int pageSize)
+        //{
+        //    return await _context.Regions
+        //        .Include(r => r.Areas.Where(a => !a.IsDeleted))
+        //        .FirstOrDefaultAsync(r => r.regionId == regionId);
+        //}
         public async Task<Region?> GetRegionByIdAsync(int regionId)
         {
-            return await _context.Regions.FindAsync(regionId);
-        }
-
-        public async Task<Region?> GetRegionWithAreasByIdAsync(int regionId)
-        {
             return await _context.Regions
-                .Include(r => r.Areas.Where(a => !a.IsDeleted))
+                .AsNoTracking()
                 .FirstOrDefaultAsync(r => r.regionId == regionId);
         }
+
+        public async Task<int> GetRegionAreaCountAsync(int regionId)
+        {
+            return await _context.Areas
+                .AsNoTracking()
+                .Where(a => a.regionId == regionId && !a.IsDeleted)
+                .CountAsync();
+        }
+
+        public async Task<List<Area>> GetRegionAreasPagedAsync(
+            int regionId,
+            int pageNumber,
+            int pageSize)
+        {
+            return await _context.Areas
+                .AsNoTracking()
+                .Where(a => a.regionId == regionId && !a.IsDeleted)
+                .OrderBy(a => a.AreaName)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
 
         public async Task AddRegionAsync(Region region)
         {

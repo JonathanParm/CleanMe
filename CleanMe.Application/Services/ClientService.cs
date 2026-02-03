@@ -32,10 +32,10 @@ namespace CleanMe.Application.Services
             _logger.LogInformation("Fetching Clients list using Dapper.");
             try
             {
-                var query = "EXEC dbo.ClientGetIndexView @Name, @Brand, @AccNo, @IsActive, @SortColumn, @SortOrder, @PageNumber, @PageSize";
+                var query = "EXEC dbo.ClientGetIndexView @ClientName, @Brand, @AccNo, @IsActive, @SortColumn, @SortOrder, @PageNumber, @PageSize";
                 var parameters = new
                 {
-                    Name = name,
+                    ClientName = name,
                     Brand = brand,
                     AccNo = accNo,
                     IsActive = isActive,
@@ -57,7 +57,7 @@ namespace CleanMe.Application.Services
         public async Task<IEnumerable<ClientViewModel>> FindDuplicateClientAsync(string name, int? clientId = null)
         {
             // Exclude any soft deletes
-            var query = "SELECT * FROM Clients WHERE IsDeleted = 0 AND Name = @Name";
+            var query = "SELECT * FROM Clients WHERE IsDeleted = 0 AND ClientName = @Name";
 
             if (clientId.HasValue)
             {
@@ -72,9 +72,10 @@ namespace CleanMe.Application.Services
             return duplicateClient.Select(c => new ClientViewModel
             {
                 clientId = c.clientId,
-                Name = c.Name,
+                ClientName = c.Name,
                 Brand = c.Brand,
                 AccNo = c.AccNo,
+                Reference = c.Reference,
                 Address = new AddressViewModel
                 {
                     Line1 = c.AddressLine1,
@@ -100,9 +101,10 @@ namespace CleanMe.Application.Services
             return new ClientViewModel
             {
                 clientId = client.clientId,
-                Name = client.Name,
+                ClientName = client.ClientName,
                 Brand = client.Brand,
                 AccNo = client.AccNo,
+                Reference = client.Reference,
                 Address = new AddressViewModel
                 {
                     Line1 = client.Address.Line1,
@@ -128,9 +130,10 @@ namespace CleanMe.Application.Services
             return new ClientViewModel
             {
                 clientId = client.clientId,
-                Name = client.Name,
+                ClientName = client.ClientName,
                 Brand = client.Brand,
                 AccNo = client.AccNo,
+                Reference = client.Reference,
                 Address = new AddressViewModel
                 {
                     Line1 = client.Address.Line1,
@@ -159,13 +162,14 @@ namespace CleanMe.Application.Services
 
         public async Task<int> AddClientAsync(ClientViewModel model, string addedById)
         {
-            _logger.LogInformation($"Creating new Client: {model.Name}");
+            _logger.LogInformation($"Creating new Client: {model.ClientName}");
 
             var client = new Client
             {
-                Name = model.Name,
+                ClientName = model.ClientName,
                 Brand = model.Brand,
                 AccNo = model.AccNo,
+                Reference = model.Reference,
                 Address = new Address()
                 {
                     Line1 = model.Address.Line1,
@@ -195,9 +199,10 @@ namespace CleanMe.Application.Services
                 throw new Exception("Client member not found.");
             }
 
-            client.Name = model.Name;
+            client.ClientName = model.ClientName;
             client.Brand = model.Brand;
             client.AccNo = model.AccNo;
+            client.Reference = model.Reference;
             client.Address = new Address()
             {
                 Line1 = model.Address.Line1,

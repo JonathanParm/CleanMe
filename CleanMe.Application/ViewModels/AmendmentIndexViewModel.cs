@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace CleanMe.Application.ViewModels
 {
@@ -12,13 +7,16 @@ namespace CleanMe.Application.ViewModels
         [Display(Name = "ID")]
         public int amendmentId { get; set; }
 
-        [Display(Name = "Source name")]
+        [Display(Name = "Source")]
         public string SourceName { get; set; }
 
-        [Display(Name = "Client name")]
+        [Display(Name = "Amendment type")]
+        public string AmendmentTypeName { get; set; }
+
+        [Display(Name = "Client")]
         public string ClientName { get; set; }
 
-        [Display(Name = "Area name")]
+        [Display(Name = "Area")]
         public string AreaName { get; set; }
 
         [Display(Name = "Asset location")]

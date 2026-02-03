@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace CleanMe.Application.Interfaces
+﻿namespace CleanMe.Application.Interfaces
 {
     public interface zzIReportOutputService
     {

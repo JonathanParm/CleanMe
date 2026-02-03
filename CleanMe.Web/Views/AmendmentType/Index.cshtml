@@ -4,7 +4,7 @@
 @{
     ViewData["Title"] = "Amendment Type List";
     string sortOrder = ViewBag.SortOrder as string ?? "ASC";
-    string sortColumn = ViewBag.SortColumn as string ?? "Name";
+    string sortColumn = ViewBag.SortColumn as string ?? "AmendmentTypeName";
 }
 
 <h2>Amendment Type List</h2>
@@ -30,13 +30,13 @@
 <!-- Filtering Form -->
 <form method="get" id="filterForm">
     <div class="table-responsive">
-        <table class="table">
+        <table class="table table-striped w-100 table-fixed">
             <thead>
                 <!-- Column Headers with Sorting -->
                 <tr>
                     <th>
-                        <a href="#" onclick="sortTable('Name')">
-                            Name @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "Name"))
+                        <a href="#" onclick="sortTable('AmendmentTypeName')">
+                            AmendmentTypeName @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "AmendmentTypeName"))
                         </a>
                     </th>
                     <th>
@@ -73,10 +73,10 @@
                 @foreach (var AmendmentType in Model)
                 {
                     <tr>
-                        <td>@AmendmentType.Name</td>
-                        <td>@AmendmentType.Description</td>
-                        <td>@(AmendmentType.IsActive ? "Yes" : "No")</td>
-                        <td>
+                        <td class="ps-4">@AmendmentType.AmendmentTypeName</td>
+                        <td class="ps-4">@AmendmentType.Description</td>
+                        <td class="ps-4">@(AmendmentType.IsActive ? "Yes" : "No")</td>
+                        <td class="ps-4">
                             <a asp-action="AddEdit" asp-route-amendmentTypeId="@AmendmentType.amendmentTypeId" class="btn btn-warning btn-sm">Edit</a>
                             <a asp-action="Delete" asp-route-amendmentTypeId="@AmendmentType.amendmentTypeId" class="btn btn-danger btn-sm">Delete</a>
                         </td>

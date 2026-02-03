@@ -1,8 +1,6 @@
 ﻿using CleanMe.Application.Filters;
 using CleanMe.Application.Interfaces;
-using CleanMe.Application.Services;
 using CleanMe.Application.ViewModels;
-using CleanMe.Domain.Entities;
 using CleanMe.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;

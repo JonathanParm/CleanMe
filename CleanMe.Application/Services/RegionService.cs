@@ -1,8 +1,11 @@
-﻿using CleanMe.Application.Interfaces;
+﻿using CleanMe.Application.DTOs;
+using CleanMe.Application.Helpers.Paging;
+using CleanMe.Application.Interfaces;
 using CleanMe.Application.ViewModels;
 using CleanMe.Domain.Entities;
 using CleanMe.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
+using System.Data;
 
 namespace CleanMe.Application.Services
 {
@@ -50,11 +53,61 @@ namespace CleanMe.Application.Services
                 throw new ApplicationException("Error fetching regions from stored procedure", ex);
             }
         }
+        public async Task<PagedResult<RegionIndexViewModel>> GetPagedIndexAsync(
+            int pageNumber,
+            int pageSize,
+            string sortColumn,
+            string sortOrder,
+            string? regionName,
+            string? reportCode,
+            string? isActive)
+        {
+            // Defensive normalisation (helps prevent bad sort inputs)
+            pageNumber = pageNumber < 1 ? 1 : pageNumber;
+            pageSize = pageSize < 1 ? 5 : pageSize;
 
+            sortOrder = (sortOrder?.ToUpperInvariant() == "DESC") ? "DESC" : "ASC";
+            sortColumn = string.IsNullOrWhiteSpace(sortColumn) ? "AssetName" : sortColumn;
+
+            var parameters = new
+            {
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                SortColumn = sortColumn,
+                SortOrder = sortOrder,
+                RegionName = regionName,
+                ReportCode = reportCode,
+                IsActive = isActive
+            };
+
+            const string proc = "dbo.RegionGetIndexView";
+
+            var rows = (await _unitOfWork.DapperRepository
+                .QueryAsync<RegionIndexRowDTO>(proc, parameters, CommandType.StoredProcedure))
+                .ToList();
+
+            var totalCount = rows.FirstOrDefault()?.TotalCount ?? 0;
+
+            var items = rows.Select(r => new RegionIndexViewModel
+            {
+                regionId = r.regionId,
+                RegionName = r.RegionName,
+                ReportCode = r.ReportCode,
+                IsActive = r.IsActive
+            }).ToList();
+
+            return new PagedResult<RegionIndexViewModel>
+            {
+                Items = items,
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalCount = totalCount
+            };
+        }
         public async Task<IEnumerable<RegionViewModel>> FindDuplicateRegionAsync(string name, string reportCode, int? regionId = null)
         {
             // Exclude any soft deletes
-            var query = "SELECT * FROM Regions WHERE IsDeleted = 0 AND (Name = @name OR ReportCode = @reportCode)";
+            var query = "SELECT * FROM Regions WHERE IsDeleted = 0 AND (RegionName = @name OR ReportCode = @reportCode)";
 
             if (regionId.HasValue)
             {
@@ -79,51 +132,43 @@ namespace CleanMe.Application.Services
             return new RegionViewModel
             {
                 regionId = region.regionId,
-                Name = region.Name,
+                RegionName = region.RegionName,
                 ReportCode = region.ReportCode,
                 IsActive = region.IsActive
             };
         }
 
-        public async Task<RegionViewModel?> GetRegionViewModelWithAreasByIdAsync(int regionId)
+        public async Task<RegionWithAreasViewModel?> GetRegionWithAreasViewModelByIdAsync(int regionId, int pageNumber, int pageSize)
         {
-            var region = await _unitOfWork.RegionRepository.GetRegionWithAreasByIdAsync(regionId);
-
+            var region = await _unitOfWork.RegionRepository.GetRegionByIdAsync(regionId);
             if (region == null)
-            {
-                return null; // No match found
-            }
+                return null;
 
-            // Convert `Region` entity to `RegionViewModel`
-            return new RegionViewModel
-            {
-                regionId = region.regionId,
-                Name = region.Name,
-                ReportCode = region.ReportCode,
-                IsActive = region.IsActive,
+            var totalCount =
+                await _unitOfWork.RegionRepository.GetRegionAreaCountAsync(regionId);
 
-                AreasList = region.Areas
-                    .OrderBy(a => a.SortOrder)
-                    .Select(a => new AreaIndexViewModel
-                    {
-                        areaId = a.areaId,
-                        Name = a.Name,
-                        RegionName = region.Name,
-                        ReportCode = a.ReportCode,
-                        IsActive = a.IsActive
-                    })
-                .ToList()
+            var areas =
+                await _unitOfWork.RegionRepository.GetRegionAreasPagedAsync(
+                    regionId, pageNumber, pageSize);
+
+            return new RegionWithAreasViewModel
+            {
+                Region = region,
+                Areas = areas,
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalCount = totalCount
             };
         }
 
         // Creates a new region (EF Core)
         public async Task<int> AddRegionAsync(RegionViewModel model, string addedById)
         {
-            _logger.LogInformation($"Adding new regon: {model.Name}");
+            _logger.LogInformation($"Adding new regon: {model.RegionName}");
 
             var region = new Region
             {
-                Name = model.Name,
+                RegionName = model.RegionName,
                 ReportCode = model.ReportCode,
                 IsActive = model.IsActive,
                 AddedAt = DateTime.UtcNow,
@@ -147,7 +192,7 @@ namespace CleanMe.Application.Services
                 throw new Exception("Region not found.");
             }
 
-            region.Name = model.Name;
+            region.RegionName = model.RegionName;
             region.ReportCode = model.ReportCode;
             region.IsActive = model.IsActive;
             region.UpdatedAt = DateTime.UtcNow;

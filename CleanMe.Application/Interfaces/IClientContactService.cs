@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using CleanMe.Application.ViewModels;
-using CleanMe.Domain.Entities;
+﻿using CleanMe.Application.ViewModels;
 
 namespace CleanMe.Application.Interfaces
 {

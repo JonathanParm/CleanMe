@@ -1,9 +1,6 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using CleanMe.Application.Interfaces;
-using CleanMe.Domain.Entities;
 using CleanMe.Shared.Models;
 
 namespace CleanMe.Application.Services

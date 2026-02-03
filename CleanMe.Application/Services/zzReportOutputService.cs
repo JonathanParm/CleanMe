@@ -3,10 +3,6 @@ using Novacode; // Community DocX
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using CleanMe.Application.Interfaces;
 
 namespace CleanMe.Application.Services

@@ -1,5 +1,6 @@
 ﻿@using CleanMe.Web.Helpers
-@model IEnumerable<CleanMe.Application.ViewModels.AmendmentIndexViewModel>
+@using CleanMe.Application.Helpers.Paging
+@model PagedResult<CleanMe.Application.ViewModels.AmendmentIndexViewModel>
 
 @{
     ViewData["Title"] = "Amendment List";
@@ -30,13 +31,18 @@
 <!-- Filtering Form -->
 <form method="get" id="filterForm">
     <div class="table-responsive">
-        <table class="table">
+        <table class="table table-striped w-100 table-fixed">
             <thead>
                 <!-- Column Headers with Sorting -->
                 <tr>
                     <th>
                         <a href="#" onclick="sortTable('SourceName')">
                             Source name @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "SourceName"))
+                        </a>
+                    </th>
+                    <th>
+                        <a href="#" onclick="sortTable('AmendmentTypeName')">
+                            Amendment type @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "AmendmentTypeName"))
                         </a>
                     </th>
                     <th>
@@ -76,6 +82,7 @@
                 <!-- Filter Row -->
                 <tr>
                     <td><input type="text" name="SourceName" class="form-control" value="@ViewBag.SourceName" placeholder="Search source name"></td>
+                    <td><input type="text" name="AmendmentTypeName" class="form-control" value="@ViewBag.AmendmentTypeName" placeholder="Search amendment type"></td>
                     <td><input type="text" name="ClientName" class="form-control" value="@ViewBag.ClientName" placeholder="Search client"></td>
                     <td><input type="text" name="AreaName" class="form-control" value="@ViewBag.AreaName" placeholder="Search area"></td>
                     <td><input type="text" name="LocationName" class="form-control" value="@ViewBag.LocationName" placeholder="Search location"></td>
@@ -89,17 +96,18 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var amendment in Model)
+                @foreach (var amendment in Model.Items)
                 {
                     <tr>
-                        <td>@amendment.SourceName</td>
-                        <td>@amendment.ClientName</td>
-                        <td>@amendment.AreaName</td>
-                        <td>@amendment.LocationName</td>
-                        <td>@amendment.MdReference</td>
-                        <td>@amendment.ClientReference</td>
-                        <td>@Html.Raw(@amendment.AmendmentSummary)</td>
-                        <td>
+                        <td class="ps-4">@amendment.SourceName</td>
+                        <td class="ps-4">@amendment.AmendmentTypeName</td>
+                        <td class="ps-4">@amendment.ClientName</td>
+                        <td class="ps-4">@amendment.AreaName</td>
+                        <td class="ps-4">@amendment.LocationName</td>
+                        <td class="ps-4">@amendment.MdReference</td>
+                        <td class="ps-4">@amendment.ClientReference</td>
+                        <td class="ps-4">@Html.Raw(@amendment.AmendmentSummary)</td>
+                        <td class="ps-4">
                             <a asp-action="AddEdit" asp-route-amendmentId="@amendment.amendmentId" class="btn btn-warning btn-sm">Edit</a>
                             <a asp-action="Delete" asp-route-amendmentId="@amendment.amendmentId" class="btn btn-danger btn-sm">Delete</a>
                         </td>
@@ -107,6 +115,15 @@
                 }
             </tbody>
         </table>
+        @await Html.PartialAsync(
+        "_IndexFooterPager",
+                new CleanMe.Application.Helpers.Paging.PagedResult<object>
+                {
+                    PageNumber = Model.PageNumber,
+                    PageSize = Model.PageSize,
+                    TotalCount = Model.TotalCount
+                }
+                )
     </div>
 </form>
 

@@ -1,18 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using CleanMe.Application.DTOs;
+using CleanMe.Application.Helpers.Paging;
 using CleanMe.Application.Interfaces;
 using CleanMe.Application.ViewModels;
-using CleanMe.Domain.Interfaces;
 using CleanMe.Domain.Entities;
-using CleanMe.Domain.Enums;
+using CleanMe.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
-using System.Reflection;
-using Microsoft.AspNetCore.Http.HttpResults;
-using CleanMe.Domain.Common;
-using CleanMe.Application.DTOs;
-using System.Collections;
+using System.Data;
 
 namespace CleanMe.Application.Services
 {
@@ -34,16 +27,16 @@ namespace CleanMe.Application.Services
 
         // Retrieve a list of CleanFrequencys using Dapper (Optimized for performance)
         public async Task<IEnumerable<CleanFrequencyIndexViewModel>> GetCleanFrequencyIndexAsync(
-            string? name, string? description, string? code, string? isActive,
+            string? cleanFrequencyName, string? description, string? code, string? isActive,
             string sortColumn, string sortOrder, int pageNumber, int pageSize)
         {
             _logger.LogInformation("Fetching Clean Frequencies list using Dapper.");
             try
             {
-                var query = "EXEC dbo.CleanFrequencyGetIndexView @Name, @Description, @Code, @IsActive, @SortColumn, @SortOrder, @PageNumber, @PageSize";
+                var query = "EXEC dbo.CleanFrequencyGetIndexView @CleanFrequencyName, @Description, @Code, @IsActive, @SortColumn, @SortOrder, @PageNumber, @PageSize";
                 var parameters = new
                 {
-                    Name = name,
+                    CleanFrequencyName = cleanFrequencyName,
                     Description = description,
                     Code = code,
                     IsActive = isActive,
@@ -61,11 +54,64 @@ namespace CleanMe.Application.Services
                 throw new ApplicationException("Error fetching CleanFrequencys from stored procedure", ex);
             }
         }
+        public async Task<PagedResult<CleanFrequencyIndexViewModel>> GetPagedIndexAsync(
+            int pageNumber,
+            int pageSize,
+            string sortColumn,
+            string sortOrder,
+            string? cleanFrequencyName,
+            string? description,
+            string? code,
+            string? isActive)
+        {
+            // Defensive normalisation (helps prevent bad sort inputs)
+            pageNumber = pageNumber < 1 ? 1 : pageNumber;
+            pageSize = pageSize < 1 ? 20 : pageSize;
 
+            sortOrder = (sortOrder?.ToUpperInvariant() == "DESC") ? "DESC" : "ASC";
+            sortColumn = string.IsNullOrWhiteSpace(sortColumn) ? "CleanFrequencyName" : sortColumn;
+
+            var parameters = new
+            {
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                SortColumn = sortColumn,
+                SortOrder = sortOrder,
+                CleanFrequencyName = cleanFrequencyName,
+                Description = description,
+                Code = code,
+                IsActive = isActive
+            };
+
+            const string proc = "dbo.CleanFrequencyGetIndexView";
+
+            var rows = (await _unitOfWork.DapperRepository
+                .QueryAsync<CleanFrequencyIndexRowDTO>(proc, parameters, CommandType.StoredProcedure))
+                .ToList();
+
+            var totalCount = rows.FirstOrDefault()?.TotalCount ?? 0;
+
+            var items = rows.Select(r => new CleanFrequencyIndexViewModel
+            {
+                cleanFrequencyId = r.cleanFrequencyId,
+                CleanFrequencyName = r.CleanFrequencyName,
+                Description = r.Description,
+                Code = r.Code,
+                IsActive = r.IsActive
+            }).ToList();
+
+            return new PagedResult<CleanFrequencyIndexViewModel>
+            {
+                Items = items,
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalCount = totalCount
+            };
+        }
         public async Task<IEnumerable<CleanFrequencyViewModel>> FindDuplicateCleanFrequencyAsync(string name, string code, int? cleanFrequencyId = null)
         {
             // Exclude any soft deletes
-            var query = "SELECT * FROM CleanFrequencies WHERE IsDeleted = 0 AND (Name = @name OR Code = @code)";
+            var query = "SELECT * FROM CleanFrequencies WHERE IsDeleted = 0 AND (CleanFrequencyName = @name OR Code = @code)";
 
             if (cleanFrequencyId.HasValue)
             {
@@ -90,7 +136,7 @@ namespace CleanMe.Application.Services
             return new CleanFrequencyViewModel
             {
                 cleanFrequencyId = CleanFrequency.cleanFrequencyId,
-                Name = CleanFrequency.Name,
+                CleanFrequencyName = CleanFrequency.CleanFrequencyName,
                 Description = CleanFrequency.Description,
                 Code = CleanFrequency.Code,
                 IsActive = CleanFrequency.IsActive
@@ -100,11 +146,11 @@ namespace CleanMe.Application.Services
         // Creates a new CleanFrequency (EF Core)
         public async Task<int> AddCleanFrequencyAsync(CleanFrequencyViewModel model, string addedById)
         {
-            _logger.LogInformation($"Adding new cleaning frequency: {model.Name}");
+            _logger.LogInformation($"Adding new cleaning frequency: {model.CleanFrequencyName}");
 
             var cleanFrequency = new CleanFrequency
             {
-                Name = model.Name,
+                CleanFrequencyName = model.CleanFrequencyName,
                 Description = model.Description,
                 Code = model.Code,
                 IsActive = model.IsActive,
@@ -129,7 +175,7 @@ namespace CleanMe.Application.Services
                 throw new Exception("Clean Frequency not found.");
             }
 
-            cleanFrequency.Name = model.Name;
+            cleanFrequency.CleanFrequencyName = model.CleanFrequencyName;
             cleanFrequency.Description = model.Description;
             cleanFrequency.Code = model.Code;
             cleanFrequency.IsActive = model.IsActive;

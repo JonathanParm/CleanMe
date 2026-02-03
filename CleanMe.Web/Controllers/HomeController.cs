@@ -1,7 +1,4 @@
-using CleanMe.Web.Models;
-using CleanMe.Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
 
 namespace CleanMe.Web.Controllers
 {

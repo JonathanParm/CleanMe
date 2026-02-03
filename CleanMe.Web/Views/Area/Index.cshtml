@@ -1,10 +1,11 @@
 ﻿@using CleanMe.Web.Helpers
-@model IEnumerable<CleanMe.Application.ViewModels.AreaIndexViewModel>
+@using CleanMe.Application.Helpers.Paging
+@model PagedResult<CleanMe.Application.ViewModels.AreaIndexViewModel>
 
 @{
     ViewData["Title"] = "Area List";
     string sortOrder = ViewBag.SortOrder as string ?? "ASC";
-    string sortColumn = ViewBag.SortColumn as string ?? "SequenceOrder";
+    string sortColumn = ViewBag.SortColumn as string ?? "AreaName";
 }
 
 <h2>Area List</h2>
@@ -30,7 +31,7 @@
 <!-- Filtering Form -->
 <form method="get" id="filterForm">
     <div class="table-responsive">
-        <table class="table">
+        <table class="table table-striped w-100 table-fixed">
             <thead>
                 <!-- Column Headers with Sorting -->
                 <tr>
@@ -40,8 +41,13 @@
                         </a>
                     </th>
                     <th>
-                        <a href="#" onclick="sortTable('Name')">
-                            Name @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "Name"))
+                        <a href="#" onclick="sortTable('AreaName')">
+                            Area @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "AreaName"))
+                        </a>
+                    </th>
+                    <th>
+                        <a href="#" onclick="sortTable('CleanerName')">
+                            Cleaner @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "CleanerName"))
                         </a>
                     </th>
                     <th>
@@ -59,8 +65,9 @@
 
                 <!-- Filter Row -->
                 <tr>
-                    <td><input type="text" name="regionName" class="form-control" value="@ViewBag.RegionName" placeholder="Search Region Name"></td>
-                    <td><input type="text" name="name" class="form-control" value="@ViewBag.Name" placeholder="Search Area Name"></td>
+                    <td><input type="text" name="regionName" class="form-control" value="@ViewBag.RegionName" placeholder="Search Region"></td>
+                    <td><input type="text" name="areaName" class="form-control" value="@ViewBag.AreaName" placeholder="Search Area"></td>
+                    <td><input type="text" name="cleanerName" class="form-control" value="@ViewBag.CleanerName" placeholder="Search Cleaner"></td>
                     <td><input type="text" name="reportCode" class="form-control" value="@ViewBag.ReportCode" placeholder="Search Report Code"></td>
                     <td>
                         <select name="isActive" class="form-control">
@@ -76,14 +83,15 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var Area in Model)
+                @foreach (var Area in Model.Items)
                 {
                     <tr>
-                        <td>@Area.RegionName</td>
-                        <td>@Area.Name</td>
-                        <td>@Area.ReportCode</td>
-                        <td>@(Area.IsActive ? "Yes" : "No")</td>
-                        <td>
+                        <td class="ps-4">@Area.RegionName</td>
+                        <td class="ps-4">@Area.AreaName</td>
+                        <td class="ps-4">@Area.CleanerName</td>
+                        <td class="ps-4">@Area.ReportCode</td>
+                        <td class="ps-4">@(Area.IsActive ? "Yes" : "No")</td>
+                        <td class="ps-4">
                             <a asp-action="AddEdit" asp-route-areaId="@Area.areaId" class="btn btn-warning btn-sm">Edit</a>
                             <a asp-action="Delete" asp-route-areaId="@Area.areaId" class="btn btn-danger btn-sm">Delete</a>
                         </td>
@@ -91,6 +99,15 @@
                 }
             </tbody>
         </table>
+        @await Html.PartialAsync(
+        "_IndexFooterPager",
+                new CleanMe.Application.Helpers.Paging.PagedResult<object>
+                {
+                    PageNumber = Model.PageNumber,
+                    PageSize = Model.PageSize,
+                    TotalCount = Model.TotalCount
+                }
+                )
     </div>
 </form>
 

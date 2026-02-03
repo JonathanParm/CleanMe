@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using CleanMe.Application.Helpers.Paging;
 using CleanMe.Application.ViewModels;
 
 namespace CleanMe.Application.Interfaces
@@ -19,6 +18,16 @@ namespace CleanMe.Application.Interfaces
         Task UpdateStaffAsync(StaffViewModel model, string updatedById);
         Task<bool> SoftDeleteStaffAsync(int staffId, string updatedById);
         Task UpdateStaffApplicationUserId(int staffId, string applicationUserId);
-
+        Task<PagedResult<StaffIndexViewModel>> GetPagedIndexAsync(
+            int pageNumber,
+            int pageSize,
+            string sortColumn,
+            string sortOrder,
+            string? staffId,
+            string? FullName,
+            string? WorkRole,
+            string? ContactDetail,
+            string? isActive
+        );
     }
 }

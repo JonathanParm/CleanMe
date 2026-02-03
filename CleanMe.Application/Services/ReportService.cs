@@ -2,15 +2,11 @@
 using CleanMe.Application.Interfaces;
 using CleanMe.Application.ViewModels;
 using OfficeOpenXml;
-using System.IO;
 using Microsoft.Extensions.Logging;
-using System.Globalization;
 using CleanMe.Domain.Interfaces;
 using OfficeOpenXml.Style;
 using System.Data;
 using CleanMe.Application.DTOs;
-using System.Drawing;
-using Microsoft.AspNetCore.Http;
 
 
 namespace CleanMe.Application.Services
@@ -65,7 +61,7 @@ namespace CleanMe.Application.Services
                 {
                     model.DateFrom,
                     model.DateTo,
-                    ClientId = model.ClientId ?? 0,
+                    ClientId = model.ClientId ?? 0                    
                 },
                 commandType: CommandType.StoredProcedure);
 

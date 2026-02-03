@@ -30,7 +30,7 @@
 <!-- Filtering Form -->
 <form method="get" id="filterForm">
     <div class="table-responsive">
-        <table class="table">
+        <table class="table table-striped w-100 table-fixed">
             <thead>
                 <!-- Column Headers with Sorting -->
                 <tr>
@@ -91,13 +91,13 @@
                 @foreach (var ClientContact in Model)
                 {
                     <tr>
-                        <td>@ClientContact.FullName</td>
-                        <td>@ClientContact.JobTitle</td>
-                        <td>@ClientContact.ClientName</td>
-                        <td>@ClientContact.PhoneMobile</td>
-                        <td>@ClientContact.Email</td>
-                        <td>@(ClientContact.IsActive ? "Yes" : "No")</td>
-                        <td>
+                        <td class="ps-4">@ClientContact.FullName</td>
+                        <td class="ps-4">@ClientContact.JobTitle</td>
+                        <td class="ps-4">@ClientContact.ClientName</td>
+                        <td class="ps-4">@ClientContact.PhoneMobile</td>
+                        <td class="ps-4">@ClientContact.Email</td>
+                        <td class="ps-4">@(ClientContact.IsActive ? "Yes" : "No")</td>
+                        <td class="ps-4">
                             <a asp-action="AddEdit" 
                             asp-route-clientContactId="@ClientContact.clientContactId"
                                asp-route-returnUrl="@Url.Action("Index", "ClientContact")" 

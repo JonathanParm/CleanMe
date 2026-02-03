@@ -30,7 +30,7 @@
 <!-- Filtering Form -->
 <form method="get" id="filterForm">
     <div class="table-responsive">
-        <table class="table">
+        <table class="table table-striped w-100 table-fixed">
             <thead>
                 <!-- Column Headers with Sorting -->
                 <tr>
@@ -91,14 +91,14 @@
                 @foreach (var Asset in Model)
                 {
                     <tr>
-                        <td>@Asset.RateName</td>
-                        <td>@Asset.ItemCodeName</td>
-                        <td>@Asset.CleanFreqName</td>
-                        <td>@Asset.ClientName</td>
-                        <td>@Asset.Rate</td>
-                        <td>@Asset.IsDefault</td>
-                        <td>@Asset.IsActive</td>
-                        <td>
+                        <td class="ps-4">@Asset.RateName</td>
+                        <td class="ps-4">@Asset.ItemCodeName</td>
+                        <td class="ps-4">@Asset.CleanFreqName</td>
+                        <td class="ps-4">@Asset.ClientName</td>
+                        <td class="ps-4">@Asset.Rate</td>
+                        <td class="ps-4">@Asset.IsDefault</td>
+                        <td class="ps-4">@Asset.IsActive</td>
+                        <td class="ps-4">
                             <a asp-action="AddEdit" asp-route-itemCodeRateId="@Asset.itemCodeRateId" class="btn btn-warning btn-sm">Edit</a>
                             <a asp-action="Delete" asp-route-itemCodeRateId="@Asset.itemCodeRateId" class="btn btn-danger btn-sm">Delete</a>
                         </td>

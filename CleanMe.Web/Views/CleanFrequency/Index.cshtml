@@ -1,10 +1,11 @@
 ﻿@using CleanMe.Web.Helpers
-@model IEnumerable<CleanMe.Application.ViewModels.CleanFrequencyIndexViewModel>
+@using CleanMe.Application.Helpers.Paging
+@model PagedResult<CleanMe.Application.ViewModels.CleanFrequencyIndexViewModel>
 
 @{
     ViewData["Title"] = "Clean Frequency List";
     string sortOrder = ViewBag.SortOrder as string ?? "ASC";
-    string sortColumn = ViewBag.SortColumn as string ?? "SequenceOrder";
+    string sortColumn = ViewBag.SortColumn as string ?? "CleanFrequencyName";
 }
 
 <h2>Clean Frequency List</h2>
@@ -30,13 +31,13 @@
 <!-- Filtering Form -->
 <form method="get" id="filterForm">
     <div class="table-responsive">
-        <table class="table">
+        <table class="table table-striped w-100 table-fixed">
             <thead>
                 <!-- Column Headers with Sorting -->
                 <tr>
                     <th>
-                        <a href="#" onclick="sortTable('Name')">
-                            Name @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "Name"))
+                        <a href="#" onclick="sortTable('CleanFrequencyName')">
+                            Clean Frequency @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "CleanFrequencyName"))
                         </a>
                     </th>
                     <th>
@@ -59,7 +60,7 @@
 
                 <!-- Filter Row -->
                 <tr>
-                    <td><input type="text" name="name" class="form-control" value="@ViewBag.Name" placeholder="Search Clean Frequency"></td>
+                    <td><input type="text" name="cleanFrequencyName" class="form-control" value="@ViewBag.CleanFrequencyName" placeholder="Search Clean Frequency"></td>
                     <td><input type="text" name="description" class="form-control" value="@ViewBag.Description" placeholder="Search Description"></td>
                     <td><input type="text" name="code" class="form-control" value="@ViewBag.Code" placeholder="Search Code"></td>
                     <td>
@@ -76,14 +77,14 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var CleanFrequency in Model)
+                @foreach (var CleanFrequency in Model.Items)
                 {
                     <tr>
-                        <td>@CleanFrequency.Name</td>
-                        <td>@CleanFrequency.Description</td>
-                        <td>@CleanFrequency.Code</td>
-                        <td>@(CleanFrequency.IsActive ? "Yes" : "No")</td>
-                        <td>
+                        <td class="ps-4">@CleanFrequency.CleanFrequencyName</td>
+                        <td class="ps-4">@CleanFrequency.Description</td>
+                        <td class="ps-4">@CleanFrequency.Code</td>
+                        <td class="ps-4">@(CleanFrequency.IsActive ? "Yes" : "No")</td>
+                        <td class="ps-4">
                             <a asp-action="AddEdit" asp-route-cleanFrequencyId="@CleanFrequency.cleanFrequencyId" class="btn btn-warning btn-sm">Edit</a>
                             <a asp-action="Delete" asp-route-cleanFrequencyId="@CleanFrequency.cleanFrequencyId" class="btn btn-danger btn-sm">Delete</a>
                         </td>
@@ -91,6 +92,15 @@
                 }
             </tbody>
         </table>
+        @await Html.PartialAsync(
+        "_IndexFooterPager",
+                new CleanMe.Application.Helpers.Paging.PagedResult<object>
+                {
+                    PageNumber = Model.PageNumber,
+                    PageSize = Model.PageSize,
+                    TotalCount = Model.TotalCount
+                }
+                )
     </div>
 </form>
 

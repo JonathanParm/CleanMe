@@ -1,15 +1,4 @@
-﻿using CleanMe.Application.Interfaces;
-using CleanMe.Application.Services;
-using CleanMe.Application.ViewModels;
-using CleanMe.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CleanMe.Application.DTOs
+﻿namespace CleanMe.Application.DTOs
 {
     public class ExportClientScheduleToExcelDto
     {

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace CleanMe.Application.ViewModels
 {
@@ -14,7 +8,7 @@ namespace CleanMe.Application.ViewModels
         public int clientId { get; set; }
 
         [Display(Name = "Client")]
-        public string Name { get; set; }
+        public string ClientName { get; set; }
 
         [Display(Name = "Brand")]
         public string Brand { get; set; }

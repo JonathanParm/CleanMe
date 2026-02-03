@@ -1,7 +1,5 @@
 ﻿using CleanMe.Application.Interfaces;
-using CleanMe.Application.Services;
 using CleanMe.Application.ViewModels;
-using CleanMe.Domain.Entities;
 using CleanMe.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -33,7 +31,7 @@ namespace CleanMe.Web.Controllers
         }
         public async Task<IActionResult> Index(
             string? name, string? brand, int? accNo, string? isActive,
-            string sortColumn = "Name", string sortOrder = "ASC",
+            string sortColumn = "ClientName", string sortOrder = "ASC",
             int pageNumber = 1, int pageSize = 20)
         {
             ViewBag.SortColumn = sortColumn;
@@ -109,7 +107,7 @@ namespace CleanMe.Web.Controllers
                 }
 
                 // Check for duplicate Client (excluding current record)
-                var duplicateClient = await _clientService.FindDuplicateClientAsync(model.Name, model.clientId);
+                var duplicateClient = await _clientService.FindDuplicateClientAsync(model.ClientName, model.clientId);
                 if (duplicateClient.Any())
                 {
                     //TempData["WarningMessage"] = "A Client with the same name already exists.";
@@ -136,7 +134,7 @@ namespace CleanMe.Web.Controllers
 
                     Console.WriteLine("DEBUG: Updating existing Client member.");
                     await _clientService.UpdateClientAsync(model, GetCurrentUserId());
-                    TempData["SuccessMessage"] = $"Client {model.Name} updated successfully!";
+                    TempData["SuccessMessage"] = $"Client {model.ClientName} updated successfully!";
                 }
 
                 if (!string.IsNullOrWhiteSpace(returnUrl))

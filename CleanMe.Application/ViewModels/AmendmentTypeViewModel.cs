@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace CleanMe.Application.ViewModels
 {
@@ -8,8 +7,8 @@ namespace CleanMe.Application.ViewModels
         public int amendmentTypeId { get; set; }
 
         [Required]
-        [StringLength(50, MinimumLength = 3, ErrorMessage = "Code must have between 3 and 50 letters")]
-        public string Name { get; set; }
+        [StringLength(50, MinimumLength = 3, ErrorMessage = "Amendment type name must have between 3 and 50 letters")]
+        public string AmendmentTypeName { get; set; }
 
         [Required]
         [Display(Name = "Description")]

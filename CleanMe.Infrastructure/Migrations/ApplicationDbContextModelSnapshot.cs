@@ -59,6 +59,9 @@ namespace CleanMe.Infrastructure.Migrations
                     b.Property<bool>("IsAccessable")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsDefault")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -138,6 +141,11 @@ namespace CleanMe.Infrastructure.Migrations
                         .HasMaxLength(450)
                         .HasColumnType("NVARCHAR");
 
+                    b.Property<string>("AmendmentTypeName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(1000)
@@ -164,6 +172,9 @@ namespace CleanMe.Infrastructure.Migrations
                     b.Property<bool>("HasIsAccessable")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("HasIsDefault")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("HasItemCodeId")
                         .HasColumnType("bit");
 
@@ -178,11 +189,6 @@ namespace CleanMe.Infrastructure.Migrations
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar");
 
                     b.Property<int>("SortOrder")
                         .HasColumnType("int");
@@ -216,16 +222,16 @@ namespace CleanMe.Infrastructure.Migrations
                         .HasMaxLength(450)
                         .HasColumnType("NVARCHAR");
 
+                    b.Property<string>("AreaName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("VARCHAR");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("VARCHAR");
 
                     b.Property<int>("ReportCode")
                         .HasColumnType("int");
@@ -271,6 +277,11 @@ namespace CleanMe.Infrastructure.Migrations
                         .HasMaxLength(450)
                         .HasColumnType("NVARCHAR");
 
+                    b.Property<string>("AssetName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar");
+
                     b.Property<string>("ClientReference")
                         .HasMaxLength(50)
                         .HasColumnType("varchar");
@@ -279,11 +290,6 @@ namespace CleanMe.Infrastructure.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("MdReference")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar");
-
-                    b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("varchar");
@@ -392,6 +398,11 @@ namespace CleanMe.Infrastructure.Migrations
                         .HasMaxLength(450)
                         .HasColumnType("NVARCHAR");
 
+                    b.Property<string>("CleanFrequencyName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar");
+
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasMaxLength(2)
@@ -407,11 +418,6 @@ namespace CleanMe.Infrastructure.Migrations
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar");
 
                     b.Property<int>("SortOrder")
                         .HasColumnType("int");
@@ -452,15 +458,19 @@ namespace CleanMe.Infrastructure.Migrations
                         .HasMaxLength(10)
                         .HasColumnType("varchar");
 
+                    b.Property<string>("ClientName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
+                    b.Property<string>("Reference")
+                        .HasMaxLength(50)
                         .HasColumnType("varchar");
 
                     b.Property<DateTime>("UpdatedAt")
@@ -770,7 +780,7 @@ namespace CleanMe.Infrastructure.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("RegionName")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("varchar");

@@ -2,7 +2,6 @@
 using CleanMe.Application.Interfaces;
 using CleanMe.Application.ViewModels;
 using OfficeOpenXml;
-using System.IO;
 using Microsoft.Extensions.Logging;
 using System.Globalization;
 using CleanMe.Domain.Interfaces;

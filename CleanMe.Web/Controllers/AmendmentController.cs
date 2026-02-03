@@ -1,12 +1,10 @@
 ﻿using CleanMe.Application.Filters;
 using CleanMe.Application.Interfaces;
-using CleanMe.Application.Services;
 using CleanMe.Application.ViewModels;
 using CleanMe.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace CleanMe.Web.Controllers
 {
@@ -36,15 +34,15 @@ namespace CleanMe.Web.Controllers
             _errorLoggingService = errorLoggingService;
         }
         public async Task<IActionResult> Index(
-                string? sourceName, string? amendTypeName,
+                string? sourceName, string? amendmentTypeName,
                 string? clientName, string? areaName, string? locationName,
                 string? mdReference, string? clientReference, string sortColumn = "SourceName", string sortOrder = "ASC",
-            int pageNumber = 1, int pageSize = 20)
+            int pageNumber = 1, int pageSize = 5)
         {
             ViewBag.SortColumn = sortColumn;
             ViewBag.SortOrder = sortOrder;
             ViewBag.SourceName = sourceName;
-            ViewBag.AmendTypeName = amendTypeName;
+            ViewBag.AmendmentTypeName = amendmentTypeName;
             ViewBag.ClientName = clientName;
             ViewBag.AreaName = areaName;
             ViewBag.LocationName = locationName;
@@ -53,11 +51,24 @@ namespace CleanMe.Web.Controllers
 
             try
             {
-                var amendmentList = await _amendmentService.GetAmendmentIndexAsync(
-                    sourceName, amendTypeName,
-                    clientName, areaName, locationName,
-                    mdReference, clientReference,
-                    sortColumn, sortOrder, pageNumber, pageSize);
+                //var amendmentList = await _amendmentService.GetAmendmentIndexAsync(
+                //    sourceName, amendTypeName,
+                //    clientName, areaName, locationName,
+                //    mdReference, clientReference,
+                //    sortColumn, sortOrder, pageNumber, pageSize);
+
+                var amendmentList = await _amendmentService.GetPagedIndexAsync(
+                    pageNumber,
+                    pageSize,
+                    sortColumn,
+                    sortOrder,
+                    sourceName,
+                    amendmentTypeName,
+                    clientName,
+                    areaName,
+                    locationName,
+                    mdReference,
+                    clientReference);
 
                 return View(amendmentList);
             }

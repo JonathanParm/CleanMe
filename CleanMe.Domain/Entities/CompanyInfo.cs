@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using CleanMe.Domain.Common;
 
 namespace CleanMe.Domain.Entities
@@ -19,19 +13,19 @@ namespace CleanMe.Domain.Entities
         public int companyInfoId { get; set; }
 
         [Required(ErrorMessage = "Must have company name")]
-        [DisplayName("Name")]
+        [Display(Name = "Name")]
         [Column(TypeName = "VARCHAR")]
         [StringLength(1000, MinimumLength = 3, ErrorMessage = "Company name must have between 3 and 100 letters")]
         public string Name { get; set; }
 
         [Required(ErrorMessage = "Must have phone number")]
-        [DisplayName("Phone")]
+        [Display(Name = "Phone")]
         [Column(TypeName = "VARCHAR")]
         [StringLength(20, MinimumLength = 7, ErrorMessage = "Phone number must have between 7 and 20 letters")]
         public string Phone { get; set; }
 
         [Required(ErrorMessage = "Must have email address")]
-        [DisplayName("Email")]
+        [Display(Name = "Email")]
         [DataType(DataType.EmailAddress)]
         [EmailAddress]
         [Column(TypeName = "VARCHAR")]
@@ -42,11 +36,11 @@ namespace CleanMe.Domain.Entities
         public Address Address { get; set; } = new Address(); // Embedded Address Object
 
         [Required]
-        [DisplayName("Updated at")]
+        [Display(Name = "Updated at")]
         public DateTime UpdatedAt { get; set; }
 
         [Required]
-        [DisplayName("Updated by")]
+        [Display(Name = "Updated by")]
         [Column(TypeName = "NVARCHAR")]
         [StringLength(450)]
         public string UpdatedById { get; set; }

@@ -1,15 +1,4 @@
-﻿using CleanMe.Domain.Common;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CleanMe.Domain.Enums;
-
-namespace CleanMe.Application.DTOs
+﻿namespace CleanMe.Application.DTOs
 {
     public class ClientWithAddressDto
     {
@@ -17,6 +6,7 @@ namespace CleanMe.Application.DTOs
         public string Name { get; set; }
         public string Brand { get; set; }
         public int AccNo { get; set; }
+        public string Reference { get; set; }
         public string AddressLine1 { get; set; } = string.Empty;
         public string? AddressLine2 { get; set; }
         public string? AddressSuburb { get; set; }

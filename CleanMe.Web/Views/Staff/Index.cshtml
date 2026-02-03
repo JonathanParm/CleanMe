@@ -1,10 +1,11 @@
 ﻿@using CleanMe.Web.Helpers
-@model IEnumerable<CleanMe.Application.ViewModels.StaffIndexViewModel>
+@using CleanMe.Application.Helpers.Paging
+@model PagedResult<CleanMe.Application.ViewModels.StaffIndexViewModel>
 
 @{
     ViewData["Title"] = "Staff List";
     string sortOrder = ViewBag.SortOrder as string ?? "ASC";
-    string sortColumn = ViewBag.SortColumn as string ?? "StaffNo";
+    string sortColumn = ViewBag.SortColumn as string ?? "StaffId";
 }
 
 <h2>Staff List</h2>
@@ -30,13 +31,13 @@
 <!-- Filtering Form -->
 <form method="get" id="filterForm">
     <div class="table-responsive">
-        <table class="table">
+        <table class="table table-striped w-100 table-fixed">
             <thead>
                 <!-- Column Headers with Sorting -->
                 <tr>
                     <th>
-                        <a href="#" onclick="sortTable('StaffNo')">
-                            Staff No @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "staffId"))
+                        <a href="#" onclick="sortTable('StaffId')">
+                            Staff No @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "StaffId"))
                         </a>
                     </th>
                     <th>
@@ -64,7 +65,7 @@
 
                 <!-- Filter Row -->
                 <tr>
-                    <td><input type="text" name="staffId" class="form-control" value="@ViewBag.StaffNo" placeholder="Search Staff No"></td>
+                    <td><input type="text" name="staffId" class="form-control" value="@ViewBag.StaffId" placeholder="Search Staff No"></td>
                     <td><input type="text" name="fullName" class="form-control" value="@ViewBag.FullName" placeholder="Search Full Name"></td>
                     <td><input type="text" name="workRole" class="form-control" value="@ViewBag.WorkRole" placeholder="Search Work Role"></td>
                     <td><input type="text" name="contactDetail" class="form-control" value="@ViewBag.ContactDetail" placeholder="Search Contact"></td>
@@ -82,15 +83,15 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var staff in Model)
+                @foreach (var staff in Model.Items)
                 {
                     <tr>
-                        <td>@staff.staffId</td>
-                        <td>@staff.FullName</td>
-                        <td>@staff.WorkRole</td>
-                        <td>@staff.ContactDetail</td>
-                        <td>@(staff.IsActive ? "Yes" : "No")</td>
-                        <td>
+                        <td class="ps-4">@staff.staffId</td>
+                        <td class="ps-4">@staff.FullName</td>
+                        <td class="ps-4">@staff.WorkRole</td>
+                        <td class="ps-4">@staff.ContactDetail</td>
+                        <td class="ps-4">@(staff.IsActive ? "Yes" : "No")</td>
+                        <td class="ps-4">
                             <a asp-action="AddEdit" asp-route-staffId="@staff.staffId" class="btn btn-warning btn-sm">Edit</a>
                             <a asp-action="Delete" asp-route-staffId="@staff.staffId" class="btn btn-danger btn-sm">Delete</a>
                         </td>
@@ -98,6 +99,15 @@
                 }
             </tbody>
         </table>
+        @await Html.PartialAsync(
+        "_IndexFooterPager",
+                new CleanMe.Application.Helpers.Paging.PagedResult<object>
+                {
+                    PageNumber = Model.PageNumber,
+                    PageSize = Model.PageSize,
+                    TotalCount = Model.TotalCount
+                }
+                )
     </div>
 </form>
 

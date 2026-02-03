@@ -1,14 +1,9 @@
-﻿using Xunit;
-using Moq;
+﻿using Moq;
 using AutoFixture;
-using Microsoft.AspNetCore.Identity;
-using System.Threading.Tasks;
-using CleanMe.Domain.Entities;
 using CleanMe.Web.Controllers;
 using CleanMe.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
-using System.Collections.Generic;
 using System.Security.Claims;
 using CleanMe.Shared.Models;
 using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;

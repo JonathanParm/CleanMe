@@ -1,11 +1,7 @@
-﻿using CleanMe.Application.ViewModels;
-using CleanMe.Domain.Entities;
+﻿using CleanMe.Domain.Entities;
 using CleanMe.Domain.Interfaces;
 using CleanMe.Infrastructure.Data;
-using Dapper;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 
 namespace CleanMe.Infrastructure.Repositories
 {
@@ -22,7 +18,7 @@ namespace CleanMe.Infrastructure.Repositories
         {
             return await _context.Clients
                 .Where(c => !c.IsDeleted)
-                .OrderBy(c => c.Name)
+                .OrderBy(c => c.ClientName)
                 .ToListAsync();
         }
 

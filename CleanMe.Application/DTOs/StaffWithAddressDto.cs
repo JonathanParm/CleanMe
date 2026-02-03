@@ -1,13 +1,4 @@
-﻿using CleanMe.Domain.Common;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CleanMe.Domain.Enums;
+﻿using CleanMe.Domain.Enums;
 
 namespace CleanMe.Application.DTOs
 {

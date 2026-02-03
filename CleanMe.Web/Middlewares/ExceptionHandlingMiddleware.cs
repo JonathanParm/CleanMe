@@ -1,12 +1,7 @@
 ﻿using CleanMe.Domain.Entities;
 using CleanMe.Infrastructure.Data;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using System;
 using System.Net;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace CleanMe.Web.Middlewares
 {

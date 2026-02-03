@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CleanMe.Application.DTOs;
-using CleanMe.Application.ViewModels;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using CleanMe.Application.ViewModels;
 
 namespace CleanMe.Application.Interfaces
 {

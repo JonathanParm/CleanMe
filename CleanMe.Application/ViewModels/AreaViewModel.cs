@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace CleanMe.Application.ViewModels
 {
@@ -17,7 +10,7 @@ namespace CleanMe.Application.ViewModels
         [Required]
         [StringLength(50, MinimumLength = 2, ErrorMessage = "Area name must have between 2 and 50 letters")]
         [Display(Name = "Area name")]
-        public string Name { get; set; }
+        public string AreaName { get; set; }
 
         [Required]
         [Display(Name = "Region")]

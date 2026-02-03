@@ -24,10 +24,10 @@ namespace CleanMe.Web.Helpers
         }
 
         public static IHtmlContent LabeledTextBoxFor<TModel, TValue>(
-            this IHtmlHelper<TModel> htmlHelper,
-            Expression<Func<TModel, TValue>> expression,
-            int labelCols = 3,
-            int inputCols = 9)
+        this IHtmlHelper<TModel> htmlHelper,
+        Expression<Func<TModel, TValue>> expression,
+        int labelCols = 3,
+        int inputCols = 9)
         {
             var propertyInfo = GetPropertyInfo(expression);
             if (propertyInfo == null)
@@ -37,7 +37,27 @@ namespace CleanMe.Web.Helpers
             var labelText = displayAttr?.Name ?? propertyInfo.Name;
 
             var label = htmlHelper.LabelFor(expression, labelText, new { @class = $"col-md-{labelCols} col-form-label" });
-            var textbox = htmlHelper.TextBoxFor(expression, new { @class = "form-control" });
+
+            // Detect DateTime / DateTime?
+            var propertyType = propertyInfo.PropertyType;
+            var underlyingType = Nullable.GetUnderlyingType(propertyType) ?? propertyType;
+            var isDateTime = underlyingType == typeof(DateTime);
+
+            IHtmlContent input;
+
+            if (isDateTime)
+            {
+                // HTML5 date input requires yyyy-MM-dd value format
+                input = htmlHelper.TextBoxFor(
+                    expression,
+                    "{0:yyyy-MM-dd}",
+                    new { @class = "form-control", type = "date" }
+                );
+            }
+            else
+            {
+                input = htmlHelper.TextBoxFor(expression, new { @class = "form-control" });
+            }
 
             var div = new TagBuilder("div");
             div.AddCssClass("mb-3 row");
@@ -48,13 +68,25 @@ namespace CleanMe.Web.Helpers
 
             var inputDiv = new TagBuilder("div");
             inputDiv.AddCssClass($"col-md-{inputCols}");
-            inputDiv.InnerHtml.AppendHtml(textbox);
+            inputDiv.InnerHtml.AppendHtml(input);
 
             div.InnerHtml.AppendHtml(labelDiv);
             div.InnerHtml.AppendHtml(inputDiv);
 
             return div;
         }
+
+        // Assuming you already have this somewhere. Included for completeness if needed:
+        //private static PropertyInfo? GetPropertyInfo<TModel, TValue>(Expression<Func<TModel, TValue>> expression)
+        //{
+        //    if (expression.Body is MemberExpression memberExpr)
+        //        return memberExpr.Member as PropertyInfo;
+
+        //    if (expression.Body is UnaryExpression unaryExpr && unaryExpr.Operand is MemberExpression memberExpr2)
+        //        return memberExpr2.Member as PropertyInfo;
+
+        //    return null;
+        //}
 
         public static IHtmlContent YesNoButtonsFor<TModel>(
             this IHtmlHelper<TModel> htmlHelper,

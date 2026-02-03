@@ -1,18 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using CleanMe.Application.DTOs;
+using CleanMe.Application.Helpers.Paging;
 using CleanMe.Application.Interfaces;
 using CleanMe.Application.ViewModels;
-using CleanMe.Domain.Interfaces;
-using CleanMe.Domain.Entities;
-using CleanMe.Domain.Enums;
-using Microsoft.Extensions.Logging;
-using System.Reflection;
-using Microsoft.AspNetCore.Http.HttpResults;
 using CleanMe.Domain.Common;
-using CleanMe.Application.DTOs;
-using System.Collections;
+using CleanMe.Domain.Entities;
+using CleanMe.Domain.Interfaces;
+using Microsoft.Extensions.Logging;
 using System.Data;
 
 namespace CleanMe.Application.Services
@@ -66,7 +59,63 @@ namespace CleanMe.Application.Services
                 throw new ApplicationException("Error fetching AssetLocations from stored procedure", ex);
             }
         }
+        public async Task<PagedResult<AssetLocationIndexViewModel>> GetPagedIndexAsync(
+            int pageNumber,
+            int pageSize,
+            string sortColumn,
+            string sortOrder,
+            string? areaName,
+            string? description,
+            string? townSuburb,
+            string? reportCode,
+            string? isActive)
+        {
+            // Defensive normalisation (helps prevent bad sort inputs)
+            pageNumber = pageNumber < 1 ? 1 : pageNumber;
+            pageSize = pageSize < 1 ? 20 : pageSize;
 
+            sortOrder = (sortOrder?.ToUpperInvariant() == "DESC") ? "DESC" : "ASC";
+            sortColumn = string.IsNullOrWhiteSpace(sortColumn) ? "Description" : sortColumn;
+
+            var parameters = new
+            {
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                SortColumn = sortColumn,
+                SortOrder = sortOrder,
+                AreaName = areaName,
+                Description = description,
+                TownSuburb = townSuburb,
+                ReportCode = reportCode,
+                IsActive = isActive
+            };
+
+            const string proc = "dbo.AssetLocationGetIndexView";
+
+            var rows = (await _unitOfWork.DapperRepository
+                .QueryAsync<AssetLocationIndexRowDTO>(proc, parameters, CommandType.StoredProcedure))
+                .ToList();
+
+            var totalCount = rows.FirstOrDefault()?.TotalCount ?? 0;
+
+            var items = rows.Select(r => new AssetLocationIndexViewModel
+            {
+                assetLocationId = r.assetLocationId,
+                AreaName = r.AreaName,
+                Description = r.Description,
+                ReportCode = r.ReportCode,
+                TownSuburb = r.TownSuburb,
+                IsActive = r.IsActive
+            }).ToList();
+
+            return new PagedResult<AssetLocationIndexViewModel>
+            {
+                Items = items,
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalCount = totalCount
+            };
+        }
         public async Task<IEnumerable<AssetLocationViewModel>> FindDuplicateAssetLocationAsync(string description, string? reportCode, int? assetLocationId = null)
         {
             // Exclude any soft deletes
@@ -141,7 +190,7 @@ namespace CleanMe.Application.Services
             return new AssetLocationViewModel
             {
                 areaId = area.areaId,
-                AreaName = area.Name,
+                AreaName = area.AreaName,
                 IsActive = true
             };
         }

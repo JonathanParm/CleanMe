@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace CleanMe.Application.ViewModels
@@ -17,7 +10,7 @@ namespace CleanMe.Application.ViewModels
         [Required]
         [StringLength(50, MinimumLength = 2, ErrorMessage = "Asset name must have between 2 and 50 letters")]
         [Display(Name = "Asset name")]
-        public string Name { get; set; }
+        public string AssetName { get; set; }
 
         [Required(ErrorMessage = "Client is requred")]
         [Display(Name = "Client")]

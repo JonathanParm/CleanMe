@@ -79,7 +79,7 @@ namespace CleanMe.Application.Services
             return new AmendmentTypeViewModel
             {
                 amendmentTypeId = AmendmentType.amendmentTypeId,
-                Name = AmendmentType.Name,
+                AmendmentTypeName = AmendmentType.AmendmentTypeName,
                 Description = AmendmentType.Description,
                 SortOrder = AmendmentType.SortOrder,
                 HasStaffId = AmendmentType.HasStaffId,
@@ -129,11 +129,11 @@ namespace CleanMe.Application.Services
         // Creates a new AmendmentType (EF Core)
         public async Task<int> AddAmendmentTypeAsync(AmendmentTypeViewModel model, string addedById)
         {
-            _logger.LogInformation($"Adding new amendment type: {model.Name}");
+            _logger.LogInformation($"Adding new amendment type: {model.AmendmentTypeName}");
 
             var AmendmentType = new AmendmentType
             {
-                Name = model.Name,
+                AmendmentTypeName = model.AmendmentTypeName,
                 Description = model.Description,
                 SortOrder = model.SortOrder,
                 HasStaffId = model.HasStaffId,
@@ -169,7 +169,7 @@ namespace CleanMe.Application.Services
                 throw new Exception("amendment type not found.");
             }
 
-            AmendmentType.Name = model.Name;
+            AmendmentType.AmendmentTypeName = model.AmendmentTypeName;
             AmendmentType.Description = model.Description;
             AmendmentType.SortOrder = model.SortOrder;
             AmendmentType.HasStaffId = model.HasStaffId;

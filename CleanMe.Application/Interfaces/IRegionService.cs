@@ -1,7 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using CleanMe.Application.Helpers.Paging;
 using CleanMe.Application.ViewModels;
-using CleanMe.Domain.Entities;
 
 namespace CleanMe.Application.Interfaces
 {
@@ -12,11 +10,18 @@ namespace CleanMe.Application.Interfaces
             string sortColumn, string sortOrder, int pageNumber, int pageSize);
         Task<IEnumerable<RegionViewModel>> FindDuplicateRegionAsync(string name, string reportCode, int? excludeRegionId);
         Task<RegionViewModel?> GetRegionViewModelByIdAsync(int regionId);
-        Task<RegionViewModel?> GetRegionViewModelWithAreasByIdAsync(int regionId);
+        Task<RegionWithAreasViewModel?> GetRegionWithAreasViewModelByIdAsync(int regionId, int pageNumber, int pageSize);
         Task<int> AddRegionAsync(RegionViewModel model, string addedById);
         Task UpdateRegionAsync(RegionViewModel model, string updatedById);
         Task<bool> SoftDeleteRegionAsync(int regionId, string updatedById);
-
-        // Retrieves a paginated & filtered region list using Dapper
+        Task<PagedResult<RegionIndexViewModel>> GetPagedIndexAsync(
+                    int pageNumber,
+                    int pageSize,
+                    string sortColumn,
+                    string sortOrder,
+                    string? regionName,
+                    string? reportCode,
+                    string? isActive
+                );
     }
 }

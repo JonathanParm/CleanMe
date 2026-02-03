@@ -100,7 +100,7 @@ namespace CleanMe.Application.Services
                 JobTitle = clientContact.JobTitle,
                 IsActive = clientContact.IsActive,
                 ApplicationUserId = clientContact.ApplicationUserId,
-                ClientName = clientContact.Client.Name
+                ClientName = clientContact.Client.ClientName
             };
         }
 
@@ -114,7 +114,7 @@ namespace CleanMe.Application.Services
             return new ClientContactViewModel
             {
                 clientId = client.clientId,
-                ClientName = client.Name,
+                ClientName = client.ClientName,
                 IsActive = true
             };
 

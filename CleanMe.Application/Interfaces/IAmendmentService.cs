@@ -1,8 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using CleanMe.Application.DTOs;
+﻿using CleanMe.Application.DTOs;
+using CleanMe.Application.Helpers.Paging;
 using CleanMe.Application.ViewModels;
-using CleanMe.Domain.Entities;
 
 namespace CleanMe.Application.Interfaces
 {
@@ -20,11 +18,24 @@ namespace CleanMe.Application.Interfaces
 
         Task<AmendmentTypeHasFieldsDto> GetAmendmentTypeHasFieldsByIdAsync(int amendmentTypeId);
 
-        // Retrieves a paginated & filtered Amendment list using Dapper
-        Task<IEnumerable<AmendmentIndexViewModel>> GetAmendmentIndexAsync(
-                string? sourceName, string? amendTypeName, 
-                string? clientName, string? areaName, string? locationName,
-                string? mdReference, string? clientReference,
-                string sortColumn, string sortOrder, int pageNumber, int pageSize);
+        //// Retrieves a paginated & filtered Amendment list using Dapper
+        //Task<IEnumerable<AmendmentIndexViewModel>> GetAmendmentIndexAsync(
+        //        string? sourceName, string? amendTypeName, 
+        //        string? clientName, string? areaName, string? locationName,
+        //        string? mdReference, string? clientReference,
+        //        string sortColumn, string sortOrder, int pageNumber, int pageSize);
+        Task<PagedResult<AmendmentIndexViewModel>> GetPagedIndexAsync(
+            int pageNumber,
+            int pageSize,
+            string sortColumn,
+            string sortOrder,
+            string? sourceName,
+            string? amendmentTypeName,
+            string? clientName,
+            string? areaName,
+            string? locationName,
+            string? mdReference,
+            string? clientReference
+        );
     }
 }

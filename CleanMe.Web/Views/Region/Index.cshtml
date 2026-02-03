@@ -1,10 +1,11 @@
 ﻿@using CleanMe.Web.Helpers
-@model IEnumerable<CleanMe.Application.ViewModels.RegionIndexViewModel>
+@using CleanMe.Application.Helpers.Paging
+@model PagedResult<CleanMe.Application.ViewModels.RegionIndexViewModel>
 
 @{
     ViewData["Title"] = "Region List";
     string sortOrder = ViewBag.SortOrder as string ?? "ASC";
-    string sortColumn = ViewBag.SortColumn as string ?? "SortOrder";
+    string sortColumn = ViewBag.SortColumn as string ?? "RegionName";
 }
 
 <h2>Region List</h2>
@@ -30,13 +31,13 @@
 <!-- Filtering Form -->
 <form method="get" id="filterForm">
     <div class="table-responsive">
-        <table class="table">
+        <table class="table table-striped w-100 table-fixed">
             <thead>
                 <!-- Column Headers with Sorting -->
                 <tr>
                     <th>
-                        <a href="#" onclick="sortTable('Name')">
-                            Name @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "Name"))
+                        <a href="#" onclick="sortTable('RegionName')">
+                            Region @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "RegionName"))
                         </a>
                     </th>
                     <th>
@@ -54,8 +55,8 @@
 
                 <!-- Filter Row -->
                 <tr>
-                    <td><input type="text" name="name" class="form-control" value="@ViewBag.Name" placeholder="Search Region Name"></td>
-                    <td><input type="text" name="code" class="form-control" value="@ViewBag.Code" placeholder="Search Code"></td>
+                    <td><input type="text" name="regionName" class="form-control" value="@ViewBag.RegionName" placeholder="Search Region Name"></td>
+                    <td><input type="text" name="reportCode" class="form-control" value="@ViewBag.ReportCode" placeholder="Search Code"></td>
                     <td>
                         <select name="isActive" class="form-control">
                             <option value="">All</option>
@@ -70,13 +71,13 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var region in Model)
+                @foreach (var region in Model.Items)
                 {
                     <tr>
-                        <td>@region.Name</td>
-                        <td>@region.ReportCode</td>
-                        <td>@(region.IsActive ? "Yes" : "No")</td>
-                        <td>
+                        <td class="ps-4">@region.RegionName</td>
+                        <td class="ps-4">@region.ReportCode</td>
+                        <td class="ps-4">@(region.IsActive ? "Yes" : "No")</td>
+                        <td class="ps-4">
                             <a asp-action="AddEdit" asp-route-regionId="@region.regionId" class="btn btn-warning btn-sm">Edit</a>
                             <a asp-action="Delete" asp-route-regionId="@region.regionId" class="btn btn-danger btn-sm">Delete</a>
                         </td>
@@ -84,6 +85,15 @@
                 }
             </tbody>
         </table>
+        @await Html.PartialAsync(
+        "_IndexFooterPager",
+                new CleanMe.Application.Helpers.Paging.PagedResult<object>
+                {
+                    PageNumber = Model.PageNumber,
+                    PageSize = Model.PageSize,
+                    TotalCount = Model.TotalCount
+                }
+                )
     </div>
 </form>
 

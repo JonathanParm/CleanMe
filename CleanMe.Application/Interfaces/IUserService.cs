@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
-using CleanMe.Domain.Entities;
+﻿using Microsoft.AspNetCore.Identity;
 using CleanMe.Shared.Models;
 
 namespace CleanMe.Application.Interfaces

@@ -1,11 +1,11 @@
-﻿using CleanMe.Application.Interfaces;
+﻿using CleanMe.Application.DTOs;
+using CleanMe.Application.Helpers.Paging;
+using CleanMe.Application.Interfaces;
 using CleanMe.Application.ViewModels;
 using CleanMe.Domain.Entities;
 using CleanMe.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using System.Xml.Linq;
-using CleanMe.Application.DTOs;
+using System.Data;
 
 namespace CleanMe.Application.Services
 {
@@ -32,7 +32,7 @@ namespace CleanMe.Application.Services
 
         // Retrieve a list of Amendments using Dapper (Optimized for performance)
         public async Task<IEnumerable<AmendmentIndexViewModel>> GetAmendmentIndexAsync(
-                string? sourceName, string? amendTypeName,
+                string? sourceName, string? amendmentTypeName,
                 string? clientName, string? areaName, string? locationName,
                 string? mdReference, string? clientReference,
                 string sortColumn, string sortOrder, int pageNumber, int pageSize)
@@ -40,11 +40,11 @@ namespace CleanMe.Application.Services
             _logger.LogInformation("Fetching Amendments list using Dapper.");
             try
             {
-                var query = "EXEC dbo.AmendmentGetIndexView @SourceName, @AmendTypeName, @ClientName, @AreaName, @LocationName, @MdReference, @ClientReference, @SortColumn, @SortOrder, @PageNumber, @PageSize";
+                var query = "EXEC dbo.AmendmentGetIndexView @SourceName, @AmendmentTypeName, @ClientName, @AreaName, @LocationName, @MdReference, @ClientReference, @SortColumn, @SortOrder, @PageNumber, @PageSize";
                 var parameters = new
                 {
                     SourceName = sourceName,
-                    AmendTypeName = amendTypeName,
+                    AmendmentTypeName = amendmentTypeName,
                     ClientName = clientName,
                     AreaName = areaName,
                     LocationName = locationName,
@@ -63,6 +63,70 @@ namespace CleanMe.Application.Services
                 // Log error (you can inject a logger if needed)
                 throw new ApplicationException("Error fetching Amendments from stored procedure", ex);
             }
+        }
+        public async Task<PagedResult<AmendmentIndexViewModel>> GetPagedIndexAsync(
+            int pageNumber,
+            int pageSize,
+            string sortColumn,
+            string sortOrder,
+            string? sourceName,
+            string? amendmentTypeName,
+            string? clientName,
+            string? areaName,
+            string? locationName,
+            string? mdReference,
+            string? clientReference)
+        {
+            // Defensive normalisation (helps prevent bad sort inputs)
+            pageNumber = pageNumber < 1 ? 1 : pageNumber;
+            pageSize = pageSize < 1 ? 20 : pageSize;
+
+            sortOrder = (sortOrder?.ToUpperInvariant() == "DESC") ? "DESC" : "ASC";
+            sortColumn = string.IsNullOrWhiteSpace(sortColumn) ? "SourceName" : sortColumn;
+
+            var parameters = new
+            {
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                SortColumn = sortColumn,
+                SortOrder = sortOrder,
+                SourceName = sourceName,
+                AmendmentTypeName = amendmentTypeName,
+                ClientName = clientName,
+                AreaName = areaName,
+                LocationName = locationName,
+                MdReference = mdReference,
+                ClientReference = clientReference
+            };
+
+            const string proc = "dbo.AmendmentGetIndexView";
+
+            var rows = (await _unitOfWork.DapperRepository
+                .QueryAsync<AmendmentIndexRowDTO>(proc, parameters, CommandType.StoredProcedure))
+                .ToList();
+
+            var totalCount = rows.FirstOrDefault()?.TotalCount ?? 0;
+
+            var items = rows.Select(r => new AmendmentIndexViewModel
+            {
+                amendmentId = r.amendmentId,
+                SourceName = r.SourceName,
+                AmendmentTypeName = r.AmendmentTypeName,
+                ClientName = r.ClientName,
+                AreaName = r.AreaName,
+                LocationName = r.LocationName,
+                MdReference = r.MdReference, 
+                ClientReference = r.ClientReference,
+                AmendmentSummary = r.AmendmentSummary
+            }).ToList();
+
+            return new PagedResult<AmendmentIndexViewModel>
+            {
+                Items = items,
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalCount = totalCount
+            };
         }
 
         public async Task<IEnumerable<AmendmentViewModel>> FindDuplicateAmendmentAsync(int amendmentTypeId, int assetId, int? excludeAmendmentId = null)
@@ -130,15 +194,15 @@ namespace CleanMe.Application.Services
                 clientId = amendment.clientId,
                 ClientName = amendment.Client?.Brand,
                 areaId = amendment.areaId,
-                AreaName = amendment.Area?.Name,
+                AreaName = amendment.Area?.AreaName,
                 assetLocationId = amendment.assetLocationId,
                 AssetLocationName = amendment.AssetLocation?.Description,
                 assetId = amendment.assetId,
-                AssetName = amendment.Asset?.Name,
+                AssetName = amendment.Asset?.AssetName,
                 amendmentTypeId = amendment.amendmentTypeId,
-                AmendmentTypeName = amendment.AmendmentType?.Name,
+                AmendmentTypeName = amendment.AmendmentType?.AmendmentTypeName,
                 cleanFrequencyId = amendment.cleanFrequencyId,
-                CleanFrequencyName = amendment.CleanFrequency?.Name,
+                CleanFrequencyName = amendment.CleanFrequency?.CleanFrequencyName,
                 itemCodeId = amendment.itemCodeId,
                 ItemCodeName = amendment.ItemCode?.Code,
                 staffId = amendment.staffId,

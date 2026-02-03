@@ -1,4 +1,6 @@
 ﻿function sortTable(column) {
+    debugger;
+
     let sortColumn = new URLSearchParams(window.location.search).get("sortColumn");
     let sortOrder = new URLSearchParams(window.location.search).get("sortOrder") === "ASC" ? "DESC" : "ASC";
     let params = new URLSearchParams(window.location.search);

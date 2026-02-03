@@ -1,5 +1,4 @@
 ﻿using CleanMe.Application.Interfaces;
-using CleanMe.Application.Services;
 using CleanMe.Application.ViewModels;
 using CleanMe.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -31,21 +30,30 @@ namespace CleanMe.Web.Controllers
             _errorLoggingService = errorLoggingService;
         }
         public async Task<IActionResult> Index(
-            string? name, string? description, string? code, string? isActive,
-            string sortColumn = "SequenceOrder", string sortOrder = "ASC",
-            int pageNumber = 1, int pageSize = 20)
+            string? cleanFrequencyName, string? description, string? code, string? isActive,
+            string sortColumn = "CleanFrequencyName", string sortOrder = "ASC",
+            int pageNumber = 1, int pageSize = 5)
         {
             ViewBag.SortColumn = sortColumn;
             ViewBag.SortOrder = sortOrder;
-            ViewBag.Name = name;
+            ViewBag.CleanFrequencyName = cleanFrequencyName;
             ViewBag.Code = code;
             ViewBag.IsActive = isActive;
 
             try
             {
-                var CleanFrequencyList = await _cleanFrequencyService.GetCleanFrequencyIndexAsync(
-                    name, description, code, isActive,
-                    sortColumn, sortOrder, pageNumber, pageSize);
+                //var CleanFrequencyList = await _cleanFrequencyService.GetCleanFrequencyIndexAsync(
+                //    name, description, code, isActive,
+                //    sortColumn, sortOrder, pageNumber, pageSize);
+                var CleanFrequencyList = await _cleanFrequencyService.GetPagedIndexAsync(
+                    pageNumber,
+                    pageSize,
+                    sortColumn,
+                    sortOrder,
+                    cleanFrequencyName,
+                    description,
+                    code,
+                    isActive);
 
                 return View(CleanFrequencyList);
             }
@@ -104,7 +112,7 @@ namespace CleanMe.Web.Controllers
                 }
 
                 // Check for duplicate CleanFrequency (excluding current record)
-                var duplicateCleanFrequency = await _cleanFrequencyService.FindDuplicateCleanFrequencyAsync(model.Name, model.Code, model.cleanFrequencyId);
+                var duplicateCleanFrequency = await _cleanFrequencyService.FindDuplicateCleanFrequencyAsync(model.CleanFrequencyName, model.Code, model.cleanFrequencyId);
                 if (duplicateCleanFrequency.Any())
                 {
                     //TempData["WarningMessage"] = "A CleanFrequency with the same name or code already exists.";
@@ -129,7 +137,7 @@ namespace CleanMe.Web.Controllers
 
                     Console.WriteLine("DEBUG: Updating existing Clean Frequency member.");
                     await _cleanFrequencyService.UpdateCleanFrequencyAsync(model, GetCurrentUserId());
-                    TempData["SuccessMessage"] = $"Clean Frequency {model.Name} updated successfully!";
+                    TempData["SuccessMessage"] = $"Clean Frequency {model.CleanFrequencyName} updated successfully!";
                 }
 
                 Console.WriteLine("DEBUG: Returning RedirectToAction('Index').");

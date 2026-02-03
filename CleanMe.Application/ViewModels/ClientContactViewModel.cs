@@ -1,9 +1,5 @@
-﻿using CleanMe.Domain.Common;
-using CleanMe.Domain.Enums;
-using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CleanMe.Application.ViewModels
 {

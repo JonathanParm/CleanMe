@@ -1,21 +1,11 @@
-﻿using CleanMe.Application.DTOs;
-using CleanMe.Application.Interfaces;
-using CleanMe.Application.ViewModels;
-using CleanMe.Domain.Common;
+﻿using CleanMe.Application.ViewModels;
 using CleanMe.Domain.Entities;
-using CleanMe.Domain.Enums;
 using CleanMe.Domain.Interfaces;
 using CleanMe.Infrastructure.Data;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CleanMe.Infrastructure.Repositories
 {
@@ -60,7 +50,7 @@ namespace CleanMe.Infrastructure.Repositories
         {
             var area = await _context.Areas
                 .Where(a => a.areaId == areaId)
-                .Select(a => new { a.areaId, a.Name })
+                .Select(a => new { a.areaId, a.AreaName })
                 .FirstOrDefaultAsync();
 
             //if (area == null)
@@ -69,7 +59,7 @@ namespace CleanMe.Infrastructure.Repositories
             return new AssetLocationViewModel
             {
                 areaId = area.areaId,
-                AreaName = area.Name,
+                AreaName = area.AreaName,
                 IsActive = true
             };
         }

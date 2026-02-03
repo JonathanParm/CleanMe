@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CleanMe.Domain.Entities
 {
@@ -13,7 +7,7 @@ namespace CleanMe.Domain.Entities
     public class ClientContact
     {
         [Key]
-        [DisplayName("Contact")]
+        [Display(Name = "Contact")]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int clientContactId { get; set; }
 
@@ -22,13 +16,13 @@ namespace CleanMe.Domain.Entities
         [StringLength(450)]
         public string? ApplicationUserId { get; set; }
 
-        [DisplayName("First name")]
+        [Display(Name = "First name")]
         [Required(ErrorMessage = "Must have first name")]
         [Column(TypeName = "varchar(50)")]
         [StringLength(50, MinimumLength = 2, ErrorMessage = "First name must have between 2 and 50 letters")]
         public string FirstName { get; set; }
 
-        [DisplayName("Family name")]
+        [Display(Name = "Family name")]
         [Required(ErrorMessage = "Must have family name")]
         [Column(TypeName = "varchar(50)")]
         [StringLength(50, MinimumLength = 2, ErrorMessage = "Family name must have between 2 and 50 letters")]
@@ -46,66 +40,66 @@ namespace CleanMe.Domain.Entities
             }
         }
 
-        [DisplayName("Job title")]
+        [Display(Name = "Job title")]
         [Column(TypeName = "VARCHAR")]
         [StringLength(20)]
         public string? JobTitle { get; set; }
 
-        [DisplayName("Mobile phone")]
+        [Display(Name = "Mobile phone")]
         [Column(TypeName = "varchar")]
         [StringLength(30, ErrorMessage = "Mobile phone number cannot have more than 30 digits")]
         [MinLength(6, ErrorMessage = "Mobile phone number must be at least 6 digits.")]
         public string? PhoneMobile { get; set; }
 
-        [DisplayName("Email")]
+        [Display(Name = "Email")]
         [Column(TypeName = "varchar")]
         [StringLength(256, ErrorMessage = "Email address must have at least 6 characters")]
         [MinLength(6, ErrorMessage = "An email address must be at least 6 digits.")]
         public string? Email { get; set; }
 
         [Required]
-        [DisplayName("Active")]
+        [Display(Name = "Active")]
         public bool IsActive { get; set; } = true;
 
         //// Foreign key property linking to the parent
         //[ForeignKey("Client")]
-        //[DisplayName("Client")]
+        //[Display(Name = "Client")]
         //public int ClientId { get; set; }
         //// Navigation property representing the parent
-        //[DisplayName("Client")]
+        //[Display(Name = "Client")]
         //public Client? Client { get; set; }
 
         [Required]
-        [DisplayName("Deleted")]
+        [Display(Name = "Deleted")]
         public bool IsDeleted { get; set; } = false;
 
         [Required]
-        [DisplayName("Added at")]
+        [Display(Name = "Added at")]
         public DateTime AddedAt { get; set; }
 
         [Required]
-        [DisplayName("Added by")]
+        [Display(Name = "Added by")]
         [Column(TypeName = "NVARCHAR")]
         [StringLength(450)]
         public string AddedById { get; set; }
 
         [Required]
-        [DisplayName("Updated at")]
+        [Display(Name = "Updated at")]
         public DateTime UpdatedAt { get; set; }
 
         [Required]
-        [DisplayName("Updated by")]
+        [Display(Name = "Updated by")]
         [Column(TypeName = "NVARCHAR")]
         [StringLength(450)]
         public string UpdatedById { get; set; }
 
         // Foreign Key
         [ForeignKey("Client")]
-        [DisplayName("Client")]
+        [Display(Name = "Client")]
         public int clientId { get; set; }
 
         // Navigation property
-        [DisplayName("Client")]
+        [Display(Name = "Client")]
         [ForeignKey(nameof(clientId))]
         public virtual Client? Client { get; set; }
     }

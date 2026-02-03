@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CleanMe.Domain.Entities
 {
@@ -21,14 +15,14 @@ namespace CleanMe.Domain.Entities
         [Column(TypeName = "VARCHAR")]
         [StringLength(100, MinimumLength = 2, ErrorMessage = "Area name must have between 2 and 100 letters")]
         [Display(Name = "Area name")]
-        public string Name { get; set; }
+        public string AreaName { get; set; }
 
         [ForeignKey("Region")]
-        [DisplayName("Region")]
+        [Display(Name = "Region")]
         public int regionId { get; set; }
 
         // Navigation property
-        [DisplayName("Region")]
+        [Display(Name = "Region")]
         [ForeignKey(nameof(regionId))]
         public virtual Region? Region { get; set; }
 
@@ -41,29 +35,29 @@ namespace CleanMe.Domain.Entities
         public int SortOrder { get; set; }
 
         [Required]
-        [DisplayName("Active")]
+        [Display(Name = "Active")]
         public bool IsActive { get; set; } = true;
 
         [Required]
-        [DisplayName("Deleted")]
+        [Display(Name = "Deleted")]
         public bool IsDeleted { get; set; } = false;
 
         [Required]
-        [DisplayName("Added at")]
+        [Display(Name = "Added at")]
         public DateTime AddedAt { get; set; }
 
         [Required]
-        [DisplayName("Created by")]
+        [Display(Name = "Created by")]
         [Column(TypeName = "NVARCHAR")]
         [StringLength(450)]
         public string AddedById { get; set; }
 
         [Required]
-        [DisplayName("Updated at")]
+        [Display(Name = "Updated at")]
         public DateTime UpdatedAt { get; set; }
 
         [Required]
-        [DisplayName("Updated by")]
+        [Display(Name = "Updated by")]
         [Column(TypeName = "NVARCHAR")]
         [StringLength(450)]
         public string UpdatedById { get; set; }

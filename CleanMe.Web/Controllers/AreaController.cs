@@ -1,7 +1,5 @@
 ﻿using CleanMe.Application.Interfaces;
-using CleanMe.Application.Services;
 using CleanMe.Application.ViewModels;
-using CleanMe.Domain.Entities;
 using CleanMe.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -32,22 +30,34 @@ namespace CleanMe.Web.Controllers
             _errorLoggingService = errorLoggingService;
         }
         public async Task<IActionResult> Index(
-            string? regionName, string? name, int? reportCode, string? isActive,
-                string sortColumn = "SequenceOrder", string sortOrder = "ASC",
-            int pageNumber = 1, int pageSize = 20)
+            string? regionName, string? areaName, int? reportCode, string? cleanerName, string? isActive,
+                string sortColumn = "AreaName", string sortOrder = "ASC",
+            int pageNumber = 1, int pageSize = 5)
         {
             ViewBag.SortColumn = sortColumn;
             ViewBag.SortOrder = sortOrder;
             ViewBag.RegionName = regionName;
-            ViewBag.Name = name;
+            ViewBag.Name = areaName;
             ViewBag.ReportCode = reportCode;
+            ViewBag.CleanerName = cleanerName;
             ViewBag.IsActive = isActive;
 
             try
             {
-                var areaList = await _areaService.GetAreaIndexAsync(
-                    regionName, name, reportCode, isActive,
-                    sortColumn, sortOrder, pageNumber, pageSize);
+                //var areaList = await _areaService.GetAreaIndexAsync(
+                //    regionName, name, reportCode, cleanerName, isActive,
+                //    sortColumn, sortOrder, pageNumber, pageSize);
+
+                var areaList = await _areaService.GetPagedIndexAsync(
+                    pageNumber,
+                    pageSize,
+                    sortColumn,
+                    sortOrder,
+                    regionName,
+                    areaName,
+                    reportCode,
+                    cleanerName,
+                    isActive);
 
                 return View(areaList);
             }
@@ -61,13 +71,15 @@ namespace CleanMe.Web.Controllers
             }
         }
         // AddEdit Action (Handles Both Add & Edit)
-        public async Task<IActionResult> AddEdit(int areaId = 0, int regionId = 0, string? returnUrl = null)
+        public async Task<IActionResult> AddEdit(int areaId = 0, int regionId = 0, int pageNumber = 1, int pageSize = 5, string? returnUrl = null)
         {
             try
             {
-                var model = areaId > 0
-                    ? await _areaService.GetAreaViewModelWithAssetLocationsByIdAsync(areaId)
-                    : await _areaService.PrepareNewAreaViewModelAsync(regionId);
+                AreaWithAssetLocationsViewModel model;
+
+                model = areaId > 0
+                    ? await _areaService.GetAreaWithAssetLocationsViewModelByIdAsync(areaId, pageNumber, pageSize)
+                    : await _areaService.PrepareNewAreaViewModelAsync(regionId, pageNumber, pageSize);
 
                 ViewBag.ReturnUrl = string.IsNullOrWhiteSpace(returnUrl) ? "Index" : returnUrl;
                 return View(model);
@@ -97,7 +109,7 @@ namespace CleanMe.Web.Controllers
                 }
 
                 // Check for duplicate Area (excluding current record)
-                var duplicateArea = await _areaService.FindDuplicateAreaAsync(model.Name, model.ReportCode, model.areaId);
+                var duplicateArea = await _areaService.FindDuplicateAreaAsync(model.AreaName, model.ReportCode, model.areaId);
                 if (duplicateArea.Any())
                 {
                     //TempData["WarningMessage"] = "A Area with the same name or code already exists.";
@@ -111,7 +123,7 @@ namespace CleanMe.Web.Controllers
                 if (model.areaId == 0)
                 {
                     int newareaId = await _areaService.AddAreaAsync(model, GetCurrentUserId());
-                    TempData["SuccessMessage"] = $"Area {model.Name} added successfully!";
+                    TempData["SuccessMessage"] = $"Area {model.AreaName} added successfully!";
                 }
                 else // Update Existing Area
                 {
@@ -127,7 +139,7 @@ namespace CleanMe.Web.Controllers
 
                     Console.WriteLine("DEBUG: Updating existing Area member.");
                     await _areaService.UpdateAreaAsync(model, GetCurrentUserId());
-                    TempData["SuccessMessage"] = $"Area {model.Name} updated successfully!";
+                    TempData["SuccessMessage"] = $"Area {model.AreaName} updated successfully!";
                 }
 
                 Console.WriteLine("DEBUG: Area saved successfully");

@@ -3,12 +3,8 @@ using CleanMe.Application.Interfaces;
 using CleanMe.Application.ViewModels;
 using CleanMe.Domain.Interfaces;
 using Dapper;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
-using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
-using System.Web.Mvc;
 using SelectListItem = Microsoft.AspNetCore.Mvc.Rendering.SelectListItem;
 
 namespace CleanMe.Application.Services

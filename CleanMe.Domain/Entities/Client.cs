@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using CleanMe.Domain.Common;
 
 namespace CleanMe.Domain.Entities
@@ -19,18 +13,23 @@ namespace CleanMe.Domain.Entities
         public int clientId { get; set; }
 
         [Required]
-        [DisplayName("Name")]
+        [Display(Name = "Client")]
         [Column(TypeName = "varchar")]
-        [StringLength(100, ErrorMessage = "Client name must have between 3 and 100 letters")]
-        public string Name { get; set; }
+        [StringLength(100, MinimumLength = 3, ErrorMessage = "Client name must have between 3 and 100 letters")]
+        public string ClientName { get; set; }
 
-        [DisplayName("Brand")]
+        [Display(Name = "Brand")]
         [Column(TypeName = "varchar")]
         [StringLength(10, MinimumLength = 2, ErrorMessage = "Client brand must have between 2 and 10 letters")]
         public string? Brand { get; set; }
 
-        [DisplayName("DR Accs")]
+        [Display(Name = "DR Accs")]
         public int AccNo { get; set; }
+
+        [Display(Name = "Reference")]
+        [Column(TypeName = "varchar")]
+        [StringLength(50, ErrorMessage = "Client reference cannot have more than 50 letters")]
+        public string? Reference { get; set; }
 
         //// Navigation property representing the collection of children
         //public ICollection<ClientContact>? Contacts { get; set; }
@@ -40,29 +39,29 @@ namespace CleanMe.Domain.Entities
         public Address Address { get; set; } = new Address(); // Embedded Address Object
 
         [Required]
-        [DisplayName("Active")]
+        [Display(Name = "Active")]
         public bool IsActive { get; set; } = true;
 
         [Required]
-        [DisplayName("Deleted")]
+        [Display(Name = "Deleted")]
         public bool IsDeleted { get; set; } = false;
 
         [Required]
-        [DisplayName("Added at")]
+        [Display(Name = "Added at")]
         public DateTime AddedAt { get; set; }
 
         [Required]
-        [DisplayName("Created by")]
+        [Display(Name = "Created by")]
         [Column(TypeName = "NVARCHAR")]
         [StringLength(450)]
         public string AddedById { get; set; }
 
         [Required]
-        [DisplayName("Updated at")]
+        [Display(Name = "Updated at")]
         public DateTime UpdatedAt { get; set; }
 
         [Required]
-        [DisplayName("Updated by")]
+        [Display(Name = "Updated by")]
         [Column(TypeName = "NVARCHAR")]
         [StringLength(450)]
         public string UpdatedById { get; set; }

@@ -5,9 +5,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using CleanMe.Application.Interfaces;
 using CleanMe.Application.ViewModels;
-using Microsoft.Extensions.Logging;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.EntityFrameworkCore;
 
 namespace CleanMe.Web.Controllers
 {

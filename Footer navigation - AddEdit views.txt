@@ -1,0 +1,34 @@
+Under CleanMe.Application.ViewModels
+Create XXXWithZZZViewModel.cs. Use RegionWithAreasViewModel as example.
+
+Update XXXRepository use RegionRepository as example.
+* GetXXXByIdAsync (using improved example from RegionRepository)
+* GetXXXYYYCountAsync
+* GetXXXYYYsPagedAsync
+
+
+Under CleanMe.Application.Interfaces 
+edit XXXService 
+* replace Task<XXXWithZZZsViewModel?> GetXXXWithZZZsViewModelByIdAsync(int xxxId, int pageNumber, int pageSize);
+* use new Repository methods.
+
+Under XXXController.cs update AddEdit view methods
+* replace GetXXXWithZZZsViewModelByIdAsync usage to use new pagination parameters.
+* update PrepareNewAreaViewModelAsync to return the new ViewModel and to use new pagination parameters.
+
+AddEdit.cshtml
+Insert between </table> and </div> 
+@await Html.PartialAsync(
+    "_PagerFooter",
+        new CleanMe.Application.Helpers.Paging.PagerModel
+        {
+            PageNumber = Model.PageNumber,
+            PageSize = Model.PageSize,
+            TotalCount = Model.TotalCount,
+            RouteValues = new Microsoft.AspNetCore.Routing.RouteValueDictionary
+            {
+                ["xxxId"] = Model.XXX.xxxId
+            }
+        },
+        viewData: null
+        )

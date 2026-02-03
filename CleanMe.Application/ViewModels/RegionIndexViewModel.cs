@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace CleanMe.Application.ViewModels
 {
@@ -13,7 +8,7 @@ namespace CleanMe.Application.ViewModels
         public int regionId { get; set; }
 
         [Display(Name = "Region name")]
-        public string Name { get; set; }
+        public string RegionName { get; set; }
 
         [Display(Name = "Report code")]
         public string ReportCode { get; set; }

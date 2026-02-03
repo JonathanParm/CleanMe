@@ -1,5 +1,7 @@
 ﻿@using CleanMe.Web.Helpers
-@model IEnumerable<CleanMe.Application.ViewModels.AssetIndexViewModel>
+@using CleanMe.Application.Helpers.Paging
+@model PagedResult<CleanMe.Application.ViewModels.AssetIndexViewModel>
+
 
 @{
     ViewData["Title"] = "Asset list";
@@ -30,7 +32,7 @@
 <!-- Filtering Form -->
 <form method="get" id="filterForm">
     <div class="table-responsive">
-        <table class="table">
+        <table class="table table-striped w-100 table-fixed">
             <thead>
                 <!-- Column Headers with Sorting -->
                 <tr>
@@ -42,6 +44,11 @@
                     <th>
                         <a href="#" onclick="sortTable('RegionName')">
                             Region @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "RegionName"))
+                        </a>
+                    </th>
+                    <th>
+                        <a href="#" onclick="sortTable('AreaName')">
+                            Area @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "AreaName"))
                         </a>
                     </th>
                     <th>
@@ -76,6 +83,7 @@
                 <tr>
                     <td><input type="text" name="assetName" class="form-control" value="@ViewBag.AssetName" placeholder="Search asset"></td>
                     <td><input type="text" name="regionName" class="form-control" value="@ViewBag.RegionName" placeholder="Search region"></td>
+                    <td><input type="text" name="areaName" class="form-control" value="@ViewBag.AreaName" placeholder="Search area"></td>
                     <td><input type="text" name="mdReference" class="form-control" value="@ViewBag.MdReference" placeholder="Search MD ref."></td>
                     <td><input type="text" name="clientName" class="form-control" value="@ViewBag.ClientName" placeholder="Search client"></td>
                     <td><input type="text" name="clientReference" class="form-control" value="@ViewBag.ClientReference" placeholder="Search client Ref."></td>
@@ -88,17 +96,18 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var Asset in Model)
+                @foreach (var Asset in Model.Items)
                 {
                     <tr>
-                        <td>@Asset.AssetName</td>
-                        <td>@Asset.RegionName</td>
-                        <td>@Asset.MdReference</td>
-                        <td>@Asset.ClientName</td>
-                        <td>@Asset.ClientReference</td>
-                        <td>@Asset.AssetLocation</td>
-                        <td>@Asset.ItemCode</td>
-                        <td>
+                        <td class="ps-4">@Asset.AssetName</td>
+                        <td class="ps-4">@Asset.RegionName</td>
+                        <td class="ps-4">@Asset.AreaName</td>
+                        <td class="ps-4">@Asset.MdReference</td>
+                        <td class="ps-4">@Asset.ClientName</td>
+                        <td class="ps-4">@Asset.ClientReference</td>
+                        <td class="ps-4">@Asset.AssetLocation</td>
+                        <td class="ps-4">@Asset.ItemCode</td>
+                        <td class="ps-4">
                             <a asp-action="AddEdit" asp-route-assetId="@Asset.assetId" class="btn btn-warning btn-sm">Edit</a>
                             <a asp-action="Delete" asp-route-assetId="@Asset.assetId" class="btn btn-danger btn-sm">Delete</a>
                         </td>
@@ -106,6 +115,15 @@
                 }
             </tbody>
         </table>
+        @await Html.PartialAsync(
+        "_IndexFooterPager",
+                new CleanMe.Application.Helpers.Paging.PagedResult<object>
+                {
+                    PageNumber = Model.PageNumber,
+                    PageSize = Model.PageSize,
+                    TotalCount = Model.TotalCount
+                }
+            )
     </div>
 </form>
 

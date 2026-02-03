@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using CleanMe.Application.Interfaces;
 using CleanMe.Application.ViewModels;
-using Microsoft.Extensions.Logging;
 
 namespace CleanMe.Web.Controllers
 {
@@ -30,19 +29,29 @@ namespace CleanMe.Web.Controllers
         }
 
         public async Task<IActionResult> Index(
-            string? staffNo, string? fullName, string? workRole,
+            string? staffId, string? fullName, string? workRole,
             string? contactDetail, string? isActive,
-            string sortColumn = "StaffNo", string sortOrder = "ASC",
-            int pageNumber = 1, int pageSize = 20)
+            string sortColumn = "staffId", string sortOrder = "ASC",
+            int pageNumber = 1, int pageSize = 5)
         {
             ViewBag.SortColumn = sortColumn;
             ViewBag.SortOrder = sortOrder;
 
             try
             {
-                var viewModel = await _staffService.GetStaffIndexAsync(
-                    staffNo, fullName, workRole, contactDetail, isActive,
-                    sortColumn, sortOrder, pageNumber, pageSize);
+                //var viewModel = await _staffService.GetStaffIndexAsync(
+                //    staffNo, fullName, workRole, contactDetail, isActive,
+                //    sortColumn, sortOrder, pageNumber, pageSize);
+                var viewModel = await _staffService.GetPagedIndexAsync(
+                    pageNumber,
+                    pageSize,
+                    sortColumn,
+                    sortOrder,
+                    staffId,
+                    fullName,
+                    workRole,
+                    contactDetail,
+                    isActive);
                 return View(viewModel);
             }
             catch (Exception ex)

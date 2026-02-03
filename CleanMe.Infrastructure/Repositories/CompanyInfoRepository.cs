@@ -1,19 +1,7 @@
-﻿using CleanMe.Application.Interfaces;
-using CleanMe.Application.ViewModels;
-using CleanMe.Domain.Entities;
-using CleanMe.Domain.Enums;
+﻿using CleanMe.Domain.Entities;
 using CleanMe.Domain.Interfaces;
 using CleanMe.Infrastructure.Data;
-using Dapper;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CleanMe.Infrastructure.Repositories
 {

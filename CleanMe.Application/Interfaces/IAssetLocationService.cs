@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using CleanMe.Application.Helpers.Paging;
 using CleanMe.Application.ViewModels;
 
 namespace CleanMe.Application.Interfaces
@@ -22,6 +21,17 @@ namespace CleanMe.Application.Interfaces
 
         Task<bool> AssignApplicationUserAsync(int assetLocationId, string email, string password);
         Task UpdateAssetLocationApplicationUserId(int assetLocationId, string applicationUserId);
+        Task<PagedResult<AssetLocationIndexViewModel>> GetPagedIndexAsync(
+            int pageNumber,
+            int pageSize,
+            string sortColumn,
+            string sortOrder,
+            string? areaName,
+            string? description,
+            string? townSuburb,
+            string? reportCode,
+            string? isActive
+        );
 
     }
 }

@@ -1,11 +1,12 @@
-﻿@using CleanMe.Application.ViewModels
+﻿@using CleanMe.Application.Helpers.Paging
+@using CleanMe.Application.ViewModels
 @using CleanMe.Domain.Enums
 @using CleanMe.Shared.Helpers
 
-@model CleanMe.Application.ViewModels.RegionViewModel
+@model CleanMe.Application.ViewModels.RegionWithAreasViewModel
 
 @{
-    ViewData["Title"] = Model.regionId == 0 ? "Add Region" : "Edit Region";
+    ViewData["Title"] = Model.Region.regionId == 0 ? "Add Region" : "Edit Region";
 }
 
 <h2>@ViewData["Title"]</h2>
@@ -15,31 +16,31 @@
 
     @Html.ValidationSummary(false, "", new { @class = "text-danger" })
 
-    @Html.HiddenFor(m => m.regionId)
+    @Html.HiddenFor(m => m.Region.regionId)
     @* <input asp-for="regionId" type="hidden" /> *@
 
-    @Html.LabeledTextBoxFor(model => model.Name)
+    @Html.LabeledTextBoxFor(model => model.Region.RegionName)
 @*     <div class="form-group">
         <label asp-for="Name" class="form-label"></label>
         <input asp-for="Name" class="form-control" required />
         <span asp-validation-for="Name" class="text-danger"></span>
     </div> *@
 
-    @Html.LabeledTextBoxFor(model => model.ReportCode)
+    @Html.LabeledTextBoxFor(model => model.Region.ReportCode)
 @*     <div class="form-group">
         <label asp-for="ReportCode" class="form-label"></label>
         <input asp-for="ReportCode" class="form-control" required />
         <span asp-validation-for="ReportCode" class="text-danger"></span>
     </div> *@
 
-    @Html.LabeledTextBoxFor(model => model.SortOrder)
+    @Html.LabeledTextBoxFor(model => model.Region.SortOrder)
 @*     <div class="form-group">
         <label asp-for="SortOrder" class="form-label"></label>
         <input asp-for="SortOrder" class="form-control" required />
         <span asp-validation-for="SortOrder" class="text-danger"></span>
     </div> *@
 
-    @Html.YesNoButtonsFor(model => model.IsActive)
+    @Html.YesNoButtonsFor(model => model.Region.IsActive)
 @*     <div class="mb-3">
         <label class="form-label">Is Active</label>
         <select asp-for="IsActive" class="form-control">
@@ -60,8 +61,8 @@
             class="btn btn-sm btn-primary"
             data-redirect="@Url.Action("AddEdit", "Area", new
             {
-                regionId = Model.regionId,
-                returnUrl = Url.Action("AddEdit", "Region", new { regionId = Model.regionId })
+                regionId = Model.Region.regionId,
+                returnUrl = Url.Action("AddEdit", "Region", new { regionId = Model.Region.regionId })
             })"
             data-form="RegionForm">
             ➕ Add Area
@@ -80,10 +81,10 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var area in Model.AreasList)
+            @foreach (var area in Model.Areas)
             {
                 <tr>
-                    <td>@area.Name</td>
+                    <td>@area.AreaName</td>
                     <td>@area.ReportCode</td>
                     <td>@(area.IsActive ? "Yes" : "No")</td>
                     <td>
@@ -92,8 +93,8 @@
                                 data-redirect="@Url.Action("AddEdit", "Area", new
                                 {
                                     areaId = area.areaId,
-                                    regionId = Model.regionId,
-                                    returnUrl = Url.Action("AddEdit", "Region", new { regionId = Model.regionId })
+                                    regionId = Model.Region.regionId,
+                                    returnUrl = Url.Action("AddEdit", "Region", new { regionId = Model.Region.regionId })
                                 })"
                                 data-form="RegionForm">
                                 ✏️ Edit
@@ -104,8 +105,8 @@
                                 data-redirect="@Url.Action("Delete", "Area", new
                                 {
                                     areaId = area.areaId,
-                                    regionId = Model.regionId,
-                                    returnUrl = Url.Action("AddEdit", "Region", new { regionId = Model.regionId })
+                                    regionId = Model.Region.regionId,
+                                    returnUrl = Url.Action("AddEdit", "Region", new { regionId = Model.Region.regionId })
                                 })"
                                 data-form="RegionForm">
                                 🗑 Delete
@@ -115,6 +116,20 @@
             }
         </tbody>
     </table>
+    @await Html.PartialAsync(
+    "_PagerFooter",
+        new CleanMe.Application.Helpers.Paging.PagerModel
+        {
+            PageNumber = Model.PageNumber,
+            PageSize = Model.PageSize,
+            TotalCount = Model.TotalCount,
+            RouteValues = new Microsoft.AspNetCore.Routing.RouteValueDictionary
+            {
+                ["regionId"] = Model.Region.regionId
+            }
+        },
+        viewData: null
+        )
 </div>
 
 @section Scripts {

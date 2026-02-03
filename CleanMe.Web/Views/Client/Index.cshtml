@@ -4,7 +4,7 @@
 @{
     ViewData["Title"] = "Client List";
     string sortOrder = ViewBag.SortOrder as string ?? "ASC";
-    string sortColumn = ViewBag.SortColumn as string ?? "Name";
+    string sortColumn = ViewBag.SortColumn as string ?? "ClientName";
 }
 
 <h2>Client List</h2>
@@ -30,13 +30,13 @@
 <!-- Filtering Form -->
 <form method="get" id="filterForm">
     <div class="table-responsive">
-        <table class="table">
+        <table class="table table-striped w-100 table-fixed">
             <thead>
                 <!-- Column Headers with Sorting -->
                 <tr>
                     <th>
-                        <a href="#" onclick="sortTable('Name')">
-                            Name @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "Name"))
+                        <a href="#" onclick="sortTable('ClientName')">
+                            ClientName @Html.Raw(HtmlHelpers.GetSortIcon(ViewContext, "ClientName"))
                         </a>
                     </th>
                     <th>
@@ -79,11 +79,11 @@
                 @foreach (var Client in Model)
                 {
                     <tr>
-                        <td>@Client.Name</td>
-                        <td>@Client.Brand</td>
-                        <td>@Client.AccNo</td>
-                        <td>@(Client.IsActive ? "Yes" : "No")</td>
-                        <td>
+                        <td class="ps-4">@Client.ClientName</td>
+                        <td class="ps-4">@Client.Brand</td>
+                        <td class="ps-4">@Client.AccNo</td>
+                        <td class="ps-4">@(Client.IsActive ? "Yes" : "No")</td>
+                        <td class="ps-4">
                             <a asp-action="AddEdit" asp-route-clientId="@Client.clientId" class="btn btn-warning btn-sm">Edit</a>
                             <a asp-action="Delete" asp-route-clientId="@Client.clientId" class="btn btn-danger btn-sm">Delete</a>
                         </td>

@@ -1,7 +1,5 @@
 ﻿using CleanMe.Application.Interfaces;
-using CleanMe.Application.Services;
 using CleanMe.Application.ViewModels;
-using CleanMe.Domain.Entities;
 using CleanMe.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -33,8 +31,8 @@ namespace CleanMe.Web.Controllers
         }
         public async Task<IActionResult> Index(
             string? areaName, string? description, string? townSuburb, string? reportCode, string? isActive,
-            string sortColumn = "SequenceOrder", string sortOrder = "ASC",
-            int pageNumber = 1, int pageSize = 20)
+            string sortColumn = "Description", string sortOrder = "ASC",
+            int pageNumber = 1, int pageSize = 5)
         {
             ViewBag.SortColumn = sortColumn;
             ViewBag.SortOrder = sortOrder;
@@ -46,9 +44,19 @@ namespace CleanMe.Web.Controllers
 
             try
             {
-                var assetLocationList = await _assetLocationService.GetAssetLocationIndexAsync(
-                    areaName, description, townSuburb, reportCode, isActive,
-                    sortColumn, sortOrder, pageNumber, pageSize);
+                //var assetLocationList = await _assetLocationService.GetAssetLocationIndexAsync(
+                //    areaName, description, townSuburb, reportCode, isActive,
+                //    sortColumn, sortOrder, pageNumber, pageSize);
+                var assetLocationList = await _assetLocationService.GetPagedIndexAsync(
+                    pageNumber,
+                    pageSize,
+                    sortColumn,
+                    sortOrder,
+                    areaName,
+                    description,
+                    townSuburb,
+                    reportCode,
+                    isActive);
 
                 return View(assetLocationList);
             }

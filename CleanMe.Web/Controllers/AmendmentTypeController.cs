@@ -1,5 +1,4 @@
 ﻿using CleanMe.Application.Interfaces;
-using CleanMe.Application.Services;
 using CleanMe.Application.ViewModels;
 using CleanMe.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -106,7 +105,7 @@ namespace CleanMe.Web.Controllers
                 }
 
                 // Check for duplicate AmendmentType (excluding current record)
-                var duplicateAmendmentType = await _amendmentTypeService.FindDuplicateAmendmentTypeAsync(model.Name, model.amendmentTypeId);
+                var duplicateAmendmentType = await _amendmentTypeService.FindDuplicateAmendmentTypeAsync(model.AmendmentTypeName, model.amendmentTypeId);
                 if (duplicateAmendmentType.Any())
                 {
                     //TempData["WarningMessage"] = "An Amendment Type with the same name or code already exists.";
@@ -131,7 +130,7 @@ namespace CleanMe.Web.Controllers
 
                     Console.WriteLine("DEBUG: Updating existing Amendment Type member.");
                     await _amendmentTypeService.UpdateAmendmentTypeAsync(model, GetCurrentUserId());
-                    TempData["SuccessMessage"] = $"Amendment Type {model.Name} updated successfully!";
+                    TempData["SuccessMessage"] = $"Amendment Type {model.AmendmentTypeName} updated successfully!";
                 }
 
                 if (!string.IsNullOrWhiteSpace(returnUrl))

@@ -1,6 +1,5 @@
 ﻿using Moq;
 using Microsoft.AspNetCore.Identity;
-using CleanMe.Domain.Entities;
 using CleanMe.Shared.Models;
 using Microsoft.AspNetCore.Http;
 

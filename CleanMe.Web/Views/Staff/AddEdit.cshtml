@@ -57,8 +57,16 @@
 
     <!-- Address Partial View -->
     <h3>Address</h3>
-    @* @Html.EditorFor(model => model.Address, "_AddressPartialView") *@
-    @Html.Partial("_AddressPartial", Model.Address)
+    @{
+        // Create a new ViewDataDictionary, copying the existing ViewData
+        var addressViewData = new ViewDataDictionary(ViewData);
+
+        // Set the field prefix so Razor generates correct names like Address.Line1
+        addressViewData.TemplateInfo.HtmlFieldPrefix = "Address";
+    }
+
+    // Render the partial view using the prefixed ViewData
+    @await Html.PartialAsync("_AddressPartial", Model.Address, addressViewData)
 
     <div class="form-group">
         <label asp-for="IrdNumber" class="form-label"></label>

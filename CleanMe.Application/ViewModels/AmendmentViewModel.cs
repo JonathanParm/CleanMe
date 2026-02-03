@@ -1,7 +1,4 @@
-﻿using CleanMe.Application.DTOs;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
@@ -59,10 +56,12 @@ namespace CleanMe.Application.ViewModels
         public bool IsAccessable { get; set; } = true;
 
         [Display(Name = "Start on")]
+        [DisplayFormat(DataFormatString = "{0:d MMM yyyy}", ApplyFormatInEditMode = false)]
         [DataType(DataType.DateTime)]
         public DateTime? StartOn { get; set; }
 
         [Display(Name = "Finish on")]
+        [DisplayFormat(DataFormatString = "{0:d MMM yyyy}", ApplyFormatInEditMode = false)]
         [DataType(DataType.DateTime)]
         public DateTime? FinishOn { get; set; }
 

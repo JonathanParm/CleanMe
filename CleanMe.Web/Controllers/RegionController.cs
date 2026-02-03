@@ -1,5 +1,4 @@
 ﻿using CleanMe.Application.Interfaces;
-using CleanMe.Application.Services;
 using CleanMe.Application.ViewModels;
 using CleanMe.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -31,21 +30,30 @@ namespace CleanMe.Web.Controllers
             _errorLoggingService = errorLoggingService;
         }
         public async Task<IActionResult> Index(
-            string? name, string? code, string? isActive,
-                string sortColumn = "SequenceOrder", string sortOrder = "ASC",
-            int pageNumber = 1, int pageSize = 20)
+            string? regionName, string? reportCode, string? isActive,
+                string sortColumn = "RegionName", string sortOrder = "ASC",
+            int pageNumber = 1, int pageSize = 5)
         {
             ViewBag.SortColumn = sortColumn;
             ViewBag.SortOrder = sortOrder;
-            ViewBag.Name = name;
-            ViewBag.Code = code;
+            ViewBag.Name = regionName;
+            ViewBag.Code = reportCode;
             ViewBag.IsActive = isActive;
 
             try
             {
-                var regionList = await _regionService.GetRegionIndexAsync(
-                    name, code, isActive,
-                    sortColumn, sortOrder, pageNumber, pageSize);
+                //var regionList = await _regionService.GetRegionIndexAsync(
+                //    name, code, isActive,
+                //    sortColumn, sortOrder, pageNumber, pageSize);
+
+                var regionList = await _regionService.GetPagedIndexAsync(
+                    pageNumber,
+                    pageSize,
+                    sortColumn,
+                    sortOrder,
+                    regionName,
+                    reportCode,
+                    isActive);
 
                 return View(regionList);
             }
@@ -59,15 +67,15 @@ namespace CleanMe.Web.Controllers
             }
         }
         // AddEdit Action (Handles Both Add & Edit)
-        public async Task<IActionResult> AddEdit(int? regionId, string? returnUrl = null)
+        public async Task<IActionResult> AddEdit(int? regionId, int pageNumber = 1, int pageSize = 5, string? returnUrl = null)
         {
             try
             {
-                RegionViewModel model;
+                RegionWithAreasViewModel model;
 
                 if (regionId.HasValue) // Edit Mode
                 {
-                    model = await _regionService.GetRegionViewModelWithAreasByIdAsync(regionId.Value);
+                    model = await _regionService.GetRegionWithAreasViewModelByIdAsync(regionId.Value, pageNumber, pageSize);
                     if (model == null)
                     {
                         return NotFound();
@@ -75,7 +83,7 @@ namespace CleanMe.Web.Controllers
                 }
                 else // Create Mode
                 {
-                    model = new RegionViewModel();
+                    model = new RegionWithAreasViewModel();
                 }
 
                 ViewBag.ReturnUrl = string.IsNullOrWhiteSpace(returnUrl) ? "Index" : returnUrl;
@@ -106,7 +114,7 @@ namespace CleanMe.Web.Controllers
                 }
 
                 // Check for duplicate region (excluding current record)
-                var duplicateRegion = await _regionService.FindDuplicateRegionAsync(model.Name, model.ReportCode, model.regionId);
+                var duplicateRegion = await _regionService.FindDuplicateRegionAsync(model.RegionName, model.ReportCode, model.regionId);
                 if (duplicateRegion.Any())
                 {
                     //TempData["WarningMessage"] = "A region with the same name or code already exists.";
@@ -131,7 +139,7 @@ namespace CleanMe.Web.Controllers
 
                     Console.WriteLine("DEBUG: Updating existing Region member.");
                     await _regionService.UpdateRegionAsync(model, GetCurrentUserId());
-                    TempData["SuccessMessage"] = $"Region {model.Name} updated successfully!";
+                    TempData["SuccessMessage"] = $"Region {model.RegionName} updated successfully!";
                 }
 
                 if (!string.IsNullOrWhiteSpace(returnUrl))

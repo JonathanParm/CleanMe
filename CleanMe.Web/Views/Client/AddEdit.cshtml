@@ -18,7 +18,7 @@
     @Html.HiddenFor(m => m.clientId)
     @* <input asp-for="clientId" type="hidden" /> *@
 
-    @Html.LabeledTextBoxFor(model => model.Name)
+    @Html.LabeledTextBoxFor(model => model.ClientName)
 
     @Html.LabeledTextBoxFor(model => model.Brand)
 
@@ -26,7 +26,16 @@
 
     <!-- Address Partial View -->
     <h3>Address</h3>
-    @Html.Partial("_AddressPartial", Model.Address)
+    @{
+        // Create a new ViewDataDictionary, copying the existing ViewData
+        var addressViewData = new ViewDataDictionary(ViewData);
+
+        // Set the field prefix so Razor generates correct names like Address.Line1
+        addressViewData.TemplateInfo.HtmlFieldPrefix = "Address";
+    }
+
+    // Render the partial view using the prefixed ViewData
+    @await Html.PartialAsync("_AddressPartial", Model.Address, addressViewData)
 
     @Html.YesNoButtonsFor(model => model.IsActive)
 

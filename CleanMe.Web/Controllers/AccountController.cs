@@ -1,11 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
-using CleanMe.Domain.Entities;
 using CleanMe.Web.Models;
 using CleanMe.Shared.Models;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication;
 
 namespace CleanMe.Web.Controllers
 {

@@ -18,7 +18,7 @@ namespace CleanMe.Infrastructure.Repositories
         {
             return await _context.AmendmentTypes
                 .Where(c => !c.IsDeleted)
-                .OrderBy(c => c.Name)
+                .OrderBy(c => c.AmendmentTypeName)
                 .ToListAsync();
         }
 

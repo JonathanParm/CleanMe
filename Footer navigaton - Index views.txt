@@ -1,0 +1,39 @@
+Under CleanMe.Application.DTOs add XXXIndexRowDto.cs with the following content:
+Copy CleanMe.Application.ViewModels XXXIndexViewModel.cs 
+using AssetIndexRowDto as an example. Pay attention to the properties/datatypes.
+
+Under CleanMe.Application.Interfaces insert into IXXXService.cs the following content.
+Only have search parameters as properties:
+Task<PagedResult<XXXIndexViewModel>> GetPagedIndexAsync(
+with same parameters as in GetXXXIndexAsync
+using IAssetService.cs as an example.
+
+Under CleanMe.Application.Services insert into XXXService.cs the following content:
+Task<PagedResult<XXXIndexViewModel>> GetPagedIndexAsync(
+with same parameters as in GetXXXIndexAsync
+using AssetService.cs as an example
+var items maps ViewModel items to DTO items.
+
+Under CleanMe.Web.Controllers amend
+var XXXList = await _xxxService.GetXXXIndexAsync( to
+var xxxList = await _xxxService.GetPagedIndexAsync(
+
+Under Views/XXX/Index.cshtml insert at the top:
+@using CleanMe.Web.Helpers
+@using CleanMe.Application.Helpers.Paging
+@model PagedResult<CleanMe.Application.ViewModels.XXXIndexViewModel>
+
+Under Views/XXX/Index.cshtml replace:
+@foreach (var XXX in Model) with
+@foreach (var XXX in Model.Items)
+
+Under Views/XXX/Index.cshtml, below the table </table> add:
+        @await Html.PartialAsync(
+        "_IndexFooterPager",
+                new CleanMe.Application.Helpers.Paging.PagedResult<object>
+                {
+                    PageNumber = Model.PageNumber,
+                    PageSize = Model.PageSize,
+                    TotalCount = Model.TotalCount
+                }
+            )
