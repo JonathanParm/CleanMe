@@ -140,6 +140,7 @@ namespace CleanMe.Web.Controllers
                 if (!ModelState.IsValid)
                 {
                     TempData["ErrorMessage"] = "Please fix the errors below.";
+                    TempData.Remove("SuccessMessage");
                     ViewBag.ReturnUrl = returnUrl;
                     return View(model);
                 }
@@ -160,6 +161,7 @@ namespace CleanMe.Web.Controllers
                 {
                     int newareaId = await _areaService.AddAreaAsync(model.AreaViewModel, GetCurrentUserId());
                     TempData["SuccessMessage"] = $"Area {model.AreaViewModel.AreaName} added successfully!";
+                    TempData.Remove("ErrorMessage");
                 }
                 else // Update Existing Area
                 {
@@ -167,6 +169,7 @@ namespace CleanMe.Web.Controllers
                     if (existingArea == null)
                     {
                         TempData["ErrorMessage"] = "Area record not found.";
+                        TempData.Remove("SuccessMessage");
                         if (!string.IsNullOrEmpty(returnUrl))
                             return Redirect(returnUrl);
 
@@ -176,6 +179,7 @@ namespace CleanMe.Web.Controllers
                     Console.WriteLine("DEBUG: Updating existing Area member.");
                     await _areaService.UpdateAreaAsync(model.AreaViewModel, GetCurrentUserId());
                     TempData["SuccessMessage"] = $"Area {model.AreaViewModel.AreaName} updated successfully!";
+                    TempData.Remove("ErrorMessage");
                 }
 
                 Console.WriteLine("DEBUG: Area saved successfully");
@@ -188,6 +192,7 @@ namespace CleanMe.Web.Controllers
             {
                 _logger.LogError(ex, "Error occurred while adding or editing this Area.");
                 TempData["ErrorMessage"] = "An error occurred while processing your request.";
+                TempData.Remove("SuccessMessage");
                 return RedirectToAction("HandleError", "Error");
             }
         }

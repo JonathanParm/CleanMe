@@ -103,6 +103,7 @@ namespace CleanMe.Web.Controllers
                 if (!ModelState.IsValid)
                 {
                     TempData["ErrorMessage"] = "Please fix the errors below.";
+                    TempData.Remove("SuccessMessage");
                     return View(model);
                 }
 
@@ -128,6 +129,7 @@ namespace CleanMe.Web.Controllers
                     if (existingClient == null)
                     {
                         TempData["ErrorMessage"] = "Client record not found.";
+                        TempData.Remove("SuccessMessage");
                         return RedirectToAction("Index");
                     }
                     contactClientId = existingClient.clientId;
@@ -135,6 +137,7 @@ namespace CleanMe.Web.Controllers
                     Console.WriteLine("DEBUG: Updating existing Client member.");
                     await _clientService.UpdateClientAsync(model, GetCurrentUserId());
                     TempData["SuccessMessage"] = $"Client {model.ClientName} updated successfully!";
+                    TempData.Remove("ErrorMessage");
                 }
 
                 if (!string.IsNullOrWhiteSpace(returnUrl))
@@ -148,6 +151,7 @@ namespace CleanMe.Web.Controllers
             {
                 _logger.LogError(ex, "Error occurred while adding or editing this Client.");
                 TempData["ErrorMessage"] = "An error occurred while processing your request.";
+                TempData.Remove("SuccessMessage");
                 return RedirectToAction("HandleError", "Error");
             }
         }

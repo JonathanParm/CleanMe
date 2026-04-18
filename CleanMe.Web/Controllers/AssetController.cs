@@ -132,6 +132,7 @@ namespace CleanMe.Web.Controllers
                 if (!ModelState.IsValid)
                 {
                     TempData["ErrorMessage"] = "Please fix the errors below.";
+                    TempData.Remove("SuccessMessage");
                     ViewBag.ReturnUrl = returnUrl;
                     await PopulateSelectListsAsync(model, model.assetId > 0);
                     return View(model);
@@ -154,6 +155,7 @@ namespace CleanMe.Web.Controllers
                 {
                     int newassetId = await _assetService.AddAssetAsync(model, GetCurrentUserId());
                     TempData["SuccessMessage"] = $"Asset {model.AssetName} added successfully!";
+                    TempData.Remove("ErrorMessage");
                 }
                 else // Update Existing Asset
                 {
@@ -161,6 +163,7 @@ namespace CleanMe.Web.Controllers
                     if (existingAsset == null)
                     {
                         TempData["ErrorMessage"] = "Asset record not found.";
+                        TempData.Remove("SuccessMessage");
                         if (!string.IsNullOrEmpty(returnUrl))
                             return Redirect(returnUrl);
 
@@ -170,6 +173,7 @@ namespace CleanMe.Web.Controllers
                     Console.WriteLine("DEBUG: Updating existing Asset.");
                     await _assetService.UpdateAssetAsync(model, GetCurrentUserId());
                     TempData["SuccessMessage"] = $"Asset {model.AssetName} updated successfully!";
+                    TempData.Remove("ErrorMessage");
                 }
 
                 Console.WriteLine("DEBUG: Asset saved successfully");

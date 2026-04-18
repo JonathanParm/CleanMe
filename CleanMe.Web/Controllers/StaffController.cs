@@ -102,12 +102,14 @@ namespace CleanMe.Web.Controllers
                     await HandleLoginAsync(model);
 
                 TempData["SuccessMessage"] = "Staff saved successfully.";
+                TempData.Remove("ErrorMessage");
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
                 await LogErrorAsync(ex);
                 TempData["ErrorMessage"] = "Failed to save staff.";
+                TempData.Remove("SuccessMessage");
                 return View(model);
             }
         }

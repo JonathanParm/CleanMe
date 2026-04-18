@@ -143,6 +143,7 @@ namespace CleanMe.Web.Controllers
                 if (!ModelState.IsValid)
                 {
                     TempData["ErrorMessage"] = "Please fix the errors below.";
+                    TempData.Remove("SuccessMessage");
                     await PopulateSelectListsAsync(model, model.amendmentId > 0);
 
                     return View(model);
@@ -176,12 +177,14 @@ namespace CleanMe.Web.Controllers
                     if (existingAmendment == null)
                     {
                         TempData["ErrorMessage"] = "Amendment record not found.";
+                        TempData.Remove("SuccessMessage");
                         return RedirectToAction("Index");
                     }
 
                     Console.WriteLine("DEBUG: Updating existing Amendment.");
                     await _amendmentService.UpdateAmendmentAsync(model.AmendmentCurrent, GetCurrentUserId());
                     TempData["SuccessMessage"] = $"Amendment {model.AmendmentCurrent.AmendmentTypeName} updated successfully!";
+                    TempData.Remove("ErrorMessage");
                 }
 
                 if (!string.IsNullOrWhiteSpace(returnUrl))
@@ -195,6 +198,7 @@ namespace CleanMe.Web.Controllers
             {
                 _logger.LogError(ex, "Error occurred while adding or editing this Amendment.");
                 TempData["ErrorMessage"] = "An error occurred while processing your request.";
+                TempData.Remove("SuccessMessage");
                 return RedirectToAction("HandleError", "Error");
             }
         }

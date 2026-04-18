@@ -117,6 +117,7 @@ namespace CleanMe.Web.Controllers
                 if (!ModelState.IsValid)
                 {
                     TempData["ErrorMessage"] = "Please fix the errors below.";
+                    TempData.Remove("SuccessMessage");
                     ViewBag.ReturnUrl = returnUrl;
                     await PopulateSelectListsAsync(model, model.itemCodeRateId > 0);
                     return View(model);
@@ -138,6 +139,7 @@ namespace CleanMe.Web.Controllers
                 {
                     int newItemCodeRateId = await _itemCodeRateService.AddItemCodeRateAsync(model, GetCurrentUserId());
                     TempData["SuccessMessage"] = $"Item Code Rate {model.Name} added successfully!";
+                    TempData.Remove("ErrorMessage");
                 }
                 else // Update Existing ItemCodeRate
                 {
@@ -154,6 +156,7 @@ namespace CleanMe.Web.Controllers
                     Console.WriteLine("DEBUG: Updating existing Item Code Rate.");
                     await _itemCodeRateService.UpdateItemCodeRateAsync(model, GetCurrentUserId());
                     TempData["SuccessMessage"] = $"Item Code Rate {model.Name} updated successfully!";
+                    TempData.Remove("ErrorMessage");
                 }
 
                 Console.WriteLine("DEBUG: Item Code Rate saved successfully");
@@ -166,6 +169,7 @@ namespace CleanMe.Web.Controllers
             {
                 _logger.LogError(ex, "Error occurred while adding or editing this Item Code Rate.");
                 TempData["ErrorMessage"] = "An error occurred while processing your request.";
+                TempData.Remove("SuccessMessage");
                 return RedirectToAction("HandleError", "Error");
             }
         }

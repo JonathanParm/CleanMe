@@ -57,20 +57,23 @@ namespace CleanMe.Web.Controllers
                 if (!ModelState.IsValid)
                 {
                     TempData["ErrorMessage"] = "Please fix the errors below.";
+                    TempData.Remove("SuccessMessage");
                     return View(model);
                 }
 
-                    var existingCompanyInfo = await _companyInfoService.GetCompanyInfoViewModelAsync();
-                    if (existingCompanyInfo == null)
-                    {
-                        TempData["ErrorMessage"] = "Company info record not found.";
+                var existingCompanyInfo = await _companyInfoService.GetCompanyInfoViewModelAsync();
+                if (existingCompanyInfo == null)
+                {
+                    TempData["ErrorMessage"] = "Company info record not found.";
+                    TempData.Remove("SuccessMessage");
 
                     return RedirectToAction("Index", "Home");
                 }
 
-                    Console.WriteLine("DEBUG: Updating existing Company information.");
-                    var result = await _companyInfoService.UpdateCompanyInfoAsync(model, GetCurrentUserId());
-                    TempData["SuccessMessage"] = $"Company informantion updated successfully!";
+                Console.WriteLine("DEBUG: Updating existing Company information.");
+                var result = await _companyInfoService.UpdateCompanyInfoAsync(model, GetCurrentUserId());
+                TempData["SuccessMessage"] = $"Company informantion updated successfully!";
+                TempData.Remove("ErrorMessage");
 
                 Console.WriteLine("DEBUG: Company information saved successfully");
 
@@ -80,6 +83,7 @@ namespace CleanMe.Web.Controllers
             {
                 _logger.LogError(ex, "Error occurred while editing company information.");
                 TempData["ErrorMessage"] = "An error occurred while processing your request.";
+                TempData.Remove("SuccessMessage");
                 return RedirectToAction("HandleError", "Error");
             }
         }

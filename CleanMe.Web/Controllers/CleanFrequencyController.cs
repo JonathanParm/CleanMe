@@ -108,6 +108,7 @@ namespace CleanMe.Web.Controllers
                 if (!ModelState.IsValid)
                 {
                     TempData["ErrorMessage"] = "Please fix the errors below.";
+                    TempData.Remove("SuccessMessage");
                     return View(model);
                 }
 
@@ -132,12 +133,14 @@ namespace CleanMe.Web.Controllers
                     if (existingCleanFrequency == null)
                     {
                         TempData["ErrorMessage"] = "Clean Frequency record not found.";
+                        TempData.Remove("SuccessMessage");
                         return RedirectToAction("Index");
                     }
 
                     Console.WriteLine("DEBUG: Updating existing Clean Frequency member.");
                     await _cleanFrequencyService.UpdateCleanFrequencyAsync(model, GetCurrentUserId());
                     TempData["SuccessMessage"] = $"Clean Frequency {model.CleanFrequencyName} updated successfully!";
+                    TempData.Remove("ErrorMessage");
                 }
 
                 Console.WriteLine("DEBUG: Returning RedirectToAction('Index').");
@@ -148,6 +151,7 @@ namespace CleanMe.Web.Controllers
             {
                 _logger.LogError(ex, "Error occurred while adding or editing cleaning frequency.");
                 TempData["ErrorMessage"] = "An error occurred while processing your request.";
+                TempData.Remove("SuccessMessage");
                 return RedirectToAction("HandleError", "Error");
             }
         }

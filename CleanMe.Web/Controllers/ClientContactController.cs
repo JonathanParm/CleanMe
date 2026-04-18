@@ -100,6 +100,7 @@ namespace CleanMe.Web.Controllers
                     await HandleLoginAsync(model);
 
                 TempData["SuccessMessage"] = "Client Contact saved successfully.";
+                TempData.Remove("ErrorMessage");
                 if (!string.IsNullOrEmpty(returnUrl))
                     return Redirect(returnUrl);
 
@@ -109,6 +110,7 @@ namespace CleanMe.Web.Controllers
             {
                 await LogErrorAsync(ex);
                 TempData["ErrorMessage"] = "Failed to save Client Contact.";
+                TempData.Remove("SuccessMessage");
 
                 ViewBag.ReturnUrl = returnUrl;
                 return View(model);

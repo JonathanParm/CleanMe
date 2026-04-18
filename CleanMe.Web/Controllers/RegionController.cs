@@ -121,6 +121,7 @@ namespace CleanMe.Web.Controllers
                 if (!ModelState.IsValid)
                 {
                     TempData["ErrorMessage"] = "Please fix the errors below.";
+                    TempData.Remove("SuccessMessage");
                     ViewBag.ReturnUrl = returnUrl;
                     var vm = await BuildRegionWithAreasViewModelForReturn(model.RegionViewModel);
                     return View(vm);
@@ -147,12 +148,14 @@ namespace CleanMe.Web.Controllers
                     if (existingRegion == null)
                     {
                         TempData["ErrorMessage"] = "Region record not found.";
+                        TempData.Remove("SuccessMessage");
                         return RedirectToAction("Index");
                     }
 
                     Console.WriteLine("DEBUG: Updating existing Region member.");
                     await _regionService.UpdateRegionAsync(model.RegionViewModel, GetCurrentUserId());
                     TempData["SuccessMessage"] = $"Region {model.RegionViewModel.RegionName} updated successfully!";
+                    TempData.Remove("ErrorMessage");
                 }
 
                 if (!string.IsNullOrWhiteSpace(returnUrl))

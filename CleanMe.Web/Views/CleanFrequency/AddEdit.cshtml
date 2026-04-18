@@ -17,6 +17,8 @@
 
     <input asp-for="cleanFrequencyId" type="hidden" />
 
+    @Html.LabeledTextBoxFor(model => model.CleanFrequencyName)
+
     @Html.LabeledTextBoxFor(model => model.Description)
 
     @Html.LabeledTextBoxFor(model => model.Code)
