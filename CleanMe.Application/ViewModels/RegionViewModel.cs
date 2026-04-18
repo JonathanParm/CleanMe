@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using CleanMe.Domain.Entities;
+using System.ComponentModel.DataAnnotations;
 
 namespace CleanMe.Application.ViewModels
 {

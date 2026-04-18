@@ -153,11 +153,16 @@ namespace CleanMe.Application.Services
 
             return new RegionWithAreasViewModel
             {
-                Region = region,
-                Areas = areas,
-                PageNumber = pageNumber,
-                PageSize = pageSize,
-                TotalCount = totalCount
+                RegionViewModel = new RegionViewModel
+                {
+                    regionId = region.regionId,
+                    RegionName = region.RegionName,
+                    ReportCode = region.ReportCode,
+                    IsActive = region.IsActive,
+                    PageNumber = pageNumber,
+                    PageSize = pageSize,
+                    TotalCount = totalCount
+                }
             };
         }
 

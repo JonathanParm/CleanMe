@@ -1,5 +1,7 @@
-﻿using CleanMe.Application.Interfaces;
+﻿using CleanMe.Application.Helpers.Paging;
+using CleanMe.Application.Interfaces;
 using CleanMe.Application.ViewModels;
+using CleanMe.Domain.Entities;
 using CleanMe.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -83,7 +85,16 @@ namespace CleanMe.Web.Controllers
                 }
                 else // Create Mode
                 {
-                    model = new RegionWithAreasViewModel();
+                    model = new RegionWithAreasViewModel
+                    {
+                        RegionViewModel = new RegionViewModel
+                        {
+                            PageNumber = pageNumber,
+                            PageSize = pageSize,
+                            TotalCount = 0
+                        },
+                        Areas = Array.Empty<Area>()
+                    };
                 }
 
                 ViewBag.ReturnUrl = string.IsNullOrWhiteSpace(returnUrl) ? "Index" : returnUrl;
@@ -101,7 +112,7 @@ namespace CleanMe.Web.Controllers
         // Post: Create or Update Region
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddEdit(RegionViewModel model, string? returnUrl = null)
+        public async Task<IActionResult> AddEdit(RegionWithAreasViewModel model, string? returnUrl = null)
         {
             try
             {
@@ -110,27 +121,29 @@ namespace CleanMe.Web.Controllers
                 if (!ModelState.IsValid)
                 {
                     TempData["ErrorMessage"] = "Please fix the errors below.";
-                    return View(model);
+                    ViewBag.ReturnUrl = returnUrl;
+                    var vm = await BuildRegionWithAreasViewModelForReturn(model.RegionViewModel);
+                    return View(vm);
                 }
 
                 // Check for duplicate region (excluding current record)
-                var duplicateRegion = await _regionService.FindDuplicateRegionAsync(model.RegionName, model.ReportCode, model.regionId);
+                var duplicateRegion = await _regionService.FindDuplicateRegionAsync(model.RegionViewModel.RegionName, model.RegionViewModel.ReportCode, model.RegionViewModel.regionId);
                 if (duplicateRegion.Any())
                 {
-                    //TempData["WarningMessage"] = "A region with the same name or code already exists.";
-                    //TempData["MatchingStaffIds"] = duplicateRegion.Select(s => s.regionId).ToArray();
                     ModelState.AddModelError("Name", "A region with the same name or code already exists.");
-                    return View(model);
+                    ViewBag.ReturnUrl = returnUrl;
+                    var vm = await BuildRegionWithAreasViewModelForReturn(model.RegionViewModel);
+                    return View(vm);
                 }
 
                 // Add new Region
-                if (model.regionId == 0)
+                if (model.RegionViewModel.regionId == 0)
                 {
-                    int newRegionId = await _regionService.AddRegionAsync(model, GetCurrentUserId());
+                    int newRegionId = await _regionService.AddRegionAsync(model.RegionViewModel, GetCurrentUserId());
                 }
                 else // Update Existing Region
                 {
-                    var existingRegion = await _regionService.GetRegionViewModelByIdAsync(model.regionId);
+                    var existingRegion = await _regionService.GetRegionViewModelByIdAsync(model.RegionViewModel.regionId);
                     if (existingRegion == null)
                     {
                         TempData["ErrorMessage"] = "Region record not found.";
@@ -138,8 +151,8 @@ namespace CleanMe.Web.Controllers
                     }
 
                     Console.WriteLine("DEBUG: Updating existing Region member.");
-                    await _regionService.UpdateRegionAsync(model, GetCurrentUserId());
-                    TempData["SuccessMessage"] = $"Region {model.RegionName} updated successfully!";
+                    await _regionService.UpdateRegionAsync(model.RegionViewModel, GetCurrentUserId());
+                    TempData["SuccessMessage"] = $"Region {model.RegionViewModel.RegionName} updated successfully!";
                 }
 
                 if (!string.IsNullOrWhiteSpace(returnUrl))
@@ -201,6 +214,29 @@ namespace CleanMe.Web.Controllers
         private string GetCurrentUserId()
         {
             return User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
+        }
+
+        // Helper: Build a RegionWithAreasViewModel to return to the view when a RegionViewModel is posted
+        private async Task<RegionWithAreasViewModel> BuildRegionWithAreasViewModelForReturn(RegionViewModel posted)
+        {
+            var vm = posted.regionId > 0
+                ? await _regionService.GetRegionWithAreasViewModelByIdAsync(posted.regionId, posted.PageNumber, posted.PageSize)
+                  ?? new RegionWithAreasViewModel()
+                : new RegionWithAreasViewModel();
+
+            vm.RegionViewModel = new RegionViewModel
+            {
+                regionId = posted.regionId,
+                RegionName = posted.RegionName,
+                ReportCode = posted.ReportCode,
+                SortOrder = posted.SortOrder,
+                IsActive = posted.IsActive,
+                PageNumber = posted.PageNumber,
+                PageSize = posted.PageSize,
+                TotalCount = posted.TotalCount
+            };
+
+            return vm;
         }
     }
 }

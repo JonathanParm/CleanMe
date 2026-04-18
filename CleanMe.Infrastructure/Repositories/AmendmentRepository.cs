@@ -2,16 +2,19 @@
 using CleanMe.Domain.Interfaces;
 using CleanMe.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace CleanMe.Infrastructure.Repositories
 {
     public class AmendmentRepository : IAmendmentRepository
     {
         private readonly ApplicationDbContext _context;
+        private readonly ILogger<AmendmentRepository> _logger;
 
-        public AmendmentRepository(ApplicationDbContext context)
+        public AmendmentRepository(ApplicationDbContext context, ILogger<AmendmentRepository> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         public async Task<IEnumerable<Amendment>> GetAllAmendmentsAsync()
@@ -59,8 +62,8 @@ namespace CleanMe.Infrastructure.Repositories
             }
             catch (DbUpdateException ex)
             {
-                // Log or debug ex.InnerException
-                throw new Exception("Add amendment failed", ex);
+                _logger.LogError(ex, "AddAmendmentAsync failed for Amendment {@Amendment}", amendment);
+                throw;
             }
         }
 
@@ -73,8 +76,8 @@ namespace CleanMe.Infrastructure.Repositories
             }
             catch (DbUpdateException ex)
             {
-                // Log or debug ex.InnerException
-                throw new Exception("Update amendment failed", ex);
+                _logger.LogError(ex, "UpdateAmendmentAsync failed for Amendment {@Amendment}", amendment);
+                throw;
             }
         }
     }
