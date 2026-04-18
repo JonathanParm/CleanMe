@@ -81,9 +81,6 @@ namespace CleanMe.Web.Controllers
         {
             try
             {
-                if (_areaService == null) throw new Exception("_areaService is null");
-                if (_lookupService == null) throw new Exception("_lookupService is null");
-
                 AreaWithAssetLocationsViewModel model;
 
                 if (areaId.HasValue && areaId.Value > 0)

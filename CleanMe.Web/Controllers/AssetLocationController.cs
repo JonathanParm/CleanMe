@@ -121,6 +121,7 @@ namespace CleanMe.Web.Controllers
                 {
                     int newassetLocationId = await _assetLocationService.AddAssetLocationAsync(model, GetCurrentUserId());
                     TempData["SuccessMessage"] = $"Asset Location {model.Description} added successfully!";
+                    TempData.Remove("ErrorMessage");
                 }
                 else // Update Existing AssetLocation
                 {
@@ -128,6 +129,7 @@ namespace CleanMe.Web.Controllers
                     if (existingAssetLocation == null)
                     {
                         TempData["ErrorMessage"] = "Asset Location record not found.";
+                        TempData.Remove("SuccessMessage");
                         if (!string.IsNullOrEmpty(returnUrl))
                             return Redirect(returnUrl);
 
@@ -137,6 +139,7 @@ namespace CleanMe.Web.Controllers
                     Console.WriteLine("DEBUG: Updating existing Asset Location member.");
                     await _assetLocationService.UpdateAssetLocationAsync(model, GetCurrentUserId());
                     TempData["SuccessMessage"] = $"Asset Location {model.Description} updated successfully!";
+                    TempData.Remove("ErrorMessage");
                 }
 
                 Console.WriteLine("DEBUG: Asset Location saved successfully");
@@ -149,6 +152,7 @@ namespace CleanMe.Web.Controllers
             {
                 _logger.LogError(ex, "Error occurred while adding or editing this Asset Location.");
                 TempData["ErrorMessage"] = "An error occurred while processing your request.";
+                TempData.Remove("SuccessMessage");
                 return RedirectToAction("HandleError", "Error");
             }
         }
