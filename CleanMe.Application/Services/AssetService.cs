@@ -130,17 +130,17 @@ namespace CleanMe.Application.Services
             };
         }
 
-        public async Task<IEnumerable<AssetViewModel>> FindDuplicateAssetAsync(string name, int? assetId = null)
+        public async Task<IEnumerable<AssetViewModel>> FindDuplicateAssetAsync(string assetName, int? assetId = null)
         {
             // Exclude any soft deletes
-            var query = "SELECT * FROM Assets WHERE IsDeleted = 0 AND Name = @name";
+            var query = "SELECT * FROM Assets WHERE IsDeleted = 0 AND AssetName = @assetName";
 
             if (assetId.HasValue && assetId > 0)
             {
                 query += " AND assetId != @assetId"; // Exclude a specific Asset (useful when updating)
             }
 
-            var parameters = new { Name = name, assetId = assetId };
+            var parameters = new { AssetName = assetName, assetId = assetId };
 
             return await _unitOfWork.DapperRepository.QueryAsync<AssetViewModel>(query, parameters);
         }

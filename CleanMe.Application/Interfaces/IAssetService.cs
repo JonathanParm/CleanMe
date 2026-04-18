@@ -10,7 +10,7 @@ namespace CleanMe.Application.Interfaces
             string? assetName, string? regionName, string? areaName, string? mdReference, string? clientName, string? clientReference,
             string? assetLocation, string? assetType,
             string sortColumn, string sortOrder, int pageNumber, int pageSize);
-        Task<IEnumerable<AssetViewModel>> FindDuplicateAssetAsync(string name, int? excludeassetId);
+        Task<IEnumerable<AssetViewModel>> FindDuplicateAssetAsync(string assetName, int? excludeassetId);
         Task<AssetViewModel?> GetAssetViewModelByIdAsync(int assetId);
         Task<AssetHierarchyDto?> GetHierarchyIdsByAssetIdAsync(int assetId);
         Task<int> AddAssetAsync(AssetViewModel model, string addedById);
