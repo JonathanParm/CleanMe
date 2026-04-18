@@ -5,7 +5,7 @@ namespace CleanMe.Application.ViewModels
 {
     public class AreaWithAssetLocationsViewModel
     {
-        public Area Area { get; set; } = null!;
+        public AreaViewModel AreaViewModel { get; set; } = null!;
         public IEnumerable<SelectListItem> Regions { get; set; } = new List<SelectListItem>();
         public IReadOnlyList<AssetLocationIndexViewModel> AssetLocations { get; set; } = Array.Empty<AssetLocationIndexViewModel>();
 

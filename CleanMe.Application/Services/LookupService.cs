@@ -136,7 +136,7 @@ namespace CleanMe.Application.Services
         {
             try
             {
-                return await GetSelectListAsync("ItemCodeLookup","item code", filter);
+                return await GetSelectListAsync("ItemCodeLookup", "item code", filter);
             }
             catch (Exception ex)
             {
@@ -236,41 +236,60 @@ namespace CleanMe.Application.Services
         //    }
         //}
 
-        private async Task<IEnumerable<SelectListItem>> GetSelectListAsync(string sqlProcedure, string caption, object? filter)
+        private async Task<IEnumerable<SelectListItem>> GetSelectListAsync(
+            string sqlProcedure,
+            string caption,
+            object? filter)
         {
             try
             {
                 string query = $"Exec {sqlProcedure} ";
-                string parametersList = string.Join(", ", filter.GetType().GetProperties().Select(p => $"@{p.Name}"));
+                string parametersList = string.Empty;
 
                 var parameters = new DynamicParameters();
 
-                foreach (PropertyInfo prop in filter.GetType().GetProperties())
+                if (filter != null)
                 {
-                    var name = prop.Name;
-                    var value = prop.GetValue(filter) ?? 0;
-                    parameters.Add("@" + name, value);
+                    parametersList = string.Join(", ", filter.GetType().GetProperties()
+                        .Select(p => $"@{p.Name}"));
+
+                    foreach (PropertyInfo prop in filter.GetType().GetProperties())
+                    {
+                        var value = prop.GetValue(filter) ?? 0;
+                        parameters.Add("@" + prop.Name, value);
+                    }
                 }
 
-                var items = await _unitOfWork.DapperRepository.QueryAsync<IdNameLookupViewModel>(query + parametersList, parameters);
+                var items = await _unitOfWork.DapperRepository
+                    .QueryAsync<IdNameLookupViewModel>(query + parametersList, parameters)
+                    ?? Enumerable.Empty<IdNameLookupViewModel>();
 
-                return new[]
-                {
-                    new SelectListItem { Value = "0", Text = $"-- Select {caption} --" }
-                }.Concat(items
-                    .OrderByDescending(al => al.Name)
-                    .ThenBy(al => al.Name)
-                    .Select(l => new SelectListItem
-                    {
-                        Value = l.Id.ToString(),
-                        Text = l.IsActive ? l.Name : $"{l.Name} (Inactive)"
-                    }));
+                return BuildSelectList(items, caption);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error Get SelectList.");
-                throw new ApplicationException("Error Get SelectList", ex);
+
+                // RETURN SAFE DEFAULT INSTEAD OF THROWING
+                return BuildSelectList(Enumerable.Empty<IdNameLookupViewModel>(), caption);
             }
+        }
+
+        private IEnumerable<SelectListItem> BuildSelectList(
+    IEnumerable<IdNameLookupViewModel> items,
+    string caption)
+        {
+            return new[]
+            {
+        new SelectListItem { Value = "0", Text = $"-- Select {caption} --" }
+    }
+            .Concat(items
+                .OrderBy(x => x.Name)
+                .Select(l => new SelectListItem
+                {
+                    Value = l.Id.ToString(),
+                    Text = l.IsActive ? l.Name : $"{l.Name} (Inactive)"
+                }));
         }
 
         private async Task<IEnumerable<SelectListItem>> GetSelectListAsync(string sqlProcedure, string caption)

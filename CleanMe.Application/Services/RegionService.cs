@@ -162,7 +162,8 @@ namespace CleanMe.Application.Services
                     PageNumber = pageNumber,
                     PageSize = pageSize,
                     TotalCount = totalCount
-                }
+                },
+                Areas = areas
             };
         }
 

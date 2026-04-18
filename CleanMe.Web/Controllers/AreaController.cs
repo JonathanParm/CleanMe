@@ -1,9 +1,12 @@
-﻿using CleanMe.Application.Interfaces;
+﻿using CleanMe.Application.Filters;
+using CleanMe.Application.Interfaces;
+using CleanMe.Application.Services;
 using CleanMe.Application.ViewModels;
 using CleanMe.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace CleanMe.Web.Controllers
 {
@@ -12,6 +15,7 @@ namespace CleanMe.Web.Controllers
     {
         private readonly IAreaService _areaService;
         private readonly IUserService _userService;
+        private readonly ILookupService _lookupService;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<AreaController> _logger;
         private readonly IErrorLoggingService _errorLoggingService;
@@ -19,12 +23,14 @@ namespace CleanMe.Web.Controllers
         public AreaController(
             IAreaService areaService,
             IUserService userService,
+            ILookupService lookupService,
             UserManager<ApplicationUser> userManager,
             ILogger<AreaController> logger,
             IErrorLoggingService errorLoggingService)
         {
             _areaService = areaService;
             _userService = userService;
+            _lookupService = lookupService;
             _userManager = userManager;
             _logger = logger;
             _errorLoggingService = errorLoggingService;
@@ -71,15 +77,48 @@ namespace CleanMe.Web.Controllers
             }
         }
         // AddEdit Action (Handles Both Add & Edit)
-        public async Task<IActionResult> AddEdit(int areaId = 0, int regionId = 0, int pageNumber = 1, int pageSize = 5, string? returnUrl = null)
+        public async Task<IActionResult> AddEdit(int? areaId = 0, int regionId = 0, int pageNumber = 1, int pageSize = 5, string? returnUrl = null)
         {
             try
             {
+                if (_areaService == null) throw new Exception("_areaService is null");
+                if (_lookupService == null) throw new Exception("_lookupService is null");
+
                 AreaWithAssetLocationsViewModel model;
 
-                model = areaId > 0
-                    ? await _areaService.GetAreaWithAssetLocationsViewModelByIdAsync(areaId, pageNumber, pageSize)
-                    : await _areaService.PrepareNewAreaViewModelAsync(regionId, pageNumber, pageSize);
+                if (areaId.HasValue && areaId.Value > 0)
+                {
+                    // EDIT MODE
+                    model = await _areaService.GetAreaWithAssetLocationsViewModelByIdAsync(
+                        areaId.Value, pageNumber, pageSize)
+                        ?? new AreaWithAssetLocationsViewModel
+                        {
+                            AreaViewModel = new AreaViewModel(),
+                            Regions = Enumerable.Empty<SelectListItem>(),
+                            AssetLocations = Array.Empty<AssetLocationIndexViewModel>(),
+                            PageNumber = pageNumber,
+                            PageSize = pageSize,
+                            TotalCount = 0
+                        };
+                }
+                else
+                {
+                    // CREATE MODE
+                    model = new AreaWithAssetLocationsViewModel
+                    {
+                        AreaViewModel = new AreaViewModel
+                        {
+                            areaId = 0,
+                            regionId = regionId
+                        },
+                        Regions = await _lookupService.GetRegionSelectListAsync(new RegionLookupFilter())
+                      ?? Enumerable.Empty<SelectListItem>(),
+                        AssetLocations = Array.Empty<AssetLocationIndexViewModel>(),
+                        PageNumber = pageNumber,
+                        PageSize = pageSize,
+                        TotalCount = 0
+                    };
+                }
 
                 ViewBag.ReturnUrl = string.IsNullOrWhiteSpace(returnUrl) ? "Index" : returnUrl;
                 return View(model);
@@ -95,7 +134,7 @@ namespace CleanMe.Web.Controllers
         // Post: Create or Update Area
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddEdit(AreaViewModel model, string? returnUrl = null)
+        public async Task<IActionResult> AddEdit(AreaWithAssetLocationsViewModel model, string? returnUrl = null)
         {
             try
             {
@@ -109,7 +148,7 @@ namespace CleanMe.Web.Controllers
                 }
 
                 // Check for duplicate Area (excluding current record)
-                var duplicateArea = await _areaService.FindDuplicateAreaAsync(model.AreaName, model.ReportCode, model.areaId);
+                var duplicateArea = await _areaService.FindDuplicateAreaAsync(model.AreaViewModel.AreaName, model.AreaViewModel.ReportCode, model.AreaViewModel.areaId);
                 if (duplicateArea.Any())
                 {
                     //TempData["WarningMessage"] = "A Area with the same name or code already exists.";
@@ -120,14 +159,14 @@ namespace CleanMe.Web.Controllers
                 }
 
                 // Add new Area
-                if (model.areaId == 0)
+                if (model.AreaViewModel.areaId == 0)
                 {
-                    int newareaId = await _areaService.AddAreaAsync(model, GetCurrentUserId());
-                    TempData["SuccessMessage"] = $"Area {model.AreaName} added successfully!";
+                    int newareaId = await _areaService.AddAreaAsync(model.AreaViewModel, GetCurrentUserId());
+                    TempData["SuccessMessage"] = $"Area {model.AreaViewModel.AreaName} added successfully!";
                 }
                 else // Update Existing Area
                 {
-                    var existingArea = await _areaService.GetAreaViewModelByIdAsync(model.areaId);
+                    var existingArea = await _areaService.GetAreaViewModelByIdAsync(model.AreaViewModel.areaId);
                     if (existingArea == null)
                     {
                         TempData["ErrorMessage"] = "Area record not found.";
@@ -138,8 +177,8 @@ namespace CleanMe.Web.Controllers
                     }
 
                     Console.WriteLine("DEBUG: Updating existing Area member.");
-                    await _areaService.UpdateAreaAsync(model, GetCurrentUserId());
-                    TempData["SuccessMessage"] = $"Area {model.AreaName} updated successfully!";
+                    await _areaService.UpdateAreaAsync(model.AreaViewModel, GetCurrentUserId());
+                    TempData["SuccessMessage"] = $"Area {model.AreaViewModel.AreaName} updated successfully!";
                 }
 
                 Console.WriteLine("DEBUG: Area saved successfully");

@@ -119,14 +119,16 @@ namespace CleanMe.Application.Services
         public async Task<IEnumerable<AreaViewModel>> FindDuplicateAreaAsync(string name, int reportCode, int? areaId = null)
         {
             // Exclude any soft deletes
-            var query = "SELECT * FROM Areas WHERE IsDeleted = 0 AND (AreaName = @name OR ReportCode = @reportCode)";
+            var query = "SELECT * FROM Areas WHERE IsDeleted = 0 AND AreaName = @name";
+            //var query = "SELECT * FROM Areas WHERE IsDeleted = 0 AND (AreaName = @name OR ReportCode = @reportCode)";
 
             if (areaId.HasValue)
             {
                 query += " AND areaId != @areaId"; // Exclude a specific Area (useful when updating)
             }
 
-            var parameters = new { Name = name, ReportCode = reportCode, areaId = areaId };
+            var parameters = new { Name = name, areaId = areaId };
+            //var parameters = new { Name = name, ReportCode = reportCode, areaId = areaId };
 
             return await _unitOfWork.DapperRepository.QueryAsync<AreaViewModel>(query, parameters);
         }
@@ -202,7 +204,15 @@ namespace CleanMe.Application.Services
 
             return new AreaWithAssetLocationsViewModel
             {
-                Area = area,
+                AreaViewModel = new AreaViewModel
+                {
+                    areaId = areaId,
+                    AreaName= area.AreaName,
+                    regionId = area.regionId,
+                    RegionName= area.Region?.RegionName,
+                    ReportCode= area.ReportCode,
+                    IsActive= area.IsActive
+                },
                 AssetLocations = area.AssetLocations
                     .OrderBy(al => al.SortOrder)
                     .Select(al => new AssetLocationIndexViewModel
@@ -231,7 +241,7 @@ namespace CleanMe.Application.Services
 
             return new AreaWithAssetLocationsViewModel
             {
-                Area = new Area
+                AreaViewModel = new AreaViewModel
                 {
                     regionId = region.regionId,
                     IsActive = true
