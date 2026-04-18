@@ -51,17 +51,17 @@ namespace CleanMe.Application.Services
             }
         }
 
-        public async Task<IEnumerable<AmendmentTypeViewModel>> FindDuplicateAmendmentTypeAsync(string name, int? amendmentTypeId = null)
+        public async Task<IEnumerable<AmendmentTypeViewModel>> FindDuplicateAmendmentTypeAsync(string amendmentTypeName, int? amendmentTypeId = null)
         {
             // Exclude any soft deletes
-            var query = "SELECT * FROM AmendmentTypes WHERE IsDeleted = 0 AND Name = @name";
+            var query = "SELECT * FROM AmendmentTypes WHERE IsDeleted = 0 AND AmendmentTypeName = @amendmentTypeName";
 
             if (amendmentTypeId.HasValue)
             {
                 query += " AND amendmentTypeId != @amendmentTypeId"; // Exclude a specific AmendmentType (useful when updating)
             }
 
-            var parameters = new { Name = name, amendmentTypeId = amendmentTypeId };
+            var parameters = new { AmendmentTypeName = amendmentTypeName, amendmentTypeId = amendmentTypeId };
 
             return await _unitOfWork.DapperRepository.QueryAsync<AmendmentTypeViewModel>(query, parameters);
         }
