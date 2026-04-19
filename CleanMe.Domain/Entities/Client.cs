@@ -9,26 +9,18 @@ namespace CleanMe.Domain.Entities
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        [Display(Name = "ID")]
         public int clientId { get; set; }
 
-        [Required]
-        [Display(Name = "Client")]
-        [Column(TypeName = "varchar")]
-        [StringLength(100, MinimumLength = 3, ErrorMessage = "Client name must have between 3 and 100 letters")]
+        [Column(TypeName = "varchar(100)")]
         public string ClientName { get; set; }
 
         [Display(Name = "Brand")]
-        [Column(TypeName = "varchar")]
-        [StringLength(10, MinimumLength = 2, ErrorMessage = "Client brand must have between 2 and 10 letters")]
+        [Column(TypeName = "varchar(10)")]
         public string? Brand { get; set; }
 
-        [Display(Name = "DR Accs")]
         public int AccNo { get; set; }
 
-        [Display(Name = "Reference")]
-        [Column(TypeName = "varchar")]
-        [StringLength(50, ErrorMessage = "Client reference cannot have more than 50 letters")]
+        [Column(TypeName = "varchar(50)")]
         public string? Reference { get; set; }
 
         //// Navigation property representing the collection of children
