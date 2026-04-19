@@ -7,10 +7,11 @@ namespace CleanMe.Application.Interfaces
     {
         // Retrieves a paginated & filtered staff list using Dapper
         Task<IEnumerable<StaffIndexViewModel>> GetStaffIndexAsync(
-            string? staffNo, string? fullName, string? workRole, string? contactDetail, string? isActive,
+            string? staffId, string? fullName, string? workRole, string? contactDetail, string? isActive,
             string sortColumn, string sortOrder, int pageNumber, int pageSize);
 
-        Task<IEnumerable<StaffViewModel>> FindDuplicateStaffAsync(string firstName, string familyName, int? staffNo, int? excludeStaffId);
+        Task<IEnumerable<StaffViewModel>> FindDuplicateStaffAsync(string firstName, string familyName, int? staffId);
+        //Task<IEnumerable<StaffViewModel>> FindDuplicateStaffAsync(string firstName, string familyName, int? staffId, int? excludeStaffId);
         Task<bool> IsEmailAvailableAsync(string email, int? staffId);
 
         Task<StaffViewModel?> GetStaffViewModelByIdAsync(int staffId);

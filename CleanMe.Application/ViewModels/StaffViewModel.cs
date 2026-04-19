@@ -9,10 +9,10 @@ namespace CleanMe.Application.ViewModels
     {
         public int StaffId { get; set; }
 
-        [Required]
-        [Range(1, int.MaxValue, ErrorMessage = "Staff number cannot be zero.")]
-        [Display(Name = "Staff Number")]
-        public int StaffNo { get; set; }
+        //[Required]
+        //[Range(1, int.MaxValue, ErrorMessage = "Staff number cannot be zero.")]
+        //[Display(Name = "Staff Number")]
+        //public int StaffNo { get; set; }
 
         [Display(Name = "First name")]
         [Required]
@@ -84,8 +84,8 @@ namespace CleanMe.Application.ViewModels
 
         [Display(Name = "Bank account number")]
         [Column(TypeName = "varchar")]
-        [StringLength(20, ErrorMessage = "Bank account number must have between 19 and 20 digits")]
-        [MinLength(19, ErrorMessage = "Bank account number must have between 19 and 20 digits")]
+        [RegularExpression(@"^\d{2}-\d{4}-\d{7}-\d{2,3}$", ErrorMessage = "Bank account must be in BB-BBBB-AAAAAAA-SSS format.")]
+
         public string? BankAccountNumber { get; set; } = string.Empty;
 
         [Display(Name = "Bank account particulars")]
@@ -111,6 +111,7 @@ namespace CleanMe.Application.ViewModels
         public string? PayrollId { get; set; } = string.Empty;
 
         [Display(Name = "Job title")]
+        [Required]
         [StringLength(20)]
         public string? JobTitle { get; set; } = string.Empty;
 

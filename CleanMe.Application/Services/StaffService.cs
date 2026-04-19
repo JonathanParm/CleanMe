@@ -73,7 +73,7 @@ namespace CleanMe.Application.Services
                 PageSize = pageSize,
                 SortColumn = sortColumn,
                 SortOrder = sortOrder,
-                staffId = staffId,
+                StaffId = staffId,
                 FullName = fullName,
                 WorkRole = workRole,
                 ContactDetail = contactDetail, 
@@ -106,17 +106,17 @@ namespace CleanMe.Application.Services
             };
         }
 
-        public async Task<IEnumerable<StaffViewModel>> FindDuplicateStaffAsync(string firstName, string familyName, int? staffNo, int? staffId = null)
+        public async Task<IEnumerable<StaffViewModel>> FindDuplicateStaffAsync(string firstName, string familyName, int? staffId)
         {
             // Exclude any soft deletes
-            var query = "SELECT * FROM Staff WHERE IsDeleted = 0 AND ((FirstName = @FirstName AND FamilyName = @FamilyName) OR StaffNo = @staffNo)";
+            var query = "SELECT * FROM Staff WHERE IsDeleted = 0 AND ((FirstName = @FirstName AND FamilyName = @FamilyName))";
 
             if (staffId.HasValue)
             {
                 query += " AND staffId != @staffId"; // Exclude a specific staff member (useful when updating)
             }
 
-            var parameters = new { FirstName = firstName, FamilyName = familyName, StaffNo = staffNo, staffId = staffId };
+            var parameters = new { FirstName = firstName, FamilyName = familyName, staffId = staffId };
 
             var duplicateStaff = await _unitOfWork.DapperRepository.QueryAsync<StaffWithAddressDto>(query, parameters);
 

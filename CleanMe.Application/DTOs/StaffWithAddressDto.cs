@@ -5,6 +5,7 @@ namespace CleanMe.Application.DTOs
     public class StaffWithAddressDto
     {
         public int staffId { get; set; }
+        public int staffNo { get; set; }
         public string? ApplicationUserId { get; set; }
         public string FirstName { get; set; }
         public string FamilyName { get; set; }

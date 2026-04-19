@@ -24,7 +24,7 @@
             @foreach (var staff in ViewBag.DuplicateStaff as IEnumerable<CleanMe.Application.ViewModels.StaffViewModel>)
             {
                 <tr>
-                    <td>@staff.StaffNo</td>
+                    <td>@staff.StaffId</td>
                     <td>@staff.FirstName @staff.FamilyName</td>
                     <td>@staff.ContactDetail</td>
                     <td>
@@ -38,7 +38,7 @@
 
 <form asp-action="AddEdit" method="post">
     <input type="hidden" name="StaffId" value="@Model.StaffId" />
-    <input type="hidden" name="StaffNo" value="@Model.StaffNo" />
-    <button type="submit" class="btn btn-primary">Proceed with New Staff</button>
+@*     <input type="hidden" name="StaffNo" value="@Model.StaffNo" />
+ *@    <button type="submit" class="btn btn-primary">Proceed with New Staff</button>
     <a asp-action="Index" class="btn btn-secondary">Cancel</a>
 </form>

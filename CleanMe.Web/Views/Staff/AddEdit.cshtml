@@ -21,12 +21,12 @@
     <input type="hidden" id="ShowPasswordSection" name="ShowPasswordSection" value="@Model.ShowPasswordSection.ToString().ToLower()" />
 
 
-    <div class="form-group">
+    @*     <div class="form-group">
         <label asp-for="StaffNo" class="form-label"></label>
         <input asp-for="StaffNo" class="form-control" id="staffNo" readonly="@(Model.StaffId > 0 ? "readonly" : null)" />
         <span asp-validation-for="StaffNo" class="text-danger"></span>
     </div>
-
+ *@
     <div class="form-group">
         <label asp-for="FirstName" class="form-label"></label>
         <input asp-for="FirstName" class="form-control" required />
@@ -84,6 +84,24 @@
         <label asp-for="BankAccountNumber" class="form-label"></label>
         <input asp-for="BankAccountNumber" class="form-control" required />
         <span asp-validation-for="BankAccountNumber" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="BankAccountParticulars" class="form-label"></label>
+        <input asp-for="BankAccountParticulars" class="form-control" required />
+        <span asp-validation-for="BankAccountParticulars" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="BankAccountCode" class="form-label"></label>
+        <input asp-for="BankAccountCode" class="form-control" required />
+        <span asp-validation-for="BankAccountCode" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="BankAccountReference" class="form-label"></label>
+        <input asp-for="BankAccountReference" class="form-control" required />
+        <span asp-validation-for="BankAccountReference" class="text-danger"></span>
     </div>
 
     <div class="form-group">
@@ -188,6 +206,22 @@
                     event.preventDefault();
                     alert("At least one contact detail (Home Phone, Mobile Phone, or Email) is required.");
                 }
+            });
+
+            const input = document.getElementById("BankAccountNumber");
+
+            input.addEventListener("input", function () {
+                // Remove all non-digits
+                let digits = this.value.replace(/\D/g, "");
+
+                // Apply NZ formatting
+                let formatted = "";
+                if (digits.length > 0) formatted += digits.substring(0, 2);
+                if (digits.length > 2) formatted += "-" + digits.substring(2, 6);
+                if (digits.length > 6) formatted += "-" + digits.substring(6, 13);
+                if (digits.length > 13) formatted += "-" + digits.substring(13, 16);
+
+                this.value = formatted;
             });
         });
     </script>
